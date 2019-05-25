@@ -1,0 +1,18 @@
+{
+  "version": "1.2.0",
+  "name": "cordova-plugin-mapbox",
+  "cordova_name": "Mapbox",
+  "description": "Mapbox plugin for Cordova 7+ (ANDROID ONLY)",
+  "license": "MIT",
+  "keywords": [],
+  "platforms": [
+    "android",
+    "ios"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=7.0"
+    }
+  ]
+}

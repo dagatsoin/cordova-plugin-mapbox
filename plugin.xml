@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        id="cordova-plugin-mapbox"
+        version="1.2.0">
+
+  <name>Mapbox</name>
+
+  <description>Mapbox plugin for Cordova 7+ (ANDROID ONLY)</description>
+
+  <author>Daniel Neveux</author>
+
+  <license>MIT</license>
+
+  <keywords>mapbox, mapox native, native maps, map</keywords>
+
+  <repo>https://github.com/dagatsoin/cordova-plugin-mapbox</repo>
+
+  <preference name="ACCESS_TOKEN" />
+
+  <engines>
+    <engine name="cordova" version=">=3.5.0"/>
+    <engine name="cordova-plugman" version=">=4.2.0"/><!-- needed for gradleReference support -->
+  </engines>
+
+  <js-module src="www/Mapbox.js" name="Mapbox">
+    <clobbers target="Mapbox" />
+  </js-module>
+
+  <!-- android -->
+  <platform name="android">
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="Mapbox">
+        <param name="android-package" value="com.dagatsoin.plugins.mapbox.CDVMapbox" />
+      </feature>
+    </config-file>
+
+    <config-file target="AndroidManifest.xml" parent="/*">
+        <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+        <uses-permission android:name="android.permission.INTERNET" />
+        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+        <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    </config-file>
+
+    <config-file target="AndroidManifest.xml" parent="/manifest/application">
+        <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService" />
+    </config-file>
+
+    <framework src="src/android/mapbox.gradle" custom="true" type="gradleReference"/>
+    <source-file src="src/android/CDVMapbox.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
+    <source-file src="src/android/Map.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
+    <source-file src="src/android/MapController.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
+    <source-file src="src/android/MapsManager.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
+    <source-file src="src/android/PluginLayout.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
+    <source-file src="src/android/libs/androidsvg-1.2.1.jar" target-dir="libs" framework="true"  />
+
+    <config-file target="res/values/strings.xml" parent="/*">
+      <string name="mapbox_accesstoken">$ACCESS_TOKEN</string>
+    </config-file>
+  </platform>
+
+  <!-- iOS -->
+  <platform name="ios">
+    <config-file parent="/*" target="config.xml">
+      <feature name="Mapbox">
+        <param name="ios-package" value="CDVMapbox" />
+      </feature>
+    </config-file>
+
+    <config-file target="*-Info.plist" parent="MGLMapboxAccessToken">
+      <string>$ACCESS_TOKEN</string>
+    </config-file>
+    <config-file target="*-Info.plist" parent="MGLMapboxMetricsEnabledSettingShownInApp">
+      <true/>
+    </config-file>
+    <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
+      <true/>
+    </config-file>
+
+    <header-file src="src/ios/CDVMapbox.h" />
+    <source-file src="src/ios/CDVMapbox.m" />
+    <header-file src="src/ios/Map.h" />
+    <source-file src="src/ios/Map.m" />
+    <header-file src="src/ios/MapController.h" />
+    <source-file src="src/ios/MapController.m" />
+    <header-file src="src/ios/MapOverlayDebugLayer.h" />
+    <source-file src="src/ios/MapOverlayDebugLayer.m" />
+    <header-file src="src/ios/MapsManager.h" />
+    <source-file src="src/ios/MapsManager.m" />
+    <header-file src="src/ios/PluginLayout.h" />
+    <source-file src="src/ios/PluginLayout.m" />
+    <source-file src="src/ios/PluginScrollLayout.m" />
+    <header-file src="src/ios/PluginScrollLayout.h" />
+
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/Mapbox.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLAccountManager.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLAnnotation.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLAnnotationImage.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLCalloutView.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLGeometry.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLMapCamera.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLMapView.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLMapView+IBAdditions.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLMapView+MGLCustomStyleLayerAdditions.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLMultiPoint.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLOfflinePack.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLOfflineRegion.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLOfflineStorage.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLOverlay.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLPointAnnotation.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLPolygon.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLPolyline.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLShape.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLStyle.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLTilePyramidOfflineRegion.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLTypes.h" />
+    <header-file src="src/ios/libs/Mapbox.framework/Headers/MGLUserLocation.h" />
+
+    <!-- Downloaded iOS SDK version 3.2.0 from https://github.com/mapbox/mapbox-gl-native/releases -->
+    <framework src="src/ios/libs/Mapbox.framework" custom="true" />
+    <resource-file src="src/ios/libs/Mapbox.bundle" />
+    <!-- This bundle adds a mandatory opt-out switch for Mapbox Metrics to the iOS Settings app  -->
+    <resource-file src="src/ios/libs/Settings.bundle" />
+
+    <framework src="GLKit.framework" weak="true" />
+    <framework src="ImageIO.framework" weak="true" />
+    <framework src="MobileCoreServices.framework" weak="true" />
+    <framework src="QuartzCore.framework" weak="true" />
+    <framework src="SystemConfiguration.framework" weak="true" />
+    <framework src="libc++.dylib" weak="true" />
+    <framework src="libsqlite3.dylib" weak="true" />
+    <framework src="libz.dylib" weak="true" />
+  </platform>
+
+</plugin>
