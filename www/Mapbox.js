@@ -1,36 +1,24 @@
-var exec = require("cordova/exec");
-
-
-function getAbsoluteMargins(mapDiv) {
-
-    var pageRect = getPageRect();
-
-    var rect = mapDiv.getBoundingClientRect();
-
-    return {
-        'top': pageRect.top + rect.top,
-        'right': (pageRect.left + pageRect.width) - rect.right,
-        'bottom': (pageRect.top + pageRect.height) - rect.bottom,
-        'left': pageRect.left + rect.left
-    };
-}
-
-
-function getDomElementsOverlay(mapDiv) {
+function getContainerChildrenOverlayElements(mapDiv) {
     var children = getAllChildren(mapDiv);
-
     var elements = [];
-    var element;
 
     for (var i = 0; i < children.length; i++) {
-        element = getDomElementOverlay(children[i]);
-
-        elements.push(element);
+        elements.push(toOverlayElement(children[i]));
     }
     return elements;
 }
 
-function getDomElementOverlay(elem) {
+function getOverlayElements(element) {
+    var children = [element].concat(getAllChildren(element));
+    var elements = [];
+
+    for (var i = 0; i < children.length; i++) {
+        elements.push(toOverlayElement(children[i], false));
+    }
+    return elements;
+}
+
+function toOverlayElement(elem) {
     var elemId = elem.getAttribute("data-pluginDomId");
     if (!elemId) {
         elemId = setRandomId();
@@ -48,21 +36,18 @@ function setRandomId() {
 
 function getAllChildren(root) {
     var list = [];
-    var clickable;
-    var style, displayCSS, opacityCSS, visibilityCSS;
-    var search = function (node) {
+    function crawl(node) {
         while (node !== null) {
             if (node.nodeType === 1) {
+                var style, displayCSS, opacityCSS, visibilityCSS;
                 style = window.getComputedStyle(node);
                 visibilityCSS = style.getPropertyValue('visibility');
                 displayCSS = style.getPropertyValue('display');
                 opacityCSS = style.getPropertyValue('opacity');
                 if (displayCSS !== "none" && opacityCSS > 0 && visibilityCSS != "hidden") {
-                    clickable = node.getAttribute("data-clickable");
-                    if (clickable &&
-                        clickable.toLowerCase() === "false" &&
-                        node.hasChildNodes()) {
-                        Array.prototype.push.apply(list, getAllChildren(node));
+                    if (node.hasChildNodes()) {
+                        list.push(node);
+                        list.push(...getAllChildren(node));
                     } else {
                         list.push(node);
                     }
@@ -70,8 +55,8 @@ function getAllChildren(root) {
             }
             node = node.nextSibling;
         }
-    };
-    search(root.firstChild);
+    }
+    crawl(root.firstChild);
     return list;
 }
 
@@ -124,10 +109,20 @@ module.exports = {
 
     show: function (options, successCallback, errorCallback, id) {
         id = id || 0;
-        if (options.domElement) {
-            options.HTMLs = getDomElementsOverlay(options.domElement);
-            options.rect = getDivRect(options.domElement);
-            delete options.domElement; //Prevent circular reference error
+        options.HTMLs = getContainerChildrenOverlayElements(options.domContainer);
+        options.rect = getDivRect(options.domContainer);
+        delete options.domContainer; //Prevent circular reference error
+
+        if (options.additionalDomElements) {
+            options.HTMLs = options.HTMLs.concat(
+                options.additionalDomElements.reduce(
+                    function (flatten, el) {
+                        return flatten.concat(getOverlayElements(el))
+                    },
+                    []
+                )
+            );
+            delete options.additionalDomElements; //Prevent circular reference error
         }
         cordova.exec(successCallback, errorCallback, "Mapbox", "SHOW", [id, options]);
     },
@@ -154,9 +149,22 @@ module.exports = {
 
     setContainer: function (container, successCallback, errorCallback, id) {
         id = id || 0;
-        container.HTMLs = getDomElementsOverlay(container.domElement);
-        container.rect = getDivRect(container.domElement);
-        delete container.domElement; //Prevent circular reference error
+        container.HTMLs = getContainerChildrenOverlayElements(container.domContainer);
+        container.rect = getDivRect(container.domContainer);
+        delete container.domContainer; //Prevent circular reference error
+        
+        if (container.additionalDomElements) {
+            container.HTMLs = container.HTMLs.concat(
+                container.additionalDomElements.reduce(
+                    function (flatten, el) {
+                        return flatten.concat(getOverlayElements(el))
+                    },
+                    []
+                )
+            );
+            delete container.additionalDomElements; //Prevent circular reference error
+        }
+
         cordova.exec(successCallback, errorCallback, "Mapbox", "SET_CONTAINER", [id, container])
     },
 
