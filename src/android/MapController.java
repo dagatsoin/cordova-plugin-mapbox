@@ -10,8 +10,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -88,7 +86,7 @@ class MapController extends AppCompatActivity {
     private String mSelectedMarkerId;
     private ArrayList<String> mOfflineRegionsNames = new ArrayList<String>();
     private HashMap<String, String> mAnchors = new HashMap<String, String>();
-    private HashMap<String, Marker> mMarkers = new HashMap<String, Marker>();
+    private HashMap<String, BouncingMarker> mMarkers = new HashMap<String, BouncingMarker>();
 
     private final static String JSON_CHARSET = "UTF-8";
     private final static String JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME";
@@ -449,9 +447,9 @@ class MapController extends AppCompatActivity {
     }
 
     void addMarker(String id, JSONObject marker) throws JSONException {
-        Marker nativeMarker = mMarkers.get(id);
+        BouncingMarker bouncingMarker = mMarkers.get(id);
 
-        if (nativeMarker != null) {
+        if (bouncingMarker != null) {
             removeMarker(id);
         }
         MarkerOptions markerOptions = new MarkerOptions();
@@ -464,26 +462,26 @@ class MapController extends AppCompatActivity {
             ));
         } else throw new JSONException("No position found in marker.");
 
-        nativeMarker = mMapboxMap.addMarker(markerOptions);
+        bouncingMarker = new BouncingMarker(mMapboxMap.addMarker(markerOptions));
 
         // Store in the map markers collection
-        mMarkers.put(id, nativeMarker);
+        mMarkers.put(id, bouncingMarker);
 
         // Hydrate the marker
         hydrateMarker(id, marker);
     }
 
     void setMarkerPosition(String id, LatLng latLng) throws JSONException {
-        Marker marker = mMarkers.get(id);
-        if (marker != null) {
-            marker.setPosition(latLng);
+        BouncingMarker bouncingMarker= mMarkers.get(id);
+        if (bouncingMarker != null) {
+            bouncingMarker.getMarker().setPosition(latLng);
         } else throw new JSONException(" MapController.setMarkerPosition: unknown marker id " + id);
     }
 
     void setMarkerIcon(String id, JSONObject imageObject) throws JSONException, IOException, SVGParseException {
-        Marker marker = mMarkers.get(id);
-        if (marker != null) {
-            marker.setIcon(getIcon(imageObject));
+        BouncingMarker bouncingMarker= mMarkers.get(id);
+        if (bouncingMarker != null) {
+            bouncingMarker.getMarker().setIcon(getIcon(imageObject));
         } else throw new JSONException(" MapController.setMarkerIcon: unknown marker id " + id);
     }
 
@@ -494,7 +492,7 @@ class MapController extends AppCompatActivity {
         boolean domAnchor = false;
         Marker marker;
 
-        marker = mMarkers.get(id);
+        marker = mMarkers.get(id).getMarker();
 
         if (geometry != null) {
             marker.setPosition(new LatLng(
@@ -566,7 +564,7 @@ class MapController extends AppCompatActivity {
 
     void removeMarker(String id) {
         if (mMarkers.get(id) == null) return;
-        mMapboxMap.removeMarker(mMarkers.get(id));
+        mMapboxMap.removeMarker(mMarkers.get(id).getMarker());
         if (mMarkers.get(id) != null) mMarkers.remove(id);
         if (mAnchors.get(id) != null) mAnchors.remove(id);
     }
@@ -692,9 +690,9 @@ class MapController extends AppCompatActivity {
 
         try {
 
-            for (Map.Entry<String, Marker> entry : mMarkers.entrySet()) {
+            for (Map.Entry<String, BouncingMarker> entry : mMarkers.entrySet()) {
                 String id = entry.getKey();
-                Marker marker = entry.getValue();
+                Marker marker = entry.getValue().getMarker();
                 PointF screenPosition = convertCoordinates(marker.getPosition());
                 LatLng nextMarkerPos = convertPoint(new PointF(screenPosition.x - delta.x, screenPosition.y - delta.y));
                 PointF nextMarkerScreenPos = convertCoordinates(nextMarkerPos);
@@ -714,9 +712,9 @@ class MapController extends AppCompatActivity {
     JSONArray getJSONMarkersScreenPositions() {
         JSONArray positions = new JSONArray();
         try {
-            for (Map.Entry<String, Marker> entry : mMarkers.entrySet()) {
+            for (Map.Entry<String, BouncingMarker> entry : mMarkers.entrySet()) {
                 String id = entry.getKey();
-                Marker marker = entry.getValue();
+                Marker marker = entry.getValue().getMarker();
                 PointF screenPosition = mMapboxMap.getProjection().toScreenLocation(marker.getPosition());
                 JSONObject position = new JSONObject();
                 position.put("id", id);
@@ -907,12 +905,16 @@ class MapController extends AppCompatActivity {
 
         @Override
         public boolean onMarkerClick(@NonNull Marker marker) {
-            Set<Map.Entry<String, Marker>> elements = mMarkers.entrySet();
-            Iterator<Map.Entry<String, Marker>> iterator = elements.iterator();
-            Map.Entry<String, Marker> entry;
+            Set<Map.Entry<String, BouncingMarker>> elements = mMarkers.entrySet();
+            Iterator<Map.Entry<String, BouncingMarker>> iterator = elements.iterator();
+            Map.Entry<String, BouncingMarker> entry;
             while (iterator.hasNext()) {
                 entry = iterator.next();
-                if (entry.getValue() == marker) mSelectedMarkerId = entry.getKey();
+                BouncingMarker bouncingMarker = entry.getValue();
+                if (bouncingMarker.getMarker() == marker) {
+                    mSelectedMarkerId = entry.getKey();
+                    bouncingMarker.bounce();
+                }
             }
 
             _callback.run();
