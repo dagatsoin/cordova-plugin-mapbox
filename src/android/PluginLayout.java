@@ -56,9 +56,6 @@ public class PluginLayout extends FrameLayout  {
         _webView = webView;
         _root = (ViewGroup) _webView.getParent();
         _context = _webView.getContext();
-        if (VERSION.SDK_INT >= 21 || "org.xwalk.core.XWalkView".equals(_webView.getClass().getName())) {
-            _webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        }
         _frontLayer = new FrontLayerLayout(_context);
 
         _scrollView = new ScrollView(_context);
