@@ -9,10 +9,8 @@
     "android",
     "ios"
   ],
-  "engines": [
-    {
-      "name": "cordova",
-      "version": ">=7.0"
-    }
-  ]
+  "engines": {
+    "name": "cordova",
+    "version": ">=7.0"
+  }
 }

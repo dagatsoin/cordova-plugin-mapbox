@@ -289,8 +289,84 @@ module.exports = {
         cordova.exec(successCallback, errorCallback, "Mapbox", "CONVERT_POINT", [id, point]);
     },
 
-    addOnMapChangeListener: function (listener, callback, id) {
+    /**
+     * This event is triggered when the map is about to start loading a new map style.
+     */
+    addOnWillStartLoadingMapListener: function(callback, id) {
         id = id || 0;
-        cordova.exec(callback, null, "Mapbox", "ADD_ON_MAP_CHANGE_LISTENER", [id, listener]);
+        cordova.exec(callback, null, "Mapbox", "ADD_ON_WILL_START_LOADING_MAP_LISTENER", [id])
     },
+
+    /**
+     * This event is triggered when the map will start rendering the map.
+     */
+    addOnWillStartRenderingMapListener: function(callback, id) {
+        id = id || 0;
+        cordova.exec(callback, null, "Mapbox", "ADD_ON_WILL_START_RENDERING_MAP_LISTENER", [id])
+    },
+
+    /**
+     * This event is triggered whenever the displayed map region is about to change without an animation.
+     */
+    addOnCameraWillChangeListener: function(callback, id) {
+        id = id || 0;
+        cordova.exec(callback, null, "Mapbox", "ADD_ON_CAMERA_WILL_CHANGE_LISTENER", [id])
+    },
+
+    /**
+     * This event is triggered whenever the displayed map region finished changing without an animation.
+     */
+    addOnCameraDidChangeListener: function(callback, id) {
+        id = id || 0;
+        cordova.exec(callback, null, "Mapbox", "ADD_ON_CAMERA_DID_CHANGE_LISTENER", [id])
+    },
+
+    /**
+     * Triggered when a style has finished loading.
+     */
+    addOnDidFinishLoadingStyleListener: function(callback, id) {
+        id = id || 0;
+        cordova.exec(callback, null, "Mapbox", "ADD_ON_DID_FINISH_LOADING_STYLE_LISTENER", [id])
+    },
+
+
+    /**
+     * Triggered when a source changes.
+     */
+    addOnSourceChangedListener: function(callback, id) {
+        id = id || 0;
+        cordova.exec(callback, null, "Mapbox", "ADD_ON_SOURCE_CHANGED_LISTENER", [id])
+    },
+
+    /**
+     * This event is triggered when the map will start rendering a frame.
+     */
+    addOnWillStartRenderingFrameListener: function(callback, id) {
+        id = id || 0;
+        cordova.exec(callback, null, "Mapbox", "ADD_ON_WILL_START_RENDERING_FRAME_LISTENER", [id])
+    },
+
+    /**
+     * This event is triggered when the map finished rendering a frame.
+     */
+    addOnDidFinishRenderingFrameListener: function(callback, id) {
+        id = id || 0;
+        cordova.exec(callback, null, "Mapbox", "ADD_ON_DID_FINISH_RENDERING_FRAME_LISTENER", [id])
+    },
+
+    /**
+     * This is triggered when the map has successfully loaded a new map style.
+     */
+    addOnDidFinishLoadingMapListener: function(callback, id) {
+        id = id || 0;
+        cordova.exec(callback, null, "Mapbox", "ADD_ON_DID_FINISH_LOADING_MAP_LISTENER", [id])
+    },
+
+    /**
+     * This event is triggered when the map is fully rendered.
+     */
+    addOnDidFinishRenderingMapListener: function(callback, id) {
+        id = id || 0;
+        cordova.exec(callback, null, "Mapbox", "ADD_ON_DID_FINISH_RENDERING_MAP_LISTENER", [id])
+    }
 };

@@ -2,10 +2,14 @@ repositories {
     mavenCentral()
 }
 
+android {
+  compileSdkVersion 27
+  buildToolsVersion '27.0.0'
+}
 
 dependencies {
     compile 'com.cocoahero.android:geojson:1.0.1@jar'
-    compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:5.1.0@aar'){
+    implementation ('com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v7:0.6.0'){
         transitive=true
         exclude group: 'com.android.support', module: 'design'
     }

@@ -48,7 +48,7 @@
     </config-file>
 
     <framework src="src/android/mapbox.gradle" custom="true" type="gradleReference"/>
-    <source-file src="src/android/BouncingMarker.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
+    <source-file src="src/android/BouncingSymbol.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
     <source-file src="src/android/CDVMapbox.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
     <source-file src="src/android/Map.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
     <source-file src="src/android/MapController.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>

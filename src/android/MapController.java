@@ -2,96 +2,68 @@ package com.dagatsoin.plugins.mapbox;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.PointF;
-import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
 
-import com.caverock.androidsvg.SVG;
-import com.caverock.androidsvg.SVGParseException;
-import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
-import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.maps.UiSettings;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.mapboxsdk.offline.OfflineRegionError;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
+import com.mapbox.mapboxsdk.plugins.annotation.OnSymbolClickListener;
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by vikti on 25/06/2016.
- * This file handles the concrete action with MapBox API.
- * //todo decouple the file from MapBox to easily switch to other APIs. Need interface.
- * Kudos to:
- * - Mapbox https://www.mapbox.com/android-sdk/examples/offline-manager/ for the offline part
- * - Anothar (@anothar) for the custom icon createIcon method
- */
-class MapController extends AppCompatActivity {
-    public FrameLayout.LayoutParams mapFrame;
+import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT;
 
+class MapController extends AppCompatActivity {
     private static float _retinaFactor;
     private final static String TAG = "MAP_CONTROLLER";
+    private Style style;
 
     private MapView mMapView;
-    private HashMap<String, Icon> mIcons = new HashMap<String, Icon>();
-    private MapboxMapOptions mInitOptions;
+    private SymbolManager mSymbolManager;
+    private String mStyleUrl;
     private MapboxMap mMapboxMap;
-    private UiSettings mUiSettings;
-    private CameraPosition mCameraPosition;
-    private Activity mActivity;
     private OfflineManager mOfflineManager;
     private OfflineRegion mOfflineRegion;
     private boolean mDownloading;
     private int mDownloadingProgress;
     private String mSelectedMarkerId;
-    private ArrayList<String> mOfflineRegionsNames = new ArrayList<String>();
-    private HashMap<String, String> mAnchors = new HashMap<String, String>();
-    private HashMap<String, BouncingMarker> mMarkers = new HashMap<String, BouncingMarker>();
-
+    private ArrayList<String> mOfflineRegionsNames = new ArrayList();
+    private HashMap<String, BouncingSymbol> mSymbols = new HashMap();
+    private Activity activity;
     private final static String JSON_CHARSET = "UTF-8";
     private final static String JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME";
     boolean isReady = false;
     Runnable mapReady;
+    private boolean mPreventMapClick;
 
     MapView getMapView() {
         return mMapView;
@@ -113,19 +85,21 @@ class MapController extends AppCompatActivity {
         return mSelectedMarkerId;
     }
 
-    MapController(final JSONObject options, Activity activity, Context context, @Nullable final ScrollView scrollView) {
+    MapController(final JSONObject options, Activity _activity, Context context, @Nullable final ScrollView scrollView) {
 
+        MapboxMapOptions initOptions;
         try {
-            mInitOptions = _createMapboxMapOptions(options);
+            initOptions = _createMapboxMapOptions(options);
+            mStyleUrl = _getStyle(options.getString("style"));
         } catch (JSONException e) {
             e.printStackTrace();
             return;
         }
         _retinaFactor = Resources.getSystem().getDisplayMetrics().density;
         mOfflineManager = OfflineManager.getInstance(context);
-        mActivity = activity;
+        activity = _activity;
 
-        mMapView = new MapView(mActivity, mInitOptions);
+        mMapView = new MapView(activity, initOptions);
         mMapView.setLayoutParams(
                 new FrameLayout.LayoutParams(
                         FrameLayout.LayoutParams.MATCH_PARENT,
@@ -138,27 +112,32 @@ class MapController extends AppCompatActivity {
 
         // Prevent scroll to intercept the touch when pane the map
         if (scrollView != null) {
-            mMapView.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_MOVE:
-                            scrollView.requestDisallowInterceptTouchEvent(true);
-                            break;
-                        case MotionEvent.ACTION_UP:
-                        case MotionEvent.ACTION_CANCEL:
-                            scrollView.requestDisallowInterceptTouchEvent(false);
-                            break;
-                    }
-                    return mMapView.onTouchEvent(event);
+            mMapView.setOnTouchListener((v, event) -> {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_MOVE:
+                        scrollView.requestDisallowInterceptTouchEvent(true);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        scrollView.requestDisallowInterceptTouchEvent(false);
+                        break;
                 }
+                return mMapView.onTouchEvent(event);
             });
         }
 
-        mMapView.getMapAsync(new OnMapReadyCallback() {
+        mMapView.getMapAsync(mapView -> {
+            mMapboxMap = mapView;
+            mapView.setStyle(new Style.Builder().fromUrl(mStyleUrl), _style -> {
+                style = _style;
 
-            public void onMapReady(MapboxMap map) {
-                mMapboxMap = map;
+                // create symbol manager object
+                mSymbolManager = new SymbolManager(mMapView, mMapboxMap, style);
+
+                // set non-data-driven properties, such as:
+                mSymbolManager.setIconAllowOverlap(true);
+                mSymbolManager.setIconTranslate(new Float[]{-4f, 5f});
+                mSymbolManager.setIconRotationAlignment(ICON_ROTATION_ALIGNMENT_VIEWPORT);
                 mapReady.run();
                 isReady = true;
 
@@ -182,15 +161,16 @@ class MapController extends AppCompatActivity {
                             if (!type.equals("Point"))
                                 throw new JSONException("Only type Point are supported for markers");
 
-                            addMarker(sourceId, source.getJSONObject("data"));
+                            addSymbol(sourceId, source.getJSONObject("data"));
                         }
                     }
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            });
 
-            }
+
         });
     }
 
@@ -227,29 +207,22 @@ class MapController extends AppCompatActivity {
     }
 
     void scrollMap(float x, float y) {
-        //CameraPosition cameraPosition = mMapboxMap.getCameraPosition();
-        mMapboxMap.moveCamera(CameraUpdateFactory.scrollBy(x, y));
-    }
-
-    public void panMap(PointF delta) {
-        PointF centerPos = convertCoordinates(getCenter());
-        LatLng newCenterLatLng = convertPoint(new PointF(centerPos.x - delta.x, centerPos.y - centerPos.y));
-        setCenter(newCenterLatLng.getLongitude(), newCenterLatLng.getLatitude());
+        mMapboxMap.scrollBy(x, y);
     }
 
     double getTilt() {
         return mMapboxMap.getCameraPosition().tilt;
     }
 
-    void setTilt(double titl) {
+    void setTilt(double tilt) {
         mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
                 new CameraPosition.Builder()
-                        .tilt(titl)
+                        .tilt(tilt)
                         .build()
         ));
     }
 
-    void flyTo(JSONObject position) throws JSONException {
+    void flyTo(JSONObject position) {
         CameraPosition cameraPosition = mMapboxMap.getCameraPosition();
 
         try {
@@ -273,12 +246,11 @@ class MapController extends AppCompatActivity {
     void downloadRegion(final String regionName, final Runnable onStart, final Runnable onProgress, final Runnable onFinish) {
 
         // Set the style, bounds zone and the min/max zoom whidh will be available once offline.
-        String styleURL = mInitOptions.getStyle();
         LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
         double minZoom = mMapboxMap.getCameraPosition().zoom;
         double maxZoom = mMapboxMap.getMaxZoomLevel();
         OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
-                styleURL, bounds, minZoom, maxZoom, _retinaFactor);
+                mStyleUrl, bounds, minZoom, maxZoom, _retinaFactor);
 
         // Build a JSONObject using the user-defined offline region title,
         // convert it into string, and use it to create a metadata variable.
@@ -294,20 +266,22 @@ class MapController extends AppCompatActivity {
             metadata = null;
         }
 
-        // Create the offline region and launch the download
-        mOfflineManager.createOfflineRegion(definition, metadata, new OfflineManager.CreateOfflineRegionCallback() {
-            @Override
-            public void onCreate(OfflineRegion offlineRegion) {
-                Log.d(TAG, "Offline region created: " + regionName);
-                mOfflineRegion = offlineRegion;
-                launchDownload(onStart, onProgress, onFinish);
-            }
+        if (metadata != null) {
+            // Create the offline region and launch the download
+            mOfflineManager.createOfflineRegion(definition, metadata, new OfflineManager.CreateOfflineRegionCallback() {
+                @Override
+                public void onCreate(OfflineRegion offlineRegion) {
+                    Log.d(TAG, "Offline region created: " + regionName);
+                    mOfflineRegion = offlineRegion;
+                    launchDownload(onStart, onProgress, onFinish);
+                }
 
-            @Override
-            public void onError(String error) {
-                Log.e(TAG, "Error: " + error);
-            }
-        });
+                @Override
+                public void onError(String error) {
+                    Log.e(TAG, "Error: " + error);
+                }
+            });
+        }
     }
 
     private void launchDownload(final Runnable onStart, final Runnable onProgress, final Runnable onFinish) {
@@ -394,7 +368,7 @@ class MapController extends AppCompatActivity {
             @Override
             public void onList(final OfflineRegion[] offlineRegions) {
 
-                if (offlineRegions.length > regionSelected) return;
+                if (offlineRegions.length > regionSelected - 1) return;
 
                 offlineRegions[regionSelected].delete(new OfflineRegion.OfflineRegionDeleteCallback() {
                     @Override
@@ -416,7 +390,7 @@ class MapController extends AppCompatActivity {
     }
 
     private String getRegionName(OfflineRegion offlineRegion) {
-        // Get the retion name from the offline region metadata
+        // Get the region name from the offline region metadata
         String regionName;
 
         try {
@@ -431,148 +405,59 @@ class MapController extends AppCompatActivity {
         return regionName;
     }
 
-    /**
-     * Store empty markers from.
-     * The markers are then hydrated in updateMarkers method.
-     *
-     * @param markers a JSONArray of markers. The markers repscect the GEOJSON specs.
-     * @return the array of new markers ids. Insertion order is preserved.
-     * @throws JSONException
-     */
-    public void addMarkers(JSONArray markers) throws JSONException {
-        for (int i = 0; i < markers.length(); i++) {
-            //todo refactor when #5626
-            throw new JSONException("Add multiple marker is not implemented yet");
-        }
-    }
 
-    void addMarker(String id, JSONObject marker) throws JSONException {
-        BouncingMarker bouncingMarker = mMarkers.get(id);
+    void addSymbol(String id, JSONObject symbolParams) throws JSONException {
+        BouncingSymbol bouncingSymbol = mSymbols.get(id);
+        LatLng latLng;
 
-        if (bouncingMarker != null) {
+        if (bouncingSymbol != null) {
             removeMarker(id);
         }
-        MarkerOptions markerOptions = new MarkerOptions();
-        JSONObject geometry = marker.isNull("geometry") ? null : marker.getJSONObject("geometry");
+        JSONObject geometry = symbolParams.isNull("geometry") ? null : symbolParams.getJSONObject("geometry");
 
         if (geometry != null) {
-            markerOptions.position(new LatLng(
+            latLng = new LatLng(
                     geometry.getJSONArray("coordinates").getDouble(1),
                     geometry.getJSONArray("coordinates").getDouble(0)
-            ));
+            );
         } else throw new JSONException("No position found in marker.");
 
-        bouncingMarker = new BouncingMarker(mMapboxMap.addMarker(markerOptions));
+        bouncingSymbol = new BouncingSymbol(id, latLng, symbolParams.getJSONObject("properties"), activity, style, mSymbolManager);
 
         // Store in the map markers collection
-        mMarkers.put(id, bouncingMarker);
-
-        // Hydrate the marker
-        hydrateMarker(id, marker);
+        mSymbols.put(id, bouncingSymbol);
     }
 
-    void setMarkerPosition(String id, LatLng latLng) throws JSONException {
-        BouncingMarker bouncingMarker= mMarkers.get(id);
-        if (bouncingMarker != null) {
-            bouncingMarker.getMarker().setPosition(latLng);
-        } else throw new JSONException(" MapController.setMarkerPosition: unknown marker id " + id);
+    void setSymbolPosition(String id, LatLng latLng) throws JSONException {
+        BouncingSymbol bouncingSymbol = mSymbols.get(id);
+        if (bouncingSymbol != null) {
+            bouncingSymbol.setLatLng(latLng);
+        } else throw new JSONException(" MapController.setSymbolPosition: unknown marker id " + id);
     }
 
-    void setMarkerIcon(String id, JSONObject imageObject) throws JSONException, IOException, SVGParseException {
-        BouncingMarker bouncingMarker= mMarkers.get(id);
-        if (bouncingMarker != null) {
-            bouncingMarker.getMarker().setIcon(getIcon(imageObject));
+    void setMarkerIcon(String id, JSONObject imageObject) throws JSONException {
+        BouncingSymbol bouncingSymbol = mSymbols.get(id);
+        if (bouncingSymbol != null) {
+            bouncingSymbol.setIcon(imageObject);
         } else throw new JSONException(" MapController.setMarkerIcon: unknown marker id " + id);
     }
 
-
-    private void hydrateMarker(String id, JSONObject jsonMarker) throws JSONException {
-        JSONObject geometry = jsonMarker.isNull("geometry") ? null : jsonMarker.getJSONObject("geometry");
-        JSONObject properties = jsonMarker.isNull("properties") ? null : jsonMarker.getJSONObject("properties");
-        boolean domAnchor = false;
-        Marker marker;
-
-        marker = mMarkers.get(id).getMarker();
-
-        if (geometry != null) {
-            marker.setPosition(new LatLng(
-                    geometry.getJSONArray("coordinates").getDouble(1),
-                    geometry.getJSONArray("coordinates").getDouble(0)
-            ));
-        } else throw new JSONException("No position found in marker.");
-
-
-        if (properties.has("title")) {
-            marker.setTitle(properties.getString("title"));
-        }
-
-        if (properties.has("snippet")) {
-            marker.setSnippet(properties.getString("snippet"));
-        }
-
-        domAnchor = properties.has("domAnchor");
-        if (domAnchor) {
-            // Store the marker as a dom element anchor
-            mAnchors.put(id, properties.getString("domAnchor"));
-            // Make an invisible marker
-            IconFactory iconFactory = IconFactory.getInstance(mActivity);
-            Bitmap bmp = Bitmap.createBitmap(new int[Color.TRANSPARENT], 1, 1, Bitmap.Config.ARGB_8888);
-            marker.setIcon(iconFactory.fromBitmap(bmp));
-            marker.setTitle(null);
-            marker.setSnippet(null);
-        } else {
-            //if it was a dom anchor, delete it
-            if (mAnchors.get(id) != null) mAnchors.remove(id);
-            if (properties.has("image")) {
-                try {
-                    marker.setIcon(getIcon(properties.getJSONObject("image")));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else {
-                IconFactory iconFactory = IconFactory.getInstance(mActivity);
-                marker.setIcon(iconFactory.defaultMarker());
-            }
-        }
-    }
-
-    /**
-     * Retrun an icon if exists or create a new one.
-     *
-     * @param imageObject {"image": {height: 40,width: 20,url: 'leaf-orange.png'}}
-     * @return Icon
-     * @throws JSONException
-     * @throws IOException
-     * @throws SVGParseException
-     */
-    private Icon getIcon(JSONObject imageObject) throws JSONException, IOException, SVGParseException {
-        String filePath = "";
-        if (imageObject.has("url")) filePath = imageObject.getString("url");
-        if (imageObject.has("image")) filePath = imageObject.getString("url");
-        if (filePath.equals(""))
-            throw new JSONException("MapController.setMarkerIconImage: No url or image path found in " + imageObject);
-
-        Icon icon = mIcons.get(filePath) != null ? mIcons.get(filePath) : createIcon(imageObject);
-        mIcons.put(filePath, icon); // TODO remove icons when non used anymore. Does C++ part remove image that are no longer needed ?
-
-        return icon;
-    }
 
     void removeMarkers(ArrayList<String> ids) {
         for (int i = 0; i < ids.size(); i++) removeMarker(ids.get(i));
     }
 
     void removeMarker(String id) {
-        if (mMarkers.get(id) == null) return;
-        mMapboxMap.removeMarker(mMarkers.get(id).getMarker());
-        if (mMarkers.get(id) != null) mMarkers.remove(id);
-        if (mAnchors.get(id) != null) mAnchors.remove(id);
+        BouncingSymbol bouncingSymbol = mSymbols.get(id);
+        if (bouncingSymbol == null) return;
+        mSymbolManager.delete(bouncingSymbol.get());
+        mSymbols.remove(id);
     }
 
     void addMarkerCallBack(Runnable callback) {
-        if (mMapboxMap == null) return;
-        mMapboxMap.setOnMarkerClickListener(new MarkerClickListener(callback));
-        mMapboxMap.setOnMapClickListener(new MapClickListener(callback));
+        if (!isReady) return;
+        mSymbolManager.addClickListener(new SymbolClickListener(callback));
+        mMapboxMap.addOnMapClickListener(new MapClickListener(callback));
     }
 
     public double getZoom() {
@@ -609,29 +494,10 @@ class MapController extends AppCompatActivity {
         return mMapboxMap.getProjection().fromScreenLocation(point);
     }
 
-    void addOnMapChangedListener(String listenerType, Runnable callback) throws JSONException {
-        MapChangedListener handler;
-
-        try {
-            handler = new MapChangedListener();
-            handler.set(listenerType, callback);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            throw new JSONException(e.getMessage());
-        }
-        mMapView.addOnMapChangedListener(handler);
-    }
-
-    private int _applyRetinaFactor(long d) {
-        return Math.round(d * _retinaFactor);
-    }
-
     private MapboxMapOptions _createMapboxMapOptions(JSONObject options) throws JSONException {
         MapboxMapOptions opts = new MapboxMapOptions();
-        opts.styleUrl(_getStyle(options.getString("style")));
         opts.attributionEnabled(options.isNull("hideAttribution") || !options.getBoolean("hideAttribution"));
         opts.logoEnabled(options.isNull("hideLogo") || options.getBoolean("hideLogo"));
-//        opts.locationEnabled(!options.isNull("showUserLocation") && options.getBoolean("showUserLocation")); // todo
         opts.camera(MapController.getCameraPosition(options.isNull("cameraPosition") ? null : options.getJSONObject("cameraPosition"), null));
         opts.compassEnabled(options.isNull("hideCompass") || !options.getBoolean("hideCompass"));
         opts.rotateGesturesEnabled(options.isNull("disableRotation") || !options.getBoolean("disableRotation"));
@@ -650,9 +516,6 @@ class MapController extends AppCompatActivity {
             return Style.DARK;
         } else if ("satellite".equalsIgnoreCase(requested)) {
             return Style.SATELLITE;
-            // TODO not currently supported on Android
-//    } else if ("hybrid".equalsIgnoreCase(requested)) {
-//      return Style.HYBRID;
         } else if ("streets".equalsIgnoreCase(requested)) {
             return Style.MAPBOX_STREETS;
         } else {
@@ -684,38 +547,13 @@ class MapController extends AppCompatActivity {
         return builder.build();
     }
 
-    JSONArray getJSONMarkersNextScreenPositions(PointF delta) {
-        JSONObject json = new JSONObject();
-        JSONArray nextMarkerPositions = new JSONArray();
-
-        try {
-
-            for (Map.Entry<String, BouncingMarker> entry : mMarkers.entrySet()) {
-                String id = entry.getKey();
-                Marker marker = entry.getValue().getMarker();
-                PointF screenPosition = convertCoordinates(marker.getPosition());
-                LatLng nextMarkerPos = convertPoint(new PointF(screenPosition.x - delta.x, screenPosition.y - delta.y));
-                PointF nextMarkerScreenPos = convertCoordinates(nextMarkerPos);
-                JSONObject position = new JSONObject();
-                position.put("id", id);
-                position.put("x", nextMarkerScreenPos.x);
-                position.put("y", nextMarkerScreenPos.y);
-                nextMarkerPositions.put(position);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return nextMarkerPositions;
-    }
-
-    JSONArray getJSONMarkersScreenPositions() {
+    JSONArray getJSONSymbolScreenPositions() {
         JSONArray positions = new JSONArray();
         try {
-            for (Map.Entry<String, BouncingMarker> entry : mMarkers.entrySet()) {
+            for (Map.Entry<String, BouncingSymbol> entry : mSymbols.entrySet()) {
                 String id = entry.getKey();
-                Marker marker = entry.getValue().getMarker();
-                PointF screenPosition = mMapboxMap.getProjection().toScreenLocation(marker.getPosition());
+                Symbol symbol = entry.getValue().get();
+                PointF screenPosition = mMapboxMap.getProjection().toScreenLocation(symbol.getLatLng());
                 JSONObject position = new JSONObject();
                 position.put("id", id);
                 position.put("x", screenPosition.x);
@@ -760,203 +598,99 @@ class MapController extends AppCompatActivity {
         }
     }
 
-    private BitmapDrawable createSVG(SVG svg, int width, int height) throws SVGParseException {
-        if (width == 0)
-            width = _applyRetinaFactor((int) Math.ceil(svg.getDocumentWidth()));
-        if (height == 0)
-            height = _applyRetinaFactor((int) Math.ceil(svg.getDocumentHeight()));
-        Bitmap newBM = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas bmcanvas = new Canvas(newBM);
-        svg.renderToCanvas(bmcanvas);
-        return new BitmapDrawable(mActivity.getApplicationContext().getResources(), newBM);
+    public void addOnWillStartLoadingMapListener(Runnable callback) {
+        mMapView.addOnWillStartLoadingMapListener(callback::run);
     }
 
-    /**
-     * Creates image for marker
-     *
-     * @param imageObject The properties.image part of a JSON marker
-     * @return an icon with a custom image
-     * @throws JSONException
-     * @throws IOException
-     * @throws SVGParseException
-     */
-    // Thanks Anothar :)
-    private Icon createIcon(JSONObject imageObject) throws JSONException, IOException, SVGParseException {
-        InputStream istream = null;
-        BitmapDrawable bitmapDrawable;
-        Icon icon = null;
-        Context ctx = mActivity.getApplicationContext();
-        AssetManager am = ctx.getResources().getAssets();
-        IconFactory iconFactory = IconFactory.getInstance(mActivity);
-        try {
-            if (imageObject != null) {
-                if (imageObject.has("url")) {
-                    String stringURI = imageObject.getString("url");
-
-                    final Uri uri = Uri.parse(stringURI);
-                    final String uriPath = uri.getPath();
-                    boolean isAsset;
-                    String path;
-                    String fileName;
-
-                    // Only accept file:/// URI
-                    if (uri.getScheme().equals("file")) {
-                        isAsset = uriPath.indexOf("/android_asset/", 0) > -1;
-                        final String filesDir = mActivity.getFilesDir().getPath();
-                        fileName = uri.getLastPathSegment();
-                        // Asset path is different from app file path.
-                        path = uriPath.substring(isAsset ? "/android_asset/".length() : filesDir.length(), uriPath.lastIndexOf('/') + 1);
-                    } else throw new JSONException("createIcon: " + uri + " URI");
-
-                    // We first look in the current asset bundle.
-                    File iconFile = new File(mActivity.getFilesDir(), path + fileName);
-                    if (iconFile.exists()) istream = new FileInputStream(iconFile);
-
-                        // If file does not exists we get the original version in the initial asset bundle with AssetsManager
-                    else {
-                        istream = am.open(path + fileName);
-                    }
-
-                    if (fileName.endsWith(".svg")) {
-                        bitmapDrawable = createSVG(SVG.getFromInputStream(istream), imageObject.has("width") ? _applyRetinaFactor(imageObject.getInt("width")) : 0,
-                                imageObject.has("height") ? _applyRetinaFactor(imageObject.getInt("height")) : 0);
-                    } else {
-                        bitmapDrawable = new BitmapDrawable(ctx.getResources(), istream);
-                    }
-                } else if (imageObject.has("data")) {
-                    byte[] decodedBytes = Base64.decode(imageObject.getString("data"), 0);
-                    bitmapDrawable = new BitmapDrawable(ctx.getResources(), BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length));
-
-                } else if (imageObject.has("svg")) {
-                    bitmapDrawable = createSVG(SVG.getFromString(imageObject.getString("svg")), imageObject.has("width") ? _applyRetinaFactor(imageObject.getInt("width")) : 0,
-                            imageObject.has("height") ? _applyRetinaFactor(imageObject.getInt("height")) : 0);
-                } else {
-                    throw new JSONException("Not found image data");
-                }
-                if (imageObject.has("width") && imageObject.has("height")) {
-                    Bitmap bitmap = new BitmapDrawable(ctx.getResources(),
-                            Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(),
-                                    _applyRetinaFactor(imageObject.getInt("width")),
-                                    _applyRetinaFactor(imageObject.getInt("height")),
-                                    true
-                            )).getBitmap();
-                    icon = iconFactory.fromBitmap(bitmap);
-                } else {
-                    icon = iconFactory.fromBitmap(bitmapDrawable.getBitmap());
-                }
-            }
-        } finally {
-            if (istream != null)
-                istream.close();
-        }
-        return icon;
+    public void addOnWillStartRenderingMapListener(Runnable callback) {
+        mMapView.addOnWillStartRenderingMapListener(callback::run);
     }
 
-    private class MapChangedListener implements MapView.OnMapChangedListener {
-
-        private Runnable _callback;
-        private int _listener;
-
-        public void set(String listenerType, Runnable callback) throws JSONException {
-            _callback = callback;
-
-            if (listenerType.equals("REGION_WILL_CHANGE")) _listener = MapView.REGION_WILL_CHANGE;
-            else if (listenerType.equals("REGION_WILL_CHANGE_ANIMATED"))
-                _listener = MapView.REGION_WILL_CHANGE_ANIMATED;
-            else if (listenerType.equals("REGION_IS_CHANGING"))
-                _listener = MapView.REGION_IS_CHANGING;
-            else if (listenerType.equals("REGION_DID_CHANGE"))
-                _listener = MapView.REGION_DID_CHANGE;
-            else if (listenerType.equals("REGION_DID_CHANGE_ANIMATED"))
-                _listener = MapView.REGION_DID_CHANGE_ANIMATED;
-            else if (listenerType.equals("WILL_START_LOADING_MAP"))
-                _listener = MapView.WILL_START_LOADING_MAP;
-            else if (listenerType.equals("DID_FAIL_LOADING_MAP"))
-                _listener = MapView.DID_FAIL_LOADING_MAP;
-            else if (listenerType.equals("DID_FINISH_LOADING_MAP"))
-                _listener = MapView.DID_FINISH_LOADING_MAP;
-            else if (listenerType.equals("WILL_START_RENDERING_FRAME"))
-                _listener = MapView.WILL_START_RENDERING_FRAME;
-            else if (listenerType.equals("DID_FINISH_RENDERING_FRAME"))
-                _listener = MapView.DID_FINISH_RENDERING_FRAME;
-            else if (listenerType.equals("DID_FINISH_RENDERING_FRAME_FULLY_RENDERED"))
-                _listener = MapView.DID_FINISH_RENDERING_FRAME_FULLY_RENDERED;
-            else if (listenerType.equals("WILL_START_RENDERING_MAP"))
-                _listener = MapView.WILL_START_RENDERING_MAP;
-            else if (listenerType.equals("DID_FINISH_RENDERING_MAP"))
-                _listener = MapView.DID_FINISH_RENDERING_MAP;
-            else if (listenerType.equals("DID_FINISH_RENDERING_MAP_FULLY_RENDERED"))
-                _listener = MapView.DID_FINISH_RENDERING_MAP_FULLY_RENDERED;
-            else throw new JSONException("Unknown map listener type:" + listenerType);
-        }
-
-        @Override
-        public void onMapChanged(int listener) {
-            if (_listener == listener) _callback.run();
-        }
+    public void addOnCameraWillChangeListener(Runnable callback) {
+        mMapView.addOnCameraWillChangeListener((boolean isAnimated) -> callback.run());
     }
 
-    private class MarkerClickListener implements MapboxMap.OnMarkerClickListener {
+    public void addOnCameraDidChangeListener(Runnable callback) {
+        mMapView.addOnCameraDidChangeListener((boolean isAnimated) -> callback.run());
+    }
+
+    public void addOnDidFinishLoadingStyleListener(Runnable callback) {
+        mMapView.addOnDidFinishLoadingStyleListener(callback::run);
+    }
+
+    public void addOnSourceChangedListener(Runnable callback) {
+        mMapView.addOnSourceChangedListener((String id) -> callback.run());
+    }
+
+    public void addOnWillStartRenderingFrameListener(Runnable callback) {
+        mMapView.addOnWillStartRenderingFrameListener(callback::run);
+    }
+
+    public void addOnDidFinishRenderingFrameListener(Runnable callback) {
+        mMapView.addOnDidFinishRenderingFrameListener((boolean fully) -> callback.run());
+    }
+
+    public void addOnDidFinishLoadingMapListener(Runnable callback) {
+        mMapView.addOnDidFinishLoadingMapListener(callback::run);
+    }
+
+    public void addOnDidFinishRenderingMapListener(Runnable callback) {
+        mMapView.addOnDidFinishRenderingMapListener((boolean fully) -> callback.run());
+    }
+
+    private class SymbolClickListener implements OnSymbolClickListener {
         private Runnable _callback;
 
-        public MarkerClickListener(Runnable callback) {
+        SymbolClickListener(Runnable callback) {
             _callback = callback;
         }
 
         @Override
-        public boolean onMarkerClick(@NonNull Marker marker) {
-            Set<Map.Entry<String, BouncingMarker>> elements = mMarkers.entrySet();
-            Iterator<Map.Entry<String, BouncingMarker>> iterator = elements.iterator();
-            Map.Entry<String, BouncingMarker> entry;
+        public void onAnnotationClick(Symbol symbol) {
+            Set<Map.Entry<String, BouncingSymbol>> elements = mSymbols.entrySet();
+            Iterator<Map.Entry<String, BouncingSymbol>> iterator = elements.iterator();
+            Map.Entry<String, BouncingSymbol> entry;
             while (iterator.hasNext()) {
                 entry = iterator.next();
-                BouncingMarker bouncingMarker = entry.getValue();
-                if (bouncingMarker.getMarker() == marker) {
+                BouncingSymbol bouncingSymbol = entry.getValue();
+                if (bouncingSymbol.get() == symbol) {
+                    bouncingSymbol.select();
                     mSelectedMarkerId = entry.getKey();
-                    bouncingMarker.bounce();
+                    break;
                 }
             }
-
+            // This prevent the MapClickListener to trigger.
+            mPreventMapClick = true;
             _callback.run();
-            return true;
         }
     }
 
     private class MapClickListener implements MapboxMap.OnMapClickListener {
         private Runnable _callback;
 
-        public MapClickListener(Runnable callback) {
+        MapClickListener(Runnable callback) {
             _callback = callback;
         }
 
         @Override
-        public void onMapClick(@NonNull LatLng point) {
-            mSelectedMarkerId = "";
+        public boolean onMapClick(@NonNull LatLng point) {
+            if (mPreventMapClick) {
+                mPreventMapClick = false;
+                return true;
+            } else {
+                final BouncingSymbol symbol = mSymbols.get(mSelectedMarkerId);
+                if (symbol != null) {
+                    symbol.deselect();
+                }
 
-            _callback.run();
+                mSelectedMarkerId = "";
+
+                _callback.run();
+                return true;
+            }
         }
     }
 
-    /*
-        private class PanListener implements MoveGestureDetector.OnMoveGestureListener {
-
-            @Override
-            public boolean onMove(MoveGestureDetector detector) {
-                Log.d("motion", "paning");
-                return false;
-            }
-
-            @Override
-            public boolean onMoveBegin(MoveGestureDetector detector) {
-                Log.d("motion", "pan began");
-                return false;
-            }
-
-            @Override
-            public void onMoveEnd(MoveGestureDetector detector) {
-                Log.d("motion", "pan ended");
-            }
-        }*/
     @Override
     public void onStart() {
         super.onStart();
