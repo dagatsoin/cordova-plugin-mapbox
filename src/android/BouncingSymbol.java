@@ -86,9 +86,9 @@ class BouncingSymbol {
     private void animate(boolean isReverse) {
         // MapBox crashes when using symbolManager.update(Symbol). Luckily, another method works but
         // uses a list.
-        ArrayList<Symbol> list = new ArrayList<>();
+       ArrayList<Symbol> list = new ArrayList<>();
         list.add(symbol);
-        if (animator != null) {
+       /*  if (animator != null) {
             animator.cancel();
         }
         animator = isReverse
@@ -107,7 +107,9 @@ class BouncingSymbol {
             symbol.setIconOffset(new PointF(0, Math.round(y)));
             symbol.setIconSize((float) (1 + .25 * factor));
             symbolManager.update(list);
-        });
+        });*/
+        symbol.setIconSize((float) (1 + (isReverse ? 0 : .25)));
+        symbolManager.update(list);
     }
 
     public Symbol get() {

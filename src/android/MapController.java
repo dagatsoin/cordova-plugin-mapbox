@@ -55,7 +55,7 @@ class MapController extends AppCompatActivity {
     private OfflineRegion mOfflineRegion;
     private boolean mDownloading;
     private int mDownloadingProgress;
-    private String mSelectedMarkerId;
+    private String mSelectedMarkerId = "";
     private ArrayList<String> mOfflineRegionsNames = new ArrayList();
     private HashMap<String, BouncingSymbol> mSymbols = new HashMap();
     private Activity activity;
@@ -650,6 +650,13 @@ class MapController extends AppCompatActivity {
             Set<Map.Entry<String, BouncingSymbol>> elements = mSymbols.entrySet();
             Iterator<Map.Entry<String, BouncingSymbol>> iterator = elements.iterator();
             Map.Entry<String, BouncingSymbol> entry;
+            // Deselect previous Symbol
+            if (!mSelectedMarkerId.isEmpty()) {
+                final BouncingSymbol prevSymbol = mSymbols.get(mSelectedMarkerId);
+                if (prevSymbol != null) {
+                    prevSymbol.deselect();
+                }
+            }
             while (iterator.hasNext()) {
                 entry = iterator.next();
                 BouncingSymbol bouncingSymbol = entry.getValue();
