@@ -61,7 +61,7 @@ function getAllChildren(root) {
 }
 
 function flatElements(elements) {
-    elements.reduce(
+    return elements.reduce(
         function (flatten, el) {
             if (!el) return flatten;
             return flatten.concat(getOverlayElements(el));
