@@ -60,6 +60,16 @@ function getAllChildren(root) {
     return list;
 }
 
+function flatElements(elements) {
+    elements.reduce(
+        function (flatten, el) {
+            if (!el) return flatten;
+            return flatten.concat(getOverlayElements(el));
+        },
+        []
+    )
+}
+
 
 function getDivRect(div) {
     if (!div) {
@@ -114,14 +124,7 @@ module.exports = {
         delete options.domContainer; //Prevent circular reference error
 
         if (options.additionalDomElements) {
-            options.HTMLs = options.HTMLs.concat(
-                options.additionalDomElements.reduce(
-                    function (flatten, el) {
-                        return flatten.concat(getOverlayElements(el))
-                    },
-                    []
-                )
-            );
+            options.HTMLs = options.HTMLs.concat(flatElements(options.additionalDomElements))
             delete options.additionalDomElements; //Prevent circular reference error
         }
         cordova.exec(successCallback, errorCallback, "Mapbox", "SHOW", [id, options]);
@@ -154,14 +157,7 @@ module.exports = {
         delete container.domContainer; //Prevent circular reference error
         
         if (container.additionalDomElements) {
-            container.HTMLs = container.HTMLs.concat(
-                container.additionalDomElements.reduce(
-                    function (flatten, el) {
-                        return flatten.concat(getOverlayElements(el))
-                    },
-                    []
-                )
-            );
+            container.HTMLs = container.HTMLs.concat(flatElements(container.additionalDomElements))
             delete container.additionalDomElements; //Prevent circular reference error
         }
 
