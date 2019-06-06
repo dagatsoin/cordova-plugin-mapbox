@@ -64,9 +64,7 @@ class BouncingSymbol {
         SymbolOptions options = new SymbolOptions().withLatLng(_latLng);
 
         try {
-            JSONObject imageParams = properties.getJSONObject("image");
-            iconFilePath = toFilePath(imageParams);
-            style.addImage(id, createImage(imageParams));
+            style.addImage(id, createImage(properties.getJSONObject("image")));
             options = options.withIconImage(id);
         } catch (JSONException | IOException | SVGParseException e) {
             e.printStackTrace();
@@ -133,15 +131,18 @@ class BouncingSymbol {
             } catch (JSONException | IOException | SVGParseException e) {
                 e.printStackTrace();
             }
-            iconFilePath = newFilePath;
             symbol.setIconImage(iconFilePath);
-            symbolManager.update((list));
+            symbolManager.update(list);
+            iconFilePath = newFilePath;
         }
     }
 
     void setLatLng(LatLng _latLng) {
         latLng = _latLng;
         symbol.setLatLng(latLng);
+        ArrayList<Symbol> list = new ArrayList<>();
+        list.add(symbol);
+        symbolManager.update(list);
     }
 
     private String toFilePath(JSONObject imageObject) {
