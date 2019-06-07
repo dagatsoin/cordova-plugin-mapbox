@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.RectF;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -61,10 +62,16 @@ public class Map {
 
         final JSONObject options;
         final JSONArray HTMLs;
+        @Nullable final String selectedFeatureLayerId;
+        @Nullable final String selectedFeatureSourceId;
+        @Nullable final String selectableFeaturePropType;
         try {
             options = args.getJSONObject(1);
             HTMLs = options.isNull("HTMLs") ? new JSONArray() : options.getJSONArray("HTMLs");
             if(options.isNull("rect")) throw new JSONException("Map constructor need a rect in the JSONObject options argument.");
+            selectedFeatureLayerId  = options.has("selectedFeatureLayerId") ? options.getString("selectedFeatureLayerId") : null;
+            selectedFeatureSourceId  = options.has("selectedFeatureSourceId") ? options.getString("selectedFeatureSourceId") : null;
+            selectableFeaturePropType  = options.has("selectableFeaturePropType") ? options.getString("selectableFeaturePropType") : null;
         } catch (JSONException e) {
             callbackContext.error(e.getMessage());
             e.printStackTrace();
@@ -76,11 +83,19 @@ public class Map {
 
         // Create a controller (which instantiate the MGLMapbox view)
         // todo find an optimized way to pass the scroll view ?
-        _mapCtrl = new MapController(options, activity, _context, _plugRef.pluginLayout.getScrollView());
+        _mapCtrl = new MapController(
+                options,
+                activity,
+                selectedFeatureLayerId,
+                selectedFeatureSourceId,
+                selectableFeaturePropType,
+                _context,
+                _plugRef.pluginLayout.getScrollView()
+        );
 
         // The view container. Contains maps and addons views.
         _layersGroup = new FrameLayout(_context);
-        _layersGroup.addView((View)_mapCtrl.getMapView());
+        _layersGroup.addView(_mapCtrl.getMapView());
     }
 
 
@@ -209,7 +224,7 @@ public class Map {
         return params;
     }
 
-    protected void sendNoResult(CallbackContext callbackContext) {
+    private void sendNoResult(CallbackContext callbackContext) {
         PluginResult pluginResult = new PluginResult(PluginResult.Status.NO_RESULT);
         pluginResult.setKeepCallback(true);
         callbackContext.sendPluginResult(pluginResult);

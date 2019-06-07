@@ -155,7 +155,7 @@ module.exports = {
         container.HTMLs = getContainerChildrenOverlayElements(container.domContainer);
         container.rect = getDivRect(container.domContainer);
         delete container.domContainer; //Prevent circular reference error
-        
+
         if (container.additionalDomElements) {
             container.HTMLs = container.HTMLs.concat(flatElements(container.additionalDomElements))
             delete container.additionalDomElements; //Prevent circular reference error
@@ -184,30 +184,49 @@ module.exports = {
         cordova.exec(successCallback, errorCallback, "Mapbox", "PAUSE_DOWNLOAD", [id]);
     },
 
-    addMarkerCallback: function (id, callback, errorCallback) {
+    addMapClickCallback: function (callback, errorCallback, id) {
         id = id || 0;
-        cordova.exec(callback, errorCallback, "Mapbox", "ADD_MARKER_CALLBACK", [id]);
+        cordova.exec(callback, errorCallback, "Mapbox", "ADD_MAP_CLICK_CALLBACK", [id]);
     },
 
-    //only handle marker for now
+    addImage: function (imageId, image, successCallback, errorCallback, id) {
+        id = id || 0;
+        cordova.exec(successCallback, errorCallback, "Mapbox", "ADD_IMAGE", [id, imageId, image]);
+    },
+
+    removeImage: function (imageId, successCallback, errorCallback, id) {
+        id = id || 0;
+        cordova.exec(successCallback, errorCallback, "Mapbox", "REMOVE_IMAGE", [id, imageId]);
+    },
+
+    addLayer: function (layerObject, beforeId, successCallback, errorCallback, id) {
+        id = id || 0;
+        cordova.exec(successCallback, errorCallback, "Mapbox", "ADD_LAYER", [id, layerObject, beforeId]);
+    },
+
+    setLayoutProperty: function (layerId, name, value, options, successCallback, errorCallback, id) {
+        id = id || 0;
+        cordova.exec(successCallback, errorCallback, "Mapbox", "SET_LAYOUT_PROPERTY", [id, layerId, name, value, options]);
+    },
+
+    removeLayer: function (layerId, successCallback, errorCallback, id) {
+        id = id || 0;
+        cordova.exec(successCallback, errorCallback, "Mapbox", "REMOVE_LAYER", [id, layerId]);
+    },
+
     addSource: function (sourceId, source, successCallback, errorCallback, id) {
         id = id || 0;
-        cordova.exec(successCallback, errorCallback, "Mapbox", "ADD_MARKER", [id, sourceId, source]);
+        cordova.exec(successCallback, errorCallback, "Mapbox", "ADD_SOURCE", [id, sourceId, source]);
     },
 
-    setMarkerLngLat: function (sourceId, coordinates, successCallback, errorCallback, id) {
+    setGeoJson: function (sourceId, geoJson, successCallback, errorCallback, id) {
         id = id || 0;
-        cordova.exec(successCallback, errorCallback, "Mapbox", "MARKER__SET_LNG_LAT", [id, sourceId, coordinates])
-    },
-
-    setMarkerIcon: function (sourceId, imageProperties, successCallback, errorCallback, id) {
-        id = id || 0;
-        cordova.exec(successCallback, errorCallback, "Mapbox", "MARKER__SET_ICON", [id, sourceId, imageProperties])
+        cordova.exec(successCallback, errorCallback, "Mapbox", "SET_GEO_JSON", [id, sourceId, geoJson])
     },
 
     removeSource: function (sourceId, successCallback, errorCallback, id) {
         id = id || 0;
-        cordova.exec(successCallback, errorCallback, "Mapbox", "REMOVE_MARKER", [id, sourceId])
+        cordova.exec(successCallback, errorCallback, "Mapbox", "REMOVE_SOURCE", [id, sourceId])
     },
 
     flyTo: function (options, successCallback, errorCallback, id) {
@@ -223,16 +242,6 @@ module.exports = {
     getCenter: function (successCallback, errorCallback, id) {
         id = id || 0;
         cordova.exec(successCallback, errorCallback, "Mapbox", "GET_CENTER", [id]);
-    },
-
-    getNextPositions: function (delta, successCallback, errorCallback, id) {
-        id = id || 0;
-        cordova.exec(successCallback, errorCallback, "Mapbox", "NEXT_MARKERS_POSITIONS_PREDICATE", [id, delta]);
-    },
-
-    getMarkersPositions: function (successCallback, errorCallback, id) {
-        id = id || 0;
-        cordova.exec(successCallback, errorCallback, "Mapbox", "GET_MARKERS_POSITIONS", [id]);
     },
 
     scrollMap: function (delta, successCallback, errorCallback, id) {
@@ -365,4 +374,4 @@ module.exports = {
         id = id || 0;
         cordova.exec(callback, null, "Mapbox", "ADD_ON_DID_FINISH_RENDERING_MAP_LISTENER", [id])
     }
-};
+};    

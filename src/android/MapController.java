@@ -1,18 +1,33 @@
 package com.dagatsoin.plugins.mapbox;
 
+import android.animation.TimeInterpolator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.PointF;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.animation.BounceInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
 
+import com.caverock.androidsvg.SVG;
+import com.caverock.androidsvg.SVGParseException;
+import com.google.gson.JsonObject;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -26,44 +41,48 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.mapboxsdk.offline.OfflineRegionError;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
-import com.mapbox.mapboxsdk.plugins.annotation.OnSymbolClickListener;
-import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
+import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
+import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
-import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT;
-
-class MapController extends AppCompatActivity {
+class MapController extends AppCompatActivity implements MapboxMap.OnMapClickListener {
     private static float _retinaFactor;
     private final static String TAG = "MAP_CONTROLLER";
+    @Nullable private String mSelectableFeaturePropType;
+    @Nullable private String mSelectedFeatureLayerId;
+    @Nullable private String mSelectedFeatureSourceId;
     private Style style;
 
     private MapView mMapView;
-    private SymbolManager mSymbolManager;
     private String mStyleUrl;
     private MapboxMap mMapboxMap;
     private OfflineManager mOfflineManager;
     private OfflineRegion mOfflineRegion;
     private boolean mDownloading;
     private int mDownloadingProgress;
-    private String mSelectedMarkerId = "";
-    private ArrayList<String> mOfflineRegionsNames = new ArrayList();
-    private HashMap<String, BouncingSymbol> mSymbols = new HashMap();
+    private ArrayList<String> mOfflineRegionsNames = new ArrayList<>();
     private Activity activity;
     private final static String JSON_CHARSET = "UTF-8";
     private final static String JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME";
     boolean isReady = false;
     Runnable mapReady;
-    private boolean mPreventMapClick;
+    private FeatureCollection mSelectedFeatureCollection =  FeatureCollection.fromFeatures(new ArrayList<>());
+    private boolean mHasSelectedFeature;
 
     MapView getMapView() {
         return mMapView;
@@ -81,11 +100,19 @@ class MapController extends AppCompatActivity {
         return mOfflineRegionsNames;
     }
 
-    String getSelectedMarkerId() {
-        return mSelectedMarkerId;
+    String getSelecteFeatureCollection() {
+        return mSelectedFeatureCollection.toJson();
     }
 
-    MapController(final JSONObject options, Activity _activity, Context context, @Nullable final ScrollView scrollView) {
+    MapController(
+            final JSONObject options,
+            Activity _activity,
+            @Nullable String selectedFeatureLayerId,
+            @Nullable String selectedFeatureSourceId,
+            @Nullable String selectableFeaturePropType,
+            Context context,
+            @Nullable final ScrollView scrollView
+    ) {
 
         MapboxMapOptions initOptions;
         try {
@@ -128,50 +155,242 @@ class MapController extends AppCompatActivity {
 
         mMapView.getMapAsync(mapView -> {
             mMapboxMap = mapView;
+            mSelectedFeatureSourceId = selectedFeatureSourceId;
+            mSelectedFeatureLayerId = selectedFeatureLayerId;
+            mSelectableFeaturePropType= selectableFeaturePropType;
+            mMapboxMap.addOnMapClickListener(MapController.this);
             mapView.setStyle(new Style.Builder().fromUrl(mStyleUrl), _style -> {
                 style = _style;
-
-                // create symbol manager object
-                mSymbolManager = new SymbolManager(mMapView, mMapboxMap, style);
-
-                // set non-data-driven properties, such as:
-                mSymbolManager.setIconAllowOverlap(true);
-                mSymbolManager.setIconTranslate(new Float[]{-4f, 5f});
-                mSymbolManager.setIconRotationAlignment(ICON_ROTATION_ALIGNMENT_VIEWPORT);
-                mapReady.run();
                 isReady = true;
+                mapReady.run();
+            });
+        });
+    }
 
-                try {
-                    // drawing initial markers
-                    if (options.has("sources")) {
-                        JSONArray sources = options.getJSONArray("sources");
-                        for (int i = 0; i < sources.length(); i++) {
-                            //todo refactor when #5626
-                            if (!sources.getJSONObject(i).getJSONObject("source").getString("type").equals("geojson"))
-                                throw new JSONException("Sources only handle GeoJSON at map creation");
+    public void addFeatureCollection(String featureCollectionId, FeatureCollection featureCollection ) {
+        final GeoJsonSource geoJsonSource = new GeoJsonSource(featureCollectionId, featureCollection);
+        if (style.getSource(featureCollectionId) == null) {
+            addGeoJsonSource(geoJsonSource);
+        }
+    }
 
-                            String sourceId = sources.getJSONObject(i).getString("sourceId");
-                            JSONObject source = sources.getJSONObject(i).getJSONObject("source");
+    public void addFeature(String featureId, Feature feature ) {
+        final GeoJsonSource geoJsonSource = new GeoJsonSource(featureId, feature);
+        if (style.getSource(featureId) == null) {
+            addGeoJsonSource(geoJsonSource);
+        }
+    }
 
-                            String dataType = source.getJSONObject("data").getString("type");
-                            if (!dataType.equals("Feature"))
-                                throw new JSONException("Only feature are supported as markers source");
+    public void addGeoJsonSource(String sourceId) {
+        if (style.getSource(sourceId) == null) {
+            style.addSource(new GeoJsonSource(sourceId));
+        }
+    }
 
-                            String type = source.getJSONObject("data").getJSONObject("geometry").getString("type");
-                            if (!type.equals("Point"))
-                                throw new JSONException("Only type Point are supported for markers");
+    private void addGeoJsonSource(GeoJsonSource geoJsonSource) {
+        if (style.getSource(geoJsonSource.getId()) == null) {
+            // Throw when a source exists with the same id
+            style.addSource(geoJsonSource);
+        }
+    }
 
-                            addSymbol(sourceId, source.getJSONObject("data"));
+    public boolean removeSource(String sourceId) {
+        try {
+            // Throw when source is still in use
+            return style.removeSource(sourceId);
+        } catch (CannotAddSourceException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void setSourceGeoJsonData(String sourceId, FeatureCollection featureCollection) {
+        final GeoJsonSource source = style.getSourceAs(sourceId);
+        if (source != null) {
+            // https://github.com/mapbox/mapbox-gl-native/issues/14565#issuecomment-496923239
+            source.setGeoJson(FeatureCollection.fromFeatures(new ArrayList<>(Objects.requireNonNull(featureCollection.features()))));
+        }
+    }
+
+    public void setSourceGeoJsonData(String sourceId, Feature feature) {
+        final GeoJsonSource source = style.getSourceAs(sourceId);
+        if (source != null) {
+            source.setGeoJson(feature);
+        }
+    }
+
+    public void addSymbolLayer(
+            String layerId,
+            String sourceId,
+            Integer minZoom,
+            Integer maxZoom,
+            @Nullable Expression filter,
+            @Nullable String beforeId
+    ) {
+        if (style.getLayer(layerId) != null) return;
+
+        final SymbolLayer symbolLayer = new SymbolLayer(layerId, sourceId);
+        symbolLayer.setMinZoom(minZoom);
+        symbolLayer.setMaxZoom(maxZoom);
+        if (filter != null) {
+            symbolLayer.setFilter(filter);
+        }
+
+        if (beforeId == null || beforeId.isEmpty()) {
+            style.addLayer(symbolLayer);
+        } else {
+            if (style.getLayer(layerId) != null) {
+                removeLayer(layerId);
+            }
+            style.addLayerBelow(symbolLayer, beforeId);
+        }
+    }
+
+    public boolean removeLayer(String layerId) {
+        return style.removeLayer(layerId);
+    }
+
+    public void addImage(String imageId, JSONObject jsonImage) {
+        try {
+            final Bitmap bitmap = createImage(jsonImage);
+            style.addImage(imageId, bitmap);
+        } catch (JSONException | IOException | SVGParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeImage(String imageId) {
+        style.removeImage(imageId);
+    }
+
+
+    public void setLayoutPropertyIconImage(String layerId, String imageId) {
+        final Layer layer = style.getLayer(layerId);
+        if (layer != null) {
+            layer.setProperties(PropertyFactory.iconImage(imageId));
+        }
+    }
+
+    public void setLayoutPropertyOffset(String layerId, Float[] offset) {
+        final Layer layer = style.getLayer(layerId);
+        if (layer != null) {
+            layer.setProperties(PropertyFactory.iconOffset(offset));
+        }
+    }
+
+    public void setLayoutPropertySize(String layerId, float size) {
+        final Layer layer = style.getLayer(layerId);
+        if (layer != null) {
+            layer.setProperties(PropertyFactory.iconSize(size));
+        }
+    }
+
+    public void setLayoutPropertyIconOverlap(String layerId, boolean isOverlap) {
+        final Layer layer = style.getLayer(layerId);
+        if (layer != null) {
+            layer.setProperties(PropertyFactory.iconAllowOverlap(isOverlap));
+        }
+    }
+
+    private float retinaFactor = Resources.getSystem().getDisplayMetrics().density;
+
+    private int applyRetinaFactor(long d) {
+        return Math.round(d * retinaFactor);
+    }
+
+    private BitmapDrawable createSVG(SVG svg, int width, int height) {
+        if (width == 0)
+            width = applyRetinaFactor((int) Math.ceil(svg.getDocumentWidth()));
+        if (height == 0)
+            height = applyRetinaFactor((int) Math.ceil(svg.getDocumentHeight()));
+        Bitmap newBM = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas bmCanvas = new Canvas(newBM);
+        svg.renderToCanvas(bmCanvas);
+        return new BitmapDrawable(activity.getApplicationContext().getResources(), newBM);
+    }
+
+    /**
+     * Creates icon for symbol from url or local file
+     *
+     * @param imageObject The properties.image part of a JSON feature
+     * @return an icon with a custom image
+     */
+    // Thanks @anothar
+    private Bitmap createImage(JSONObject imageObject) throws JSONException, IOException, SVGParseException {
+        InputStream stream = null;
+        BitmapDrawable bitmapDrawable;
+        Bitmap bitmap = null;
+        Context ctx = activity.getApplicationContext();
+        AssetManager am = ctx.getResources().getAssets();
+
+        try {
+            if (imageObject != null) {
+                if (imageObject.has("uri")) {
+                    String stringURI = imageObject.getString("uri");
+
+                    final Uri uri = Uri.parse(stringURI);
+                    final String uriPath = uri.getPath() != null ? uri.getPath() : "";
+                    final boolean isAsset = uriPath.contains("/android_asset/");
+                    final String filesDir = activity.getFilesDir().getPath();
+                    final boolean doesContainFilesDirInPath = uriPath.contains(filesDir);
+                    final int startIndex = isAsset
+                            ? "/android_asset/".length()
+                            : doesContainFilesDirInPath
+                            ? filesDir.length()
+                            : 0;
+                    final int endIndex = uriPath.lastIndexOf('/') + 1;
+                    String path = isAsset
+                            ? uriPath.substring(startIndex, endIndex)
+                            : "www/" + uriPath.substring(startIndex, endIndex);
+                    final String fileName = uri.getLastPathSegment();
+
+                    // We first look in the current asset bundle.
+                    final File iconFile = new File(activity.getFilesDir(), path + fileName);
+
+                    if (iconFile.exists()) {
+                        stream = new FileInputStream(iconFile);
+                    }
+                    // If file does not exists we get the original version in the initial asset bundle with AssetsManager
+                    else {
+                        try {
+                            stream = am.open(path + fileName);
+                        } catch (IOException e) {
+                            throw new JSONException("File not found: " + uri);
                         }
                     }
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    if (fileName != null && fileName.endsWith(".svg")) {
+                        bitmapDrawable = createSVG(SVG.getFromInputStream(stream), imageObject.has("width") ? applyRetinaFactor(imageObject.getInt("width")) : 0,
+                                imageObject.has("height") ? applyRetinaFactor(imageObject.getInt("height")) : 0);
+                    } else {
+                        bitmapDrawable = new BitmapDrawable(ctx.getResources(), stream);
+                    }
+                } else if (imageObject.has("data")) {
+                    byte[] decodedBytes = Base64.decode(imageObject.getString("data"), 0);
+                    bitmapDrawable = new BitmapDrawable(ctx.getResources(), BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length));
+
+                } else if (imageObject.has("svg")) {
+                    bitmapDrawable = createSVG(SVG.getFromString(imageObject.getString("svg")), imageObject.has("width") ? applyRetinaFactor(imageObject.getInt("width")) : 0,
+                            imageObject.has("height") ? applyRetinaFactor(imageObject.getInt("height")) : 0);
+                } else {
+                    throw new JSONException("Not found image data");
                 }
-            });
-
-
-        });
+                if (imageObject.has("width") && imageObject.has("height")) {
+                    bitmap = new BitmapDrawable(ctx.getResources(),
+                            Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(),
+                                    applyRetinaFactor(imageObject.getInt("width")),
+                                    applyRetinaFactor(imageObject.getInt("height")),
+                                    true
+                            )).getBitmap();
+                } else {
+                    bitmap = bitmapDrawable.getBitmap();
+                }
+            }
+        } finally {
+            if (stream != null)
+                stream.close();
+        }
+        return bitmap;
     }
 
     public LatLng getCenter() {
@@ -405,58 +624,8 @@ class MapController extends AppCompatActivity {
         return regionName;
     }
 
-
-    void addSymbol(String id, JSONObject symbolParams) throws JSONException {
-        BouncingSymbol bouncingSymbol = mSymbols.get(id);
-        LatLng latLng;
-
-        if (bouncingSymbol != null) {
-            removeMarker(id);
-        }
-        JSONObject geometry = symbolParams.isNull("geometry") ? null : symbolParams.getJSONObject("geometry");
-
-        if (geometry != null) {
-            latLng = new LatLng(
-                    geometry.getJSONArray("coordinates").getDouble(1),
-                    geometry.getJSONArray("coordinates").getDouble(0)
-            );
-        } else throw new JSONException("No position found in marker.");
-
-        bouncingSymbol = new BouncingSymbol(id, latLng, symbolParams.getJSONObject("properties"), activity, style, mSymbolManager);
-
-        // Store in the map markers collection
-        mSymbols.put(id, bouncingSymbol);
-    }
-
-    void setSymbolPosition(String id, LatLng latLng) throws JSONException {
-        BouncingSymbol bouncingSymbol = mSymbols.get(id);
-        if (bouncingSymbol != null) {
-            bouncingSymbol.setLatLng(latLng);
-        } else throw new JSONException(" MapController.setSymbolPosition: unknown marker id " + id);
-    }
-
-    void setMarkerIcon(String id, JSONObject imageObject) throws JSONException {
-        BouncingSymbol bouncingSymbol = mSymbols.get(id);
-        if (bouncingSymbol != null) {
-            bouncingSymbol.setIcon(imageObject);
-        } else throw new JSONException(" MapController.setMarkerIcon: unknown marker id " + id);
-    }
-
-
-    void removeMarkers(ArrayList<String> ids) {
-        for (int i = 0; i < ids.size(); i++) removeMarker(ids.get(i));
-    }
-
-    void removeMarker(String id) {
-        BouncingSymbol bouncingSymbol = mSymbols.get(id);
-        if (bouncingSymbol == null) return;
-        mSymbolManager.delete(bouncingSymbol.get());
-        mSymbols.remove(id);
-    }
-
-    void addMarkerCallBack(Runnable callback) {
+    void addMapClickCallback(Runnable callback) {
         if (!isReady) return;
-        mSymbolManager.addClickListener(new SymbolClickListener(callback));
         mMapboxMap.addOnMapClickListener(new MapClickListener(callback));
     }
 
@@ -547,28 +716,9 @@ class MapController extends AppCompatActivity {
         return builder.build();
     }
 
-    JSONArray getJSONSymbolScreenPositions() {
-        JSONArray positions = new JSONArray();
-        try {
-            for (Map.Entry<String, BouncingSymbol> entry : mSymbols.entrySet()) {
-                String id = entry.getKey();
-                Symbol symbol = entry.getValue().get();
-                PointF screenPosition = mMapboxMap.getProjection().toScreenLocation(symbol.getLatLng());
-                JSONObject position = new JSONObject();
-                position.put("id", id);
-                position.put("x", screenPosition.x);
-                position.put("y", screenPosition.y);
-                positions.put(position);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return positions;
-    }
-
     JSONObject getJSONCameraScreenPosition() throws JSONException {
         CameraPosition position = mMapboxMap.getCameraPosition();
-        PointF screenPosition = mMapboxMap.getProjection().toScreenLocation(position.target);
+        PointF screenPosition = convertCoordinates(position.target);
         try {
             return new JSONObject()
                     .put("x", screenPosition.x)
@@ -638,63 +788,92 @@ class MapController extends AppCompatActivity {
         mMapView.addOnDidFinishRenderingMapListener((boolean fully) -> callback.run());
     }
 
-    private class SymbolClickListener implements OnSymbolClickListener {
-        private Runnable _callback;
+    @Override
+    public boolean onMapClick(@NonNull LatLng point) {
+        if (style != null && mSelectedFeatureLayerId != null) {
 
-        SymbolClickListener(Runnable callback) {
-            _callback = callback;
-        }
-
-        @Override
-        public void onAnnotationClick(Symbol symbol) {
-            Set<Map.Entry<String, BouncingSymbol>> elements = mSymbols.entrySet();
-            Iterator<Map.Entry<String, BouncingSymbol>> iterator = elements.iterator();
-            Map.Entry<String, BouncingSymbol> entry;
-            // Deselect previous Symbol
-            if (!mSelectedMarkerId.isEmpty()) {
-                final BouncingSymbol prevSymbol = mSymbols.get(mSelectedMarkerId);
-                if (prevSymbol != null) {
-                    prevSymbol.deselect();
-                }
-            }
-            while (iterator.hasNext()) {
-                entry = iterator.next();
-                BouncingSymbol bouncingSymbol = entry.getValue();
-                if (bouncingSymbol.get() == symbol) {
-                    bouncingSymbol.select();
-                    mSelectedMarkerId = entry.getKey();
+            final PointF pixel = convertCoordinates(point);
+            List<Feature> features = mMapboxMap.queryRenderedFeatures(pixel);
+            Feature feature = null;
+            for (int i = 0; i < features.size(); i++ ) {
+                final JsonObject properties = features.get(i).properties();
+                if (properties.has("type") && properties.get("type").getAsString().equals(mSelectableFeaturePropType)) {
+                    feature = features.get(i);
                     break;
                 }
             }
-            // This prevent the MapClickListener to trigger.
-            mPreventMapClick = true;
-            _callback.run();
+            List<Feature> selectedFeature = mMapboxMap.queryRenderedFeatures(pixel, mSelectedFeatureLayerId);
+
+            if (selectedFeature.size() > 0 && mHasSelectedFeature) {
+                return false;
+            }
+
+            if (feature == null) {
+                if (mHasSelectedFeature) {
+                    deselectFeature();
+                }
+                return false;
+            }
+
+            if (mHasSelectedFeature) {
+                deselectFeature();
+            }
+
+            selectFeature(feature);
         }
+        return false;
+    }
+
+    private TimeInterpolator interpolator = new BounceInterpolator();
+
+    private void selectFeature(final Feature feature) {
+        if (mSelectedFeatureLayerId == null || mSelectedFeatureSourceId == null) return;
+
+        final SymbolLayer selectedFeatureLayer = (SymbolLayer) style.getLayer(mSelectedFeatureLayerId);
+
+        if (selectedFeatureLayer == null) return;
+
+        GeoJsonSource source = style.getSourceAs(mSelectedFeatureSourceId);
+        if (source != null) {
+            source.setGeoJson(feature);
+        }
+        ValueAnimator featureAnimator = new ValueAnimator();
+        featureAnimator.setObjectValues(0f, 1f);
+        featureAnimator.setDuration(800);
+        featureAnimator.setInterpolator(interpolator);
+        featureAnimator.addUpdateListener(animator -> {
+            final float factor = (float)(animator.getAnimatedValue());
+            selectedFeatureLayer.setProperties(PropertyFactory.iconSize((float) (1 + .25 * factor)));
+        });
+        featureAnimator.start();
+        mHasSelectedFeature = true;
+    }
+
+    public void deselectFeature() {
+        if (mSelectedFeatureSourceId == null) return;
+
+        final GeoJsonSource source = style.getSourceAs(mSelectedFeatureSourceId);
+        if (source != null) {
+            source.setGeoJson(FeatureCollection.fromFeatures(
+                    new Feature[]{}));
+        }
+        mHasSelectedFeature = false;
     }
 
     private class MapClickListener implements MapboxMap.OnMapClickListener {
-        private Runnable _callback;
+        private Runnable callback;
 
-        MapClickListener(Runnable callback) {
-            _callback = callback;
+        MapClickListener(Runnable cb) {
+            callback = cb;
         }
 
         @Override
         public boolean onMapClick(@NonNull LatLng point) {
-            if (mPreventMapClick) {
-                mPreventMapClick = false;
-                return true;
-            } else {
-                final BouncingSymbol symbol = mSymbols.get(mSelectedMarkerId);
-                if (symbol != null) {
-                    symbol.deselect();
-                }
-
-                mSelectedMarkerId = "";
-
-                _callback.run();
-                return true;
-            }
+            List<Feature> features = mMapboxMap.queryRenderedFeatures(convertCoordinates(point));
+            Objects.requireNonNull(mSelectedFeatureCollection.features()).clear();
+            Objects.requireNonNull(mSelectedFeatureCollection.features()).addAll(features);
+            callback.run();
+            return true;
         }
     }
 
