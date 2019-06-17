@@ -52,12 +52,12 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
     private static final String CONVERT_POINT = "CONVERT_POINT";
     private static final String DELETE_OFFLINE_REGION = "DELETE_OFFLINE_REGION";
     private static final String DESTROY = "DESTROY";
-    private static final String DOWNLOAD_CURRENT_MAP = "DOWNLOAD_CURRENT_MAP";
+    private static final String DOWNLOAD_REGION = "DOWNLOAD_REGION";
     private static final String FLY_TO = "FLY_TO";
     private static final String GET_BOUNDS = "GET_BOUNDS";
     private static final String GET_CAMERA_POSITION = "GET_CAMERA_POSITION";
     private static final String GET_CENTER = "GET_CENTER";
-    private static final String GET_OFFLINE_REGIONS_LIST = "GET_OFFLINE_REGIONS_LIST";
+    private static final String GET_OFFLINE_REGION_LIST = "GET_OFFLINE_REGION_LIST";
     private static final String GET_PITCH = "GET_PITCH";
     private static final String GET_ZOOM = "GET_ZOOM";
     private static final String HIDE = "HIDE";
@@ -153,11 +153,10 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
     }
 
     public boolean execute(final String action, final CordovaArgs args, final CallbackContext callbackContext) {
-
         try {
             if (args.isNull(0)) {
                 callbackContext.error(action + " needs a map id");
-                return false;
+                return true;
             }
 
             final int id = args.getInt(0);
@@ -170,10 +169,8 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                             map.getMapCtrl().getMapView().setVisibility(View.VISIBLE);
                             callbackContext.success();
                         });
-                        return true;
                     } else {
                         callbackContext.error("Map is already displayed");
-                        return false;
                     }
                 } else {
                     activity.runOnUiThread(() -> {
@@ -197,15 +194,14 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                         mapsGroup.addView(aMap.getViewGroup());
                         aMap.getMapCtrl().mapReady = callbackContext::success;
                     });
-                    return true;
                 }
+                return true;
             }
 
             // need a map for all following actions
             if (map == null || !map.getMapCtrl().isReady) {
                 callbackContext.error(action + " map is not ready");
-                callbackContext.success();
-                return false;
+                return true;
             }
 
             final MapController mapCtrl = map.getMapCtrl();
@@ -231,7 +227,6 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     break;
                 case RESIZE:
                     activity.runOnUiThread(() -> map.setContainer(args, callbackContext));
-
                     break;
                 case GET_ZOOM:
                     activity.runOnUiThread(() -> {
@@ -241,7 +236,6 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                             e.printStackTrace();
                         }
                     });
-
                     break;
                 case SET_ZOOM:
                     activity.runOnUiThread(() -> {
@@ -257,7 +251,6 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                             callbackContext.error(e.getMessage());
                         }
                     });
-
                     break;
                 case ZOOM_TO:  //todo allow AnimationOptions
                     activity.runOnUiThread(() -> {
@@ -273,7 +266,6 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                             callbackContext.error("action " + e.getMessage());
                         }
                     });
-
                     break;
                 case GET_CENTER:
                     activity.runOnUiThread(() -> {
@@ -289,7 +281,6 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                             callbackContext.error("action " + e.getMessage());
                         }
                     });
-
                     break;
                 case SET_CENTER:
                     activity.runOnUiThread(() -> {
@@ -305,7 +296,6 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                             callbackContext.error("action " + e.getMessage());
                         }
                     });
-
                     break;
                 case SCROLL_MAP:
                     activity.runOnUiThread(() -> {
@@ -321,7 +311,6 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                             callbackContext.error("action " + e.getMessage());
                         }
                     });
-
                     break;
                 case SET_PITCH:
                     activity.runOnUiThread(() -> {
@@ -336,7 +325,6 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                             callbackContext.error("action " + e.getMessage());
                         }
                     });
-
                     break;
                 case GET_PITCH:
                     activity.runOnUiThread(() -> {
@@ -348,7 +336,6 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                             callbackContext.error("action " + e.getMessage());
                         }
                     });
-
                     break;
                 case FLY_TO:
                     activity.runOnUiThread(() -> {
@@ -365,7 +352,6 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                             callbackContext.error("action " + e.getMessage());
                         }
                     });
-
                     break;
                 case ADD_MAP_CLICK_CALLBACK:
                     activity.runOnUiThread(() -> {
@@ -841,107 +827,124 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                 case SET_CONTAINER:
                     activity.runOnUiThread(() -> map.setContainer(args, callbackContext));
                     break;
-                case DOWNLOAD_CURRENT_MAP:
-                    activity.runOnUiThread(() -> {
-                        Runnable startedCallback = () -> {
-                            try {
-                                JSONObject startedMsg = new JSONObject("{" +
-                                        "\"mapDownloadStatus\":{" +
-                                        "\"name\": \"" + id + "\"," +
-                                        "\"started\": true" +
-                                        '}' +
-                                        '}');
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, startedMsg);
-                                result.setKeepCallback(true);
-                                callbackContext.sendPluginResult(result);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                callbackContext.error(e.getMessage());
-                            }
-                        };
-
-                        Runnable progressCallback = () -> {
-                            try {
-                                JSONObject progressMsg = new JSONObject("{" +
-                                        "\"mapDownloadStatus\":{" +
-                                        "\"name\": \"" + id + "\"," +
-                                        "\"downloading\":" + mapCtrl.isDownloading() + ',' +
-                                        "\"progress\":" + mapCtrl.getDownloadingProgress() +
-                                        '}' +
-                                        '}');
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, progressMsg);
-                                result.setKeepCallback(true);
-                                callbackContext.sendPluginResult(result);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                callbackContext.error(e.getMessage());
-                            }
-                        };
-
-                        Runnable finishedCallback = () -> {
-                            try {
-                                JSONObject finishedMsg = new JSONObject("{" +
-                                        "\"mapDownloadStatus\":{" +
-                                        "\"name\": \"" + id + "\"," +
-                                        "\"finished\": true" +
-                                        '}' +
-                                        '}');
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, finishedMsg);
-                                result.setKeepCallback(true);
-                                callbackContext.sendPluginResult(result);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                callbackContext.error(e.getMessage());
-                            }
-                        };
-                        mapCtrl.downloadRegion("" + id, startedCallback, progressCallback, finishedCallback);
-                    });
-                    break;
-                case PAUSE_DOWNLOAD:
-                    activity.runOnUiThread(() -> {
-                        mapCtrl.pauseDownload();
-                        callbackContext.success();
-                    });
-                    break;
-                case GET_OFFLINE_REGIONS_LIST:
-                    activity.runOnUiThread(() -> mapCtrl.getOfflineRegions(() -> {
-                        ArrayList regionsList = mapCtrl.getOfflineRegionsNames();
-                        callbackContext.success(new JSONArray(regionsList));
-                    }));
-                    break;
-                case DELETE_OFFLINE_REGION:
-                    activity.runOnUiThread(() -> {
+                case DOWNLOAD_REGION:
+                    cordova.getThreadPool().execute(() -> {
                         try {
-                            int regionId = args.getInt(1);
-                            mapCtrl.removeOfflineRegion(regionId, () -> {
+                            final String regionName = args.getString(1);
+
+                            final JSONObject jsonBounds = args.getJSONObject(2);
+                            final JSONArray NE = jsonBounds.getJSONArray("ne");
+                            final JSONArray SW = jsonBounds.getJSONArray("sw");
+                            final LatLngBounds latLngBounds = new LatLngBounds.Builder()
+                                    .include(new LatLng(NE.getDouble(0), NE.getDouble(1)))
+                                    .include(new LatLng(SW.getDouble(0), SW.getDouble(1)))
+                                    .build();
+                            final int minZoom = args.getInt(3);
+                            final int maxZoom = args.getInt(4);
+
+                            Runnable startedCallback = () -> {
                                 try {
-                                    callbackContext.success(new JSONObject("{\"ok\":true}"));
+                                    PluginResult result = new PluginResult(PluginResult.Status.OK, new JSONObject("{isStarted: true}"));
+                                    result.setKeepCallback(true);
+                                    callbackContext.sendPluginResult(result);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
+                            };
 
+                            Runnable progressCallback = () -> {
+                                try {
+                                    JSONObject progressMsg = new JSONObject();
+                                    progressMsg.put("name", regionName);
+                                    progressMsg.put("isDownloading", mapCtrl.isDownloading());
+                                    progressMsg.put("progress", mapCtrl.getDownloadingProgress());
+                                    PluginResult result = new PluginResult(PluginResult.Status.OK, progressMsg);
+                                    result.setKeepCallback(true);
+                                    callbackContext.sendPluginResult(result);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            };
+
+                            Runnable finishedCallback = () -> {
+                                try {
+                                    PluginResult result = new PluginResult(PluginResult.Status.OK, new JSONObject("{isFinished: true}"));
+                                    callbackContext.sendPluginResult(result);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            };
+                            mapCtrl.getOfflineRegions(() -> {
+                                try {
+                                    ArrayList<String> regionsList = mapCtrl.getOfflineRegionsNames();
+                                    final boolean isAlreadyDownloaded = regionsList.contains(regionName);
+                                    if (!isAlreadyDownloaded) {
+                                        mapCtrl.downloadRegion(regionName, latLngBounds, minZoom, maxZoom, startedCallback, progressCallback, finishedCallback);
+                                    } else {
+                                        callbackContext.error(new JSONObject("{error: 'MAP_EXISTS'}"));
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             });
+
                         } catch (JSONException e) {
-                            callbackContext.error("Need an id region to delete.");
                             e.printStackTrace();
                         }
                     });
                     break;
+                case PAUSE_DOWNLOAD:
+                    mapCtrl.pauseDownload();
+                    callbackContext.success();
+                    break;
+                case GET_OFFLINE_REGION_LIST:
+                    mapCtrl.getOfflineRegions(() -> {
+                        ArrayList<String> regionsList = mapCtrl.getOfflineRegionsNames();
+                        callbackContext.success(new JSONArray(regionsList));
+                    });
+                    break;
+                case DELETE_OFFLINE_REGION:
+                    try {
+                        String regionId = args.getString(1);
+                        mapCtrl.removeOfflineRegion(
+                                regionId,
+                                () -> {
+                                    try {
+                                        callbackContext.success(new JSONObject("{isDeleted: true}"));
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                },
+                                () -> {
+                                    try {
+                                        callbackContext.success(new JSONObject("{isDeleted: false}"));
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                });
+                    } catch (JSONException e) {
+                        callbackContext.error("Need an id region to delete.");
+                        e.printStackTrace();
+                    }
+                    break;
                 case GET_BOUNDS:
                     activity.runOnUiThread(() -> {
                         try {
-                            LatLngBounds latLngBounds = mapCtrl.getBounds();
-                            callbackContext.success(new JSONObject("{" +
-                                    "\"sw\": {" +
-                                    "\"lat\":" + latLngBounds.getLatSouth() + ',' +
-                                    "\"lng\":" + latLngBounds.getLonWest() +
-                                    "}," +
-                                    "\"ne\": {" +
-                                    "\"lat\":" + latLngBounds.getLatNorth() + ',' +
-                                    "\"lng\":" + latLngBounds.getLonEast() +
-                                    "}" +
-                                    "}"
-                            ));
+                            final LatLngBounds latLngBounds = mapCtrl.getBounds();
+                            final JSONArray sw = new JSONArray();
+                            final JSONArray ne = new JSONArray();
+                            try {
+                                sw.put(latLngBounds.getSouthWest().getLongitude());
+                                sw.put(latLngBounds.getSouthWest().getLatitude());
+                                ne.put(latLngBounds.getNorthEast().getLongitude());
+                                ne.put(latLngBounds.getNorthEast().getLatitude());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            final JSONObject result = new JSONObject();
+                            result.put("sw", sw);
+                            result.put("ne", ne);
+                            callbackContext.success(result);
                         } catch (JSONException e) {
                             e.printStackTrace();
                             callbackContext.error(e.getMessage());

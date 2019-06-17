@@ -56,7 +56,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -72,7 +71,7 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
     private String mStyleUrl;
     private MapboxMap mMapboxMap;
     private OfflineManager mOfflineManager;
-    private OfflineRegion mOfflineRegion;
+    @Nullable private OfflineRegion mOfflineRegion;
     private boolean mDownloading;
     private int mDownloadingProgress;
     private ArrayList<String> mOfflineRegionsNames = new ArrayList<>();
@@ -123,7 +122,6 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
             return;
         }
         _retinaFactor = Resources.getSystem().getDisplayMetrics().density;
-        mOfflineManager = OfflineManager.getInstance(context);
         activity = _activity;
 
         mMapView = new MapView(activity, initOptions);
@@ -158,6 +156,7 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
             mSelectedFeatureSourceId = selectedFeatureSourceId;
             mSelectedFeatureLayerId = selectedFeatureLayerId;
             mSelectableFeaturePropType= selectableFeaturePropType;
+            mOfflineManager = OfflineManager.getInstance(context);
             mMapboxMap.addOnMapClickListener(MapController.this);
             mapView.setStyle(new Style.Builder().fromUrl(mStyleUrl), _style -> {
                 style = _style;
@@ -455,118 +454,112 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
     }
 
     /**
-     * Download the actual region for offline use.
-     *
-     * @param regionName the region name
-     * @param onStart    a callback fired when download start
-     * @param onProgress a callback fired along the download progression
-     * @param onFinish   a callback fired at the end of the download
+     * Download a given region for offline use.
      */
-    void downloadRegion(final String regionName, final Runnable onStart, final Runnable onProgress, final Runnable onFinish) {
+    void downloadRegion(
+            final String regionName,
+            LatLngBounds bounds,
+            int minZoom,
+            int maxZoom,
+            final Runnable onStart,
+            final Runnable onProgress,
+            final Runnable onFinish
+    ) {
+        String styleURL = style.getUrl();
 
-        // Set the style, bounds zone and the min/max zoom whidh will be available once offline.
-        LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
-        double minZoom = mMapboxMap.getCameraPosition().zoom;
-        double maxZoom = mMapboxMap.getMaxZoomLevel();
+        // Define the offline region
         OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
-                mStyleUrl, bounds, minZoom, maxZoom, _retinaFactor);
+                styleURL,
+                bounds,
+                minZoom,
+                maxZoom,
+                _retinaFactor
+        );
 
         // Build a JSONObject using the user-defined offline region title,
         // convert it into string, and use it to create a metadata variable.
         // The metadata variable will later be passed to createOfflineRegion()
-        byte[] metadata;
         try {
             JSONObject jsonObject = new JSONObject();
+            // regionName is questId
             jsonObject.put(JSON_FIELD_REGION_NAME, regionName);
             String json = jsonObject.toString();
-            metadata = json.getBytes(JSON_CHARSET);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to encode metadata: " + e.getMessage());
-            metadata = null;
-        }
-
-        if (metadata != null) {
+            final byte[] metadata = json.getBytes(JSON_CHARSET);
             // Create the offline region and launch the download
             mOfflineManager.createOfflineRegion(definition, metadata, new OfflineManager.CreateOfflineRegionCallback() {
                 @Override
                 public void onCreate(OfflineRegion offlineRegion) {
                     Log.d(TAG, "Offline region created: " + regionName);
                     mOfflineRegion = offlineRegion;
-                    launchDownload(onStart, onProgress, onFinish);
+                    // Set up an observer to handle download progress and
+                    // notify the user when the region is finished downloading
+                    // Start the progression
+                    onStart.run();
+                    mDownloading = true;
+                    offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
+                    offlineRegion.setObserver(new OfflineRegion.OfflineRegionObserver() {
+                        @Override
+                        public void onStatusChanged(OfflineRegionStatus status) {
+                            // Compute a percentage
+                            double percentage = status.getRequiredResourceCount() >= 0 ?
+                                    (100.0 * status.getCompletedResourceCount() / status.getRequiredResourceCount()) :
+                                    0.0;
+
+                            if (status.isComplete()) {
+                                // Download complete
+                                mDownloading = false;
+                                onFinish.run();
+                                return;
+                            } else if (status.isRequiredResourceCountPrecise()) {
+                                // Switch to determinate state
+                                mDownloadingProgress = ((int) Math.round(percentage));
+                                onProgress.run();
+                            }
+
+                            // Log what is being currently downloaded
+                            Log.d(TAG, String.format("%s/%s resources; %s bytes downloaded.",
+                                    String.valueOf(status.getCompletedResourceCount()),
+                                    String.valueOf(status.getRequiredResourceCount()),
+                                    String.valueOf(status.getCompletedResourceSize())));
+                        }
+
+                        @Override
+                        public void onError(OfflineRegionError error) {
+                            Log.e(TAG, "Mapbox download map error: reason: " + error.getReason());
+                            Log.e(TAG, "Mapbox download map error: message: " + error.getMessage());
+                        }
+
+                        @Override
+                        public void mapboxTileCountLimitExceeded(long limit) {
+                            if (minZoom > maxZoom) {
+                                Log.w(TAG, "Mapbox tile count limit exceeded: " + limit + ". Trying with lower max zoom.");
+                                downloadRegion(regionName, bounds, minZoom, maxZoom - 1, onStart, onProgress, onFinish);
+                            }
+                            Log.e(TAG, "Mapbox tile count limit exceeded: " + limit);
+                        }
+                    });
                 }
 
                 @Override
                 public void onError(String error) {
-                    Log.e(TAG, "Error: " + error);
+                    Log.e(TAG, "Mapbox download map error: " + error);
                 }
             });
+        } catch (Exception e) {
+            Log.e(TAG, "Mapbox failed to encode metadata for offline map: " + e.getMessage());
         }
     }
 
-    private void launchDownload(final Runnable onStart, final Runnable onProgress, final Runnable onFinish) {
-        // Set up an observer to handle download progress and
-        // notify the user when the region is finished downloading
-        // Start the progression
-        mDownloading = true;
-        onStart.run();
-
-        mOfflineRegion.setObserver(new OfflineRegion.OfflineRegionObserver() {
-            @Override
-            public void onStatusChanged(OfflineRegionStatus status) {
-                // Compute a percentage
-                double percentage = status.getRequiredResourceCount() >= 0 ?
-                        (100.0 * status.getCompletedResourceCount() / status.getRequiredResourceCount()) :
-                        0.0;
-
-                if (status.isComplete()) {
-                    // Download complete
-                    mDownloading = false;
-                    onFinish.run();
-                    return;
-                } else if (status.isRequiredResourceCountPrecise()) {
-                    // Switch to determinate state
-                    onProgress.run();
-                    mDownloadingProgress = ((int) Math.round(percentage));
-                }
-
-                // Log what is being currently downloaded
-                Log.d(TAG, String.format("%s/%s resources; %s bytes downloaded.",
-                        String.valueOf(status.getCompletedResourceCount()),
-                        String.valueOf(status.getRequiredResourceCount()),
-                        String.valueOf(status.getCompletedResourceSize())));
-            }
-
-            @Override
-            public void onError(OfflineRegionError error) {
-                Log.e(TAG, "onError reason: " + error.getReason());
-                Log.e(TAG, "onError message: " + error.getMessage());
-            }
-
-            @Override
-            public void mapboxTileCountLimitExceeded(long limit) {
-                Log.e(TAG, "Mapbox tile count limit exceeded: " + limit);
-            }
-        });
-
-        // Change the region state
-        mOfflineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
-    }
-
     void pauseDownload() {
-        mOfflineRegion.setDownloadState(OfflineRegion.STATE_INACTIVE);
+        if (mOfflineRegion != null) {
+            mOfflineRegion.setDownloadState(OfflineRegion.STATE_INACTIVE);
+        }
     }
 
     void getOfflineRegions(final Runnable callback) {
         mOfflineManager.listOfflineRegions(new OfflineManager.ListOfflineRegionsCallback() {
             @Override
             public void onList(final OfflineRegion[] offlineRegions) {
-
-                // Check result. If no regions have been
-                // downloaded yet, notify user and return
-                if (offlineRegions == null || offlineRegions.length == 0) {
-                    return;
-                }
-
                 // Clean the last ref array and add all of the region names to the list.
                 mOfflineRegionsNames.clear();
                 for (OfflineRegion offlineRegion : offlineRegions) {
@@ -582,23 +575,40 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
         });
     }
 
-    void removeOfflineRegion(final int regionSelected, final Runnable onDeleteCallback) {
+    /**
+     * Delete an offline region based on the regionName stored in the meta data
+     * @param regionName the region name
+     * @param onDelete on success callback
+     * @param onError on error callback
+     */
+    void removeOfflineRegion(final String regionName, final Runnable onDelete, final Runnable onError) {
         mOfflineManager.listOfflineRegions(new OfflineManager.ListOfflineRegionsCallback() {
             @Override
             public void onList(final OfflineRegion[] offlineRegions) {
 
-                if (offlineRegions.length > regionSelected - 1) return;
-
-                offlineRegions[regionSelected].delete(new OfflineRegion.OfflineRegionDeleteCallback() {
-                    @Override
-                    public void onDelete() {
-                        onDeleteCallback.run();
+                OfflineRegion selectedRegion = null;
+                for (OfflineRegion region : offlineRegions) {
+                    if(getRegionName(region).equals(regionName)) {
+                        selectedRegion = region;
+                        break;
                     }
+                }
 
-                    @Override
-                    public void onError(String error) {
-                    }
-                });
+                if (selectedRegion == null) {
+                    onError.run();
+                } else {
+                    selectedRegion.delete(new OfflineRegion.OfflineRegionDeleteCallback() {
+                        @Override
+                        public void onDelete() {
+                            onDelete.run();
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            onError.run();
+                        }
+                    });
+                }
             }
 
             @Override
@@ -797,7 +807,7 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
             Feature feature = null;
             for (int i = 0; i < features.size(); i++ ) {
                 final JsonObject properties = features.get(i).properties();
-                if (properties.has("type") && properties.get("type").getAsString().equals(mSelectableFeaturePropType)) {
+                if (properties != null && properties.has("type") && properties.get("type").getAsString().equals(mSelectableFeaturePropType)) {
                     feature = features.get(i);
                     break;
                 }

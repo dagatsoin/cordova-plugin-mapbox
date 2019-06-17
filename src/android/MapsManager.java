@@ -14,16 +14,12 @@ import org.apache.cordova.CordovaArgs;
  * Created by vikti on 24/06/2016.
  */
 class MapsManager {
-    private static MapsManager mOurInstance = new MapsManager();
-    private static SparseArray<Map> mMaps = new SparseArray();
+    private static SparseArray<Map> mMaps = new SparseArray<>();
     private static CDVMapbox mPlugRef;
     private static Activity mActivity;
 
-    public static MapsManager getInstance() {
-        return mOurInstance;
-    }
-
-    public static void init(final CDVMapbox plugin, Activity activity) {
+    
+    static void init(final CDVMapbox plugin, Activity activity) {
         mPlugRef = plugin;
         mActivity = activity;
     }
@@ -38,18 +34,12 @@ class MapsManager {
         return mMaps.get(id);
     }
 
-    public static int getCount(){
+    static int getCount(){
         return mMaps.size();
     }
 
     static void removeMap(int mapId){
         mMaps.delete(mapId);
-    }
-
-    static void onStart() {
-        for( int i = 0; i < mMaps.size(); i++){
-            mMaps.get(i).getMapCtrl().getMapView().onStart();
-        }
     }
 
     static void onPause() {
@@ -69,24 +59,6 @@ class MapsManager {
                     ((ViewGroup) viewGroup.getParent()).removeView(viewGroup);
                 mPlugRef.mapsGroup.addView(viewGroup);
             }
-        }
-    }
-
-    static void onStop() {
-        for( int i = 0; i < mMaps.size(); i++){
-            mMaps.get(i).getMapCtrl().getMapView().onStop();
-        }
-    }
-
-    static void onLowMemory() {
-        for( int i = 0; i < mMaps.size(); i++){
-            mMaps.get(i).getMapCtrl().getMapView().onLowMemory();
-        }
-    }
-
-    static void onSaveInstanceState(Bundle outState) {
-        for( int i = 0; i < mMaps.size(); i++){
-            mMaps.get(i).getMapCtrl().getMapView().onSaveInstanceState(outState);
         }
     }
 

@@ -163,23 +163,22 @@ module.exports = {
 
         cordova.exec(successCallback, errorCallback, "Mapbox", "SET_CONTAINER", [id, container])
     },
-
-    downloadCurrentMap: function (id, statusCallback, errorCallback) {
+    downloadRegion: function (regionName, bounds, minZoom, maxZoom, statusCallback, errorCallback, id) {
         id = id || 0;
-        cordova.exec(statusCallback, errorCallback, "Mapbox", "DOWNLOAD_CURRENT_MAP", [id]);
+        cordova.exec(statusCallback, errorCallback, "Mapbox", "DOWNLOAD_REGION", [id, regionName, bounds, minZoom, maxZoom]);
     },
 
-    getOfflineRegionsList: function (id, successCallback, errorCallback) {
+    getOfflineRegionList: function (successCallback, errorCallback, id) {
         id = id || 0;
-        cordova.exec(successCallback, errorCallback, "Mapbox", "GET_OFFLINE_REGIONS_LIST", [id]);
+        cordova.exec(successCallback, errorCallback, "Mapbox", "GET_OFFLINE_REGION_LIST", [id]);
     },
 
-    deleteOfflineRegion: function (id, zoneId, successCallback, errorCallback) {
+    deleteOfflineRegion: function (regionName, successCallback, errorCallback, id) {
         id = id || 0;
-        cordova.exec(successCallback, errorCallback, "Mapbox", "DELETE_OFFLINE_REGION", [id, zoneId]);
+        cordova.exec(successCallback, errorCallback, "Mapbox", "DELETE_OFFLINE_REGION", [id, regionName]);
     },
 
-    pauseDownload: function (id, successCallback, errorCallback) {
+    pauseDownload: function (successCallback, errorCallback, id) {
         id = id || 0;
         cordova.exec(successCallback, errorCallback, "Mapbox", "PAUSE_DOWNLOAD", [id]);
     },
