@@ -17,7 +17,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.animation.BounceInterpolator;
 import android.widget.FrameLayout;
@@ -36,11 +35,6 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.Style;
-import com.mapbox.mapboxsdk.offline.OfflineManager;
-import com.mapbox.mapboxsdk.offline.OfflineRegion;
-import com.mapbox.mapboxsdk.offline.OfflineRegionError;
-import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
-import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
@@ -60,8 +54,6 @@ import java.util.List;
 import java.util.Objects;
 
 class MapController extends AppCompatActivity implements MapboxMap.OnMapClickListener {
-    private static float _retinaFactor;
-    private final static String TAG = "MAP_CONTROLLER";
     @Nullable private String mSelectableFeaturePropType;
     @Nullable private String mSelectedFeatureLayerId;
     @Nullable private String mSelectedFeatureSourceId;
@@ -70,14 +62,8 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
     private MapView mMapView;
     private String mStyleUrl;
     private MapboxMap mMapboxMap;
-    private OfflineManager mOfflineManager;
-    @Nullable private OfflineRegion mOfflineRegion;
-    private boolean mDownloading;
-    private int mDownloadingProgress;
     private ArrayList<String> mOfflineRegionsNames = new ArrayList<>();
-    private Activity activity;
-    private final static String JSON_CHARSET = "UTF-8";
-    private final static String JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME";
+    private Activity mActivity;
     boolean isReady = false;
     Runnable mapReady;
     private FeatureCollection mSelectedFeatureCollection =  FeatureCollection.fromFeatures(new ArrayList<>());
@@ -87,44 +73,30 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
         return mMapView;
     }
 
-    int getDownloadingProgress() {
-        return mDownloadingProgress;
-    }
-
-    boolean isDownloading() {
-        return mDownloading;
-    }
-
-    ArrayList<String> getOfflineRegionsNames() {
-        return mOfflineRegionsNames;
-    }
-
     String getSelecteFeatureCollection() {
         return mSelectedFeatureCollection.toJson();
     }
 
     MapController(
             final JSONObject options,
-            Activity _activity,
+            Activity activity,
             @Nullable String selectedFeatureLayerId,
             @Nullable String selectedFeatureSourceId,
             @Nullable String selectableFeaturePropType,
-            Context context,
             @Nullable final ScrollView scrollView
     ) {
 
         MapboxMapOptions initOptions;
         try {
-            initOptions = _createMapboxMapOptions(options);
-            mStyleUrl = _getStyle(options.getString("style"));
+            initOptions = createMapboxMapOptions(options);
+            mStyleUrl = getStyle(options.getString("style"));
         } catch (JSONException e) {
             e.printStackTrace();
             return;
         }
-        _retinaFactor = Resources.getSystem().getDisplayMetrics().density;
-        activity = _activity;
+        mActivity = activity;
 
-        mMapView = new MapView(activity, initOptions);
+        mMapView = new MapView(mActivity, initOptions);
         mMapView.setLayoutParams(
                 new FrameLayout.LayoutParams(
                         FrameLayout.LayoutParams.MATCH_PARENT,
@@ -156,7 +128,6 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
             mSelectedFeatureSourceId = selectedFeatureSourceId;
             mSelectedFeatureLayerId = selectedFeatureLayerId;
             mSelectableFeaturePropType= selectableFeaturePropType;
-            mOfflineManager = OfflineManager.getInstance(context);
             mMapboxMap.addOnMapClickListener(MapController.this);
             mapView.setStyle(new Style.Builder().fromUrl(mStyleUrl), _style -> {
                 style = _style;
@@ -164,6 +135,11 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
                 mapReady.run();
             });
         });
+    }
+
+    public OfflineController getOfflineController() {
+        @Nullable OfflineController offlineController = OfflineControllerPool.get(mStyleUrl);
+        return offlineController != null ? offlineController : OfflineControllerPool.create(mActivity, mStyleUrl);
     }
 
     public void addFeatureCollection(String featureCollectionId, FeatureCollection featureCollection ) {
@@ -305,7 +281,7 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
         Bitmap newBM = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas bmCanvas = new Canvas(newBM);
         svg.renderToCanvas(bmCanvas);
-        return new BitmapDrawable(activity.getApplicationContext().getResources(), newBM);
+        return new BitmapDrawable(mActivity.getApplicationContext().getResources(), newBM);
     }
 
     /**
@@ -319,7 +295,7 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
         InputStream stream = null;
         BitmapDrawable bitmapDrawable;
         Bitmap bitmap = null;
-        Context ctx = activity.getApplicationContext();
+        Context ctx = mActivity.getApplicationContext();
         AssetManager am = ctx.getResources().getAssets();
 
         try {
@@ -330,7 +306,7 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
                     final Uri uri = Uri.parse(stringURI);
                     final String uriPath = uri.getPath() != null ? uri.getPath() : "";
                     final boolean isAsset = uriPath.contains("/android_asset/");
-                    final String filesDir = activity.getFilesDir().getPath();
+                    final String filesDir = mActivity.getFilesDir().getPath();
                     final boolean doesContainFilesDirInPath = uriPath.contains(filesDir);
                     final int startIndex = isAsset
                             ? "/android_asset/".length()
@@ -344,7 +320,7 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
                     final String fileName = uri.getLastPathSegment();
 
                     // We first look in the current asset bundle.
-                    final File iconFile = new File(activity.getFilesDir(), path + fileName);
+                    final File iconFile = new File(mActivity.getFilesDir(), path + fileName);
 
                     if (iconFile.exists()) {
                         stream = new FileInputStream(iconFile);
@@ -453,187 +429,6 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
         }
     }
 
-    /**
-     * Download a given region for offline use.
-     */
-    void downloadRegion(
-            final String regionName,
-            LatLngBounds bounds,
-            int minZoom,
-            int maxZoom,
-            final Runnable onStart,
-            final Runnable onProgress,
-            final Runnable onFinish
-    ) {
-        String styleURL = style.getUrl();
-
-        // Define the offline region
-        OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
-                styleURL,
-                bounds,
-                minZoom,
-                maxZoom,
-                _retinaFactor
-        );
-
-        // Build a JSONObject using the user-defined offline region title,
-        // convert it into string, and use it to create a metadata variable.
-        // The metadata variable will later be passed to createOfflineRegion()
-        try {
-            JSONObject jsonObject = new JSONObject();
-            // regionName is questId
-            jsonObject.put(JSON_FIELD_REGION_NAME, regionName);
-            String json = jsonObject.toString();
-            final byte[] metadata = json.getBytes(JSON_CHARSET);
-            // Create the offline region and launch the download
-            mOfflineManager.createOfflineRegion(definition, metadata, new OfflineManager.CreateOfflineRegionCallback() {
-                @Override
-                public void onCreate(OfflineRegion offlineRegion) {
-                    Log.d(TAG, "Offline region created: " + regionName);
-                    mOfflineRegion = offlineRegion;
-                    // Set up an observer to handle download progress and
-                    // notify the user when the region is finished downloading
-                    // Start the progression
-                    onStart.run();
-                    mDownloading = true;
-                    offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
-                    offlineRegion.setObserver(new OfflineRegion.OfflineRegionObserver() {
-                        @Override
-                        public void onStatusChanged(OfflineRegionStatus status) {
-                            // Compute a percentage
-                            double percentage = status.getRequiredResourceCount() >= 0 ?
-                                    (100.0 * status.getCompletedResourceCount() / status.getRequiredResourceCount()) :
-                                    0.0;
-
-                            if (status.isComplete()) {
-                                // Download complete
-                                mDownloading = false;
-                                onFinish.run();
-                                return;
-                            } else if (status.isRequiredResourceCountPrecise()) {
-                                // Switch to determinate state
-                                mDownloadingProgress = ((int) Math.round(percentage));
-                                onProgress.run();
-                            }
-
-                            // Log what is being currently downloaded
-                            Log.d(TAG, String.format("%s/%s resources; %s bytes downloaded.",
-                                    String.valueOf(status.getCompletedResourceCount()),
-                                    String.valueOf(status.getRequiredResourceCount()),
-                                    String.valueOf(status.getCompletedResourceSize())));
-                        }
-
-                        @Override
-                        public void onError(OfflineRegionError error) {
-                            Log.e(TAG, "Mapbox download map error: reason: " + error.getReason());
-                            Log.e(TAG, "Mapbox download map error: message: " + error.getMessage());
-                        }
-
-                        @Override
-                        public void mapboxTileCountLimitExceeded(long limit) {
-                            if (minZoom > maxZoom) {
-                                Log.w(TAG, "Mapbox tile count limit exceeded: " + limit + ". Trying with lower max zoom.");
-                                downloadRegion(regionName, bounds, minZoom, maxZoom - 1, onStart, onProgress, onFinish);
-                            }
-                            Log.e(TAG, "Mapbox tile count limit exceeded: " + limit);
-                        }
-                    });
-                }
-
-                @Override
-                public void onError(String error) {
-                    Log.e(TAG, "Mapbox download map error: " + error);
-                }
-            });
-        } catch (Exception e) {
-            Log.e(TAG, "Mapbox failed to encode metadata for offline map: " + e.getMessage());
-        }
-    }
-
-    void pauseDownload() {
-        if (mOfflineRegion != null) {
-            mOfflineRegion.setDownloadState(OfflineRegion.STATE_INACTIVE);
-        }
-    }
-
-    void getOfflineRegions(final Runnable callback) {
-        mOfflineManager.listOfflineRegions(new OfflineManager.ListOfflineRegionsCallback() {
-            @Override
-            public void onList(final OfflineRegion[] offlineRegions) {
-                // Clean the last ref array and add all of the region names to the list.
-                mOfflineRegionsNames.clear();
-                for (OfflineRegion offlineRegion : offlineRegions) {
-                    mOfflineRegionsNames.add(getRegionName(offlineRegion));
-                }
-                callback.run();
-            }
-
-            @Override
-            public void onError(String error) {
-
-            }
-        });
-    }
-
-    /**
-     * Delete an offline region based on the regionName stored in the meta data
-     * @param regionName the region name
-     * @param onDelete on success callback
-     * @param onError on error callback
-     */
-    void removeOfflineRegion(final String regionName, final Runnable onDelete, final Runnable onError) {
-        mOfflineManager.listOfflineRegions(new OfflineManager.ListOfflineRegionsCallback() {
-            @Override
-            public void onList(final OfflineRegion[] offlineRegions) {
-
-                OfflineRegion selectedRegion = null;
-                for (OfflineRegion region : offlineRegions) {
-                    if(getRegionName(region).equals(regionName)) {
-                        selectedRegion = region;
-                        break;
-                    }
-                }
-
-                if (selectedRegion == null) {
-                    onError.run();
-                } else {
-                    selectedRegion.delete(new OfflineRegion.OfflineRegionDeleteCallback() {
-                        @Override
-                        public void onDelete() {
-                            onDelete.run();
-                        }
-
-                        @Override
-                        public void onError(String error) {
-                            onError.run();
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onError(String error) {
-
-            }
-        });
-    }
-
-    private String getRegionName(OfflineRegion offlineRegion) {
-        // Get the region name from the offline region metadata
-        String regionName;
-
-        try {
-            byte[] metadata = offlineRegion.getMetadata();
-            String json = new String(metadata, JSON_CHARSET);
-            JSONObject jsonObject = new JSONObject(json);
-            regionName = jsonObject.getString(JSON_FIELD_REGION_NAME);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to decode metadata: " + e.getMessage());
-            regionName = "Region " + offlineRegion.getID();
-        }
-        return regionName;
-    }
-
     void addMapClickCallback(Runnable callback) {
         if (!isReady) return;
         mMapboxMap.addOnMapClickListener(new MapClickListener(callback));
@@ -673,7 +468,7 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
         return mMapboxMap.getProjection().fromScreenLocation(point);
     }
 
-    private MapboxMapOptions _createMapboxMapOptions(JSONObject options) throws JSONException {
+    private MapboxMapOptions createMapboxMapOptions(JSONObject options) throws JSONException {
         MapboxMapOptions opts = new MapboxMapOptions();
         opts.attributionEnabled(options.isNull("hideAttribution") || !options.getBoolean("hideAttribution"));
         opts.logoEnabled(options.isNull("hideLogo") || options.getBoolean("hideLogo"));
@@ -688,7 +483,7 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
         return opts;
     }
 
-    private static String _getStyle(final String requested) {
+    private static String getStyle(final String requested) {
         if ("light".equalsIgnoreCase(requested)) {
             return Style.LIGHT;
         } else if ("dark".equalsIgnoreCase(requested)) {

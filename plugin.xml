@@ -2,7 +2,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-mapbox"
-        version="1.2.0">
+        version="1.2.1">
 
   <name>Mapbox</name>
 
@@ -51,6 +51,8 @@
     <source-file src="src/android/CDVMapbox.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
     <source-file src="src/android/Map.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
     <source-file src="src/android/MapController.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
+    <source-file src="src/android/OfflineController.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
+    <source-file src="src/android/OfflineControllerPool.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
     <source-file src="src/android/MapsManager.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
     <source-file src="src/android/PluginLayout.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
     <source-file src="src/android/libs/androidsvg-1.2.1.jar" target-dir="libs" framework="true"  />

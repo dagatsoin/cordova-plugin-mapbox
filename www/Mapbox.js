@@ -163,24 +163,73 @@ module.exports = {
 
         cordova.exec(successCallback, errorCallback, "Mapbox", "SET_CONTAINER", [id, container])
     },
-    downloadRegion: function (regionName, bounds, minZoom, maxZoom, statusCallback, errorCallback, id) {
+    downloadRegion: function (options, statusCallback, errorCallback, id) {
         id = id || 0;
-        cordova.exec(statusCallback, errorCallback, "Mapbox", "DOWNLOAD_REGION", [id, regionName, bounds, minZoom, maxZoom]);
+        cordova.exec(statusCallback, errorCallback, "Mapbox", "DOWNLOAD_REGION", [id, options]);
     },
 
-    getOfflineRegionList: function (successCallback, errorCallback, id) {
-        id = id || 0;
-        cordova.exec(successCallback, errorCallback, "Mapbox", "GET_OFFLINE_REGION_LIST", [id]);
+    /**
+     * 
+     * @param {*} styleUrl 
+     * @param {*} successCallback 
+     * @param {*} errorCallback 
+     * @param {*} id 
+     */
+    getOfflineRegionList: function (_args) {
+        const styleUrl = typeof arguments[0] === "string" ? arguments[0] : null
+        const successCallback = styleUrl === null ? arguments[0] : arguments[1]
+        const errorCallback = styleUrl === null ? arguments[1] : arguments[2]
+        const id = styleUrl === null ? arguments[2] || 0 : arguments[3] || 0
+
+        cordova.exec(successCallback, errorCallback, "Mapbox", "GET_OFFLINE_REGION_LIST", [id, styleUrl]);
     },
 
-    deleteOfflineRegion: function (regionName, successCallback, errorCallback, id) {
-        id = id || 0;
-        cordova.exec(successCallback, errorCallback, "Mapbox", "DELETE_OFFLINE_REGION", [id, regionName]);
+    /**
+     * 
+     * @param {regionName: string, styleUrl: string} options
+     * @param {*} successCallback 
+     * @param {*} errorCallback 
+     * @param {*} id 
+     */
+    deleteOfflineRegion: function (_args) {
+        const options = typeof arguments[0] === "object" ? arguments[0] : null
+        const successCallback = options === null ? arguments[0] : arguments[1]
+        const errorCallback = options === null ? arguments[1] : arguments[2]
+        const id = options === null ? arguments[2] || 0 : arguments[3] || 0
+
+        cordova.exec(successCallback, errorCallback, "Mapbox", "DELETE_OFFLINE_REGION", [id, options]);
     },
 
-    pauseDownload: function (successCallback, errorCallback, id) {
-        id = id || 0;
-        cordova.exec(successCallback, errorCallback, "Mapbox", "PAUSE_DOWNLOAD", [id]);
+    /**
+     * 
+     * @param {regionName: string, styleUrl: string} options
+     * @param {*} successCallback 
+     * @param {*} errorCallback 
+     * @param {*} id 
+     */
+    pauseDownload: function (_args) {
+        const options = typeof arguments[0] === "object" ? arguments[0] : null
+        const successCallback = options === null ? arguments[0] : arguments[1]
+        const errorCallback = options === null ? arguments[1] : arguments[2]
+        const id = options === null ? arguments[2] || 0 : arguments[3] || 0
+
+        cordova.exec(successCallback, errorCallback, "Mapbox", "PAUSE_DOWNLOAD", [id, options]);
+    },
+
+    /**
+     * 
+     * @param {regionName: string, styleUrl: string} options
+     * @param {*} successCallback 
+     * @param {*} errorCallback 
+     * @param {*} id 
+     */
+    resumeDownload: function (_args) {
+        const options = typeof arguments[0] === "object" ? arguments[0] : null
+        const successCallback = options === null ? arguments[0] : arguments[1]
+        const errorCallback = options === null ? arguments[1] : arguments[2]
+        const id = options === null ? arguments[2] || 0 : arguments[3] || 0
+
+        cordova.exec(successCallback, errorCallback, "Mapbox", "RESUME_DOWNLOAD", [id, options]);
     },
 
     addMapClickCallback: function (callback, errorCallback, id) {

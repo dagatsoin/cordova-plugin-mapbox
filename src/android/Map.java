@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.RectF;
 import android.support.annotation.Nullable;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -27,23 +26,24 @@ import org.json.JSONObject;
  */
 public class Map {
 
-    private int _id;
-    private CDVMapbox _plugRef;
-    private FrameLayout _layersGroup;
-    private JSONObject _mapDivLayoutJSON;
-    private MapController _mapCtrl;
+    private int mId;
+    private CDVMapbox mPlugRef;
+    private FrameLayout mLayersGroup;
+    private JSONObject mMapDivLayoutJSON;
+    private MapController mMapCtrl;
 
-    private static CordovaWebView _cdvWebView;
-    private static float _retinaFactor;
+    private static CordovaWebView mCdvWebView;
+    private static float mRetinaFactor;
 
-    public CallbackContext markerCallbackContext;
-    public MapController getMapCtrl(){
-        return _mapCtrl;
+    CallbackContext mMarkerCallbackContext;
+
+    MapController getMapCtrl(){
+        return mMapCtrl;
     }
-    public ViewGroup getViewGroup(){
-        return _layersGroup;
+    ViewGroup getViewGroup(){
+        return mLayersGroup;
     }
-    public int getId(){return _id;}
+    public int getId(){return mId;}
 
     /**
      * Create a map without any layout set
@@ -53,12 +53,11 @@ public class Map {
      * @param callbackContext command callback context
      */
     public Map(int id, final CordovaArgs args, CDVMapbox plugRef, Activity activity, CallbackContext callbackContext) {
-
-        _id = id;
-        _plugRef = plugRef;
-        _cdvWebView = _plugRef.webView;
-        Context _context = _cdvWebView.getView().getContext();
-        _retinaFactor = Resources.getSystem().getDisplayMetrics().density;
+        mId = id;
+        mPlugRef = plugRef;
+        mCdvWebView = mPlugRef.webView;
+        Context _context = mCdvWebView.getView().getContext();
+        mRetinaFactor = Resources.getSystem().getDisplayMetrics().density;
 
         final JSONObject options;
         final JSONArray HTMLs;
@@ -79,28 +78,27 @@ public class Map {
         }
 
         // Draw the blocking touch zones to allow click on overlay DOM elements
-        _updateMapOverlay(HTMLs);
+        updateMapOverlay(HTMLs);
 
         // Create a controller (which instantiate the MGLMapbox view)
         // todo find an optimized way to pass the scroll view ?
-        _mapCtrl = new MapController(
+        mMapCtrl = new MapController(
                 options,
                 activity,
                 selectedFeatureLayerId,
                 selectedFeatureSourceId,
                 selectableFeaturePropType,
-                _context,
-                _plugRef.pluginLayout.getScrollView()
+                mPlugRef.pluginLayout.getScrollView()
         );
 
         // The view container. Contains maps and addons views.
-        _layersGroup = new FrameLayout(_context);
-        _layersGroup.addView(_mapCtrl.getMapView());
+        mLayersGroup = new FrameLayout(_context);
+        mLayersGroup.addView(mMapCtrl.getMapView());
     }
 
 
     //change to updateLauyoutWhenScroll
-    private void _updateMapOverlay(JSONArray HTMLs){
+    private void updateMapOverlay(JSONArray HTMLs){
 
         JSONObject elemInfo, elemSize;
         String elemId;
@@ -112,11 +110,11 @@ public class Map {
                 elemId = elemInfo.getString("id");
                 elemSize = elemInfo.getJSONObject("size");
 
-                divW = _applyRetinaFactor(elemSize.getLong("width"));
-                divH = _applyRetinaFactor(elemSize.getLong("height"));
-                divLeft = _applyRetinaFactor(elemSize.getLong("left"));
-                divTop = _applyRetinaFactor(elemSize.getLong("top"));
-                _plugRef.pluginLayout.setHTMLElement(elemId, divLeft, divTop, divLeft + divW, divTop + divH);
+                divW = applyRetinaFactor(elemSize.getLong("width"));
+                divH = applyRetinaFactor(elemSize.getLong("height"));
+                divLeft = applyRetinaFactor(elemSize.getLong("left"));
+                divTop = applyRetinaFactor(elemSize.getLong("top"));
+                mPlugRef.pluginLayout.setHTMLElement(elemId, divLeft, divTop, divLeft + divW, divTop + divH);
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -124,25 +122,25 @@ public class Map {
     }
 
     public void onScroll(int x, int y){
-        _plugRef.pluginLayout.setMapDrawingRect(
-                _id,
-                _toRect(_mapDivLayoutJSON, x, y)
+        mPlugRef.pluginLayout.setMapDrawingRect(
+                mId,
+                toRect(mMapDivLayoutJSON, x, y)
         );
     }
 
     private void updateMapViewLayout() {
-        if (_plugRef.pluginLayout == null) {
+        if (mPlugRef.pluginLayout == null) {
             return;
         }
 
-        _plugRef.pluginLayout.setMapDrawingRect(
-                _id,
-                _toRect(_mapDivLayoutJSON, _cdvWebView.getView().getScrollX(), _cdvWebView.getView().getScrollY())
+        mPlugRef.pluginLayout.setMapDrawingRect(
+                mId,
+                toRect(mMapDivLayoutJSON, mCdvWebView.getView().getScrollX(), mCdvWebView.getView().getScrollY())
         );
 
-        _plugRef.pluginLayout.updateViewPosition();
+        mPlugRef.pluginLayout.updateViewPosition();
 
-        _layersGroup.requestLayout(); //todo watch this line if nothing is resized
+        mLayersGroup.requestLayout(); //todo watch this line if nothing is resized
 
     }
 
@@ -163,12 +161,12 @@ public class Map {
             }
 
             // update the map size
-            _mapDivLayoutJSON = options.getJSONObject("rect");
+            mMapDivLayoutJSON = options.getJSONObject("rect");
 
             // update the map overlay DOM elements touch boxes
             JSONArray HTMLs = options.isNull("HTMLs") ? new JSONArray() : options.getJSONArray("HTMLs");
-            _plugRef.pluginLayout.clearHTMLElement();
-            _updateMapOverlay(HTMLs);
+            mPlugRef.pluginLayout.clearHTMLElement();
+            updateMapOverlay(HTMLs);
 
             // Finally, update the map view layout to take account of the new map dimension.
             updateMapViewLayout();
@@ -179,20 +177,20 @@ public class Map {
         }
     }
 
-    private float _applyRetinaFactor(long d) {
-        return d * _retinaFactor;
+    private float applyRetinaFactor(long d) {
+        return d * mRetinaFactor;
     }
 
 
-    private RectF _toRect(JSONObject rect, float... scroll) {
+    private RectF toRect(JSONObject rect, float... scroll) {
         float scrollX = scroll.length > 0 ? scroll[0] : 0;
         float scrollY = scroll.length > 1 ? scroll[1] : 0;
 
         try{
-            float left = _applyRetinaFactor(rect.getLong("left"));
-            float width = _applyRetinaFactor(rect.getLong("width"));
-            float top = _applyRetinaFactor(rect.getLong("top"));
-            float height = _applyRetinaFactor(rect.getLong("height"));
+            float left = applyRetinaFactor(rect.getLong("left"));
+            float width = applyRetinaFactor(rect.getLong("width"));
+            float top = applyRetinaFactor(rect.getLong("top"));
+            float height = applyRetinaFactor(rect.getLong("height"));
 
             return new RectF(
                 left - scrollX,
@@ -208,8 +206,8 @@ public class Map {
 
     //todo take in account all type of layer
     private FrameLayout.LayoutParams _toLayoutParams(RectF rect) {
-        int screenW = Math.round(_cdvWebView.getView().getWidth());
-        int screenH = Math.round(_cdvWebView.getView().getHeight());
+        int screenW = Math.round(mCdvWebView.getView().getWidth());
+        int screenH = Math.round(mCdvWebView.getView().getHeight());
         int left = Math.round(rect.left);
         int right = Math.round(rect.right);
         int top = Math.round(rect.top);
