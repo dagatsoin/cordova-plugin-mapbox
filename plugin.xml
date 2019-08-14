@@ -32,10 +32,12 @@
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="Mapbox">
         <param name="android-package" value="com.dagatsoin.plugins.mapbox.CDVMapbox" />
+        <param name="onload" value="true" />
       </feature>
     </config-file>
 
     <config-file target="AndroidManifest.xml" parent="/*">
+        <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
         <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
         <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
         <uses-permission android:name="android.permission.INTERNET" />

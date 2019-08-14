@@ -137,17 +137,11 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                 )
         );
 
-        // make webview transparent to see the map through
-        //_root.setBackgroundColor(Color.WHITE);
-        //webView.getView().setBackgroundColor(Color.TRANSPARENT);
-
         try {
             int mapboxAccesstokenResourceId = cordova.getActivity().getResources().getIdentifier(MAPBOX_ACCESSTOKEN_RESOURCE_KEY, "string", cordova.getActivity().getPackageName());
             final String _accessToken = cordova.getActivity().getString(mapboxAccesstokenResourceId);
 
-            Handler mainHandler = new Handler(activity.getMainLooper());
-
-            mainHandler.post(() -> Mapbox.getInstance(activity, _accessToken));
+            activity.runOnUiThread(() -> Mapbox.getInstance(activity, _accessToken));
         } catch (Resources.NotFoundException e) {
             // we'll deal with this when the _accessToken property is read, but for now let's dump the error:
             e.printStackTrace();
