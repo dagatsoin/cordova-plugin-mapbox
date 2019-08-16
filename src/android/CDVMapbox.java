@@ -1,7 +1,6 @@
 package com.dagatsoin.plugins.mapbox;
 
 import android.app.Activity;
-import android.os.Handler;
 import android.content.res.Resources;
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
@@ -219,44 +218,35 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                         final int minZoom = options.getInt("minZoom");
                         final int maxZoom = options.getInt("maxZoom");
 
-                        Runnable startedCallback = () -> {
-                            try {
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, new JSONObject("{isStarted: true}"));
-                                result.setKeepCallback(true);
-                                callbackContext.sendPluginResult(result);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        };
-
                         Runnable progressCallback = () -> {
                             try {
-                                JSONObject progressMsg = new JSONObject();
-                                progressMsg.put("regionName", regionName);
-                                progressMsg.put("isDownloading", offlineController.isDownloading());
-                                progressMsg.put("progress", offlineController.getDownloadingProgress());
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, progressMsg);
-                                result.setKeepCallback(true);
-                                callbackContext.sendPluginResult(result);
+                                final OfflineController.OfflineRegionDownloadState dlState = offlineController.getOfflineRegionDownloadState();
+                                if (dlState != null) {
+                                    JSONObject progressMsg = new JSONObject();
+                                    progressMsg.put("regionName", regionName);
+                                    progressMsg.put("downloadingProgress", dlState.downloadingProgress);
+                                    progressMsg.put("isComplete", dlState.isComplete);
+                                    progressMsg.put("requiredResourceCount", dlState.requiredResourceCount);
+                                    progressMsg.put("downloadState", dlState.downloadState == 1 ? "STATE_ACTIVE" : "STATE_INACTIVE");
+                                    progressMsg.put("completeTileSize", dlState.completeTileSize);
+                                    progressMsg.put("completeTileCount", dlState.completeTileCount);
+                                    progressMsg.put("completeResourceSize", dlState.completeResourceSize);
+                                    progressMsg.put("completedResourceCount", dlState.completedResourceCount);
+                                    PluginResult result = new PluginResult(PluginResult.Status.OK, progressMsg);
+                                    result.setKeepCallback(true);
+                                    callbackContext.sendPluginResult(result);
+                                }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         };
 
-                        Runnable finishedCallback = () -> {
-                            try {
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, new JSONObject("{isFinished: true}"));
-                                callbackContext.sendPluginResult(result);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        };
                         offlineController.getOfflineRegions(() -> {
                             try {
                                 ArrayList<String> regionsList = offlineController.getOfflineRegionsNames();
                                 final boolean isAlreadyDownloaded = regionsList.contains(regionName);
                                 if (!isAlreadyDownloaded) {
-                                    offlineController.downloadRegion(regionName, latLngBounds, minZoom, maxZoom, startedCallback, progressCallback, finishedCallback);
+                                    offlineController.downloadRegion(regionName, latLngBounds, minZoom, maxZoom, progressCallback);
                                 } else {
                                     callbackContext.error(new JSONObject("{error: 'MAP_EXISTS'}"));
                                 }

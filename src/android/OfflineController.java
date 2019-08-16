@@ -2,6 +2,7 @@ package com.dagatsoin.plugins.mapbox;
 
 import android.app.Activity;
 import android.content.res.Resources;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -21,13 +22,13 @@ class OfflineController {
     private String mStyleUrl;
     private OfflineManager mOfflineManager;
     private HashMap<String, OfflineRegion> mDownloadingOfflineRegionList = new HashMap();
-    private int mDownloadingProgress;
     private ArrayList<String> mOfflineRegionsNames = new ArrayList<>();
     private final static String JSON_CHARSET = "UTF-8";
     private final static String JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME";
+    private OfflineRegionDownloadState mOfflineRegionDownloadState;
 
-    int getDownloadingProgress() {
-        return mDownloadingProgress;
+    @Nullable OfflineRegionDownloadState getOfflineRegionDownloadState() {
+        return mOfflineRegionDownloadState;
     }
 
     boolean isDownloading() {
@@ -54,9 +55,7 @@ class OfflineController {
             final LatLngBounds bounds,
             final int minZoom,
             final int maxZoom,
-            final Runnable onStart,
-            final Runnable onProgress,
-            final Runnable onFinish
+            final Runnable onProgress
     ) {
         // Define the offline region
         OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
@@ -85,8 +84,9 @@ class OfflineController {
                     // Set up an observer to handle download progress and
                     // notify the user when the region is finished downloading
                     // Start the progression
-                    onStart.run();
+                    mOfflineRegionDownloadState = new OfflineRegionDownloadState();
                     offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
+                    onProgress.run();
                     offlineRegion.setObserver(new OfflineRegion.OfflineRegionObserver() {
                         @Override
                         public void onStatusChanged(OfflineRegionStatus status) {
@@ -95,14 +95,22 @@ class OfflineController {
                                     (100.0 * status.getCompletedResourceCount() / status.getRequiredResourceCount()) :
                                     0.0;
 
+                            mOfflineRegionDownloadState.downloadingProgress = ((int) Math.round(percentage));
+                            mOfflineRegionDownloadState.completedResourceCount = status.getCompletedResourceCount();
+                            mOfflineRegionDownloadState.completeResourceSize = status.getCompletedResourceSize();
+                            mOfflineRegionDownloadState.completeTileCount = status.getCompletedTileCount();
+                            mOfflineRegionDownloadState.completeTileSize = status.getCompletedTileSize();
+                            mOfflineRegionDownloadState.downloadState = status.getDownloadState();
+                            mOfflineRegionDownloadState.requiredResourceCount = status.getRequiredResourceCount();
+                            mOfflineRegionDownloadState.isComplete = status.isComplete();
+
+                            if (status.isRequiredResourceCountPrecise()) {
+                                onProgress.run();
+                            }
+
                             if (status.isComplete()) {
                                 // Download complete
-                                onFinish.run();
                                 mDownloadingOfflineRegionList.remove(regionName);
-                            } else if (status.isRequiredResourceCountPrecise()) {
-                                // Switch to determinate state
-                                mDownloadingProgress = ((int) Math.round(percentage));
-                                onProgress.run();
                             }
 
                             // Log what is being currently downloaded
@@ -122,7 +130,7 @@ class OfflineController {
                         public void mapboxTileCountLimitExceeded(long limit) {
                             if (minZoom > maxZoom) {
                                 Log.w(TAG, "Mapbox tile count limit exceeded: " + limit + ". Trying with lower max zoom.");
-                                downloadRegion(regionName, bounds, minZoom, maxZoom - 1, onStart, onProgress, onFinish);
+                                downloadRegion(regionName, bounds, minZoom, maxZoom - 1, onProgress);
                             }
                             Log.e(TAG, "Mapbox tile count limit exceeded: " + limit);
                         }
@@ -242,5 +250,16 @@ class OfflineController {
             regionName = "Region " + offlineRegion.getID();
         }
         return regionName;
+    }
+
+    class OfflineRegionDownloadState {
+        int downloadingProgress = 0;
+        boolean isComplete = false;
+        long requiredResourceCount = 0;
+        int downloadState = OfflineRegion.STATE_ACTIVE;
+        long completeTileSize = 0;
+        long completeTileCount = 0;
+        long completeResourceSize = 0;
+        long completedResourceCount = 0;
     }
 }
