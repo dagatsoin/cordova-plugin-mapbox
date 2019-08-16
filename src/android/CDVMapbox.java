@@ -219,41 +219,32 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                         final int maxZoom = options.getInt("maxZoom");
 
                         Runnable progressCallback = () -> {
-                            try {
-                                final OfflineController.OfflineRegionDownloadState dlState = offlineController.getOfflineRegionDownloadState();
-                                if (dlState != null) {
-                                    JSONObject progressMsg = new JSONObject();
-                                    progressMsg.put("regionName", regionName);
-                                    progressMsg.put("downloadingProgress", dlState.downloadingProgress);
-                                    progressMsg.put("isComplete", dlState.isComplete);
-                                    progressMsg.put("requiredResourceCount", dlState.requiredResourceCount);
-                                    progressMsg.put("downloadState", dlState.downloadState == 1 ? "STATE_ACTIVE" : "STATE_INACTIVE");
-                                    progressMsg.put("completeTileSize", dlState.completeTileSize);
-                                    progressMsg.put("completeTileCount", dlState.completeTileCount);
-                                    progressMsg.put("completeResourceSize", dlState.completeResourceSize);
-                                    progressMsg.put("completedResourceCount", dlState.completedResourceCount);
-                                    PluginResult result = new PluginResult(PluginResult.Status.OK, progressMsg);
-                                    result.setKeepCallback(true);
-                                    callbackContext.sendPluginResult(result);
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                            final OfflineController.OfflineRegionState dlState = offlineController.getOfflineRegionDownloadState(regionName);
+                            if (dlState != null) {
+                                PluginResult result = new PluginResult(PluginResult.Status.OK, toJSONRegionState(dlState));
+                                result.setKeepCallback(true);
+                                callbackContext.sendPluginResult(result);
                             }
                         };
 
-                        offlineController.getOfflineRegions(() -> {
-                            try {
-                                ArrayList<String> regionsList = offlineController.getOfflineRegionsNames();
-                                final boolean isAlreadyDownloaded = regionsList.contains(regionName);
-                                if (!isAlreadyDownloaded) {
-                                    offlineController.downloadRegion(regionName, latLngBounds, minZoom, maxZoom, progressCallback);
-                                } else {
-                                    callbackContext.error(new JSONObject("{error: 'MAP_EXISTS'}"));
+
+                        try {
+                            ArrayList<OfflineController.OfflineRegionState> states = offlineController.getOfflineRegionStates();
+                            boolean isAlreadyDownloaded = false;
+                            for (OfflineController.OfflineRegionState state: states) {
+                                if (state.regionName.equals("regionName")) {
+                                    isAlreadyDownloaded = true;
                                 }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
-                        });
+                            if (!isAlreadyDownloaded) {
+                                offlineController.downloadRegion(regionName, latLngBounds, minZoom, maxZoom, progressCallback);
+                            } else {
+                                callbackContext.error(new JSONObject("{error: 'MAP_EXISTS'}"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -309,13 +300,13 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                 cordova.getThreadPool().execute(() -> {
                     try {
                         final String styleUrl = args.optString(1);
-                        OfflineController offlineController;
-                        offlineController = getOfflineController(map, styleUrl, activity);
-                        OfflineController finalOfflineController = offlineController;
-                        offlineController.getOfflineRegions(() -> {
-                            ArrayList<String> regionsList = finalOfflineController.getOfflineRegionsNames();
-                            callbackContext.success(new JSONArray(regionsList));
-                        });
+                        final OfflineController offlineController = getOfflineController(map, styleUrl, activity);
+                        final ArrayList<OfflineController.OfflineRegionState> states = offlineController.getOfflineRegionStates();
+                        final ArrayList<JSONObject> res = new ArrayList<>();
+                        for (OfflineController.OfflineRegionState state: states) {
+                            res.add(toJSONRegionState(state));
+                        }
+                        callbackContext.success(new JSONArray(res));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -363,6 +354,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                 final MapController mapCtrl = map.getMapCtrl();
                 final String styleUrl = args.optString(2);
                 final OfflineController offlineController = getOfflineController(map, styleUrl, activity);
+                Runnable callback = () -> map.setContainer(args, callbackContext);
                 switch (action) {
                     case HIDE:
                         activity.runOnUiThread(() -> {
@@ -385,7 +377,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                         });
                         break;
                     case RESIZE:
-                        activity.runOnUiThread(() -> map.setContainer(args, callbackContext));
+                        activity.runOnUiThread(callback);
                         break;
                     case GET_ZOOM:
                         activity.runOnUiThread(() -> {
@@ -984,7 +976,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                         }));
                         break;
                     case SET_CONTAINER:
-                        activity.runOnUiThread(() -> map.setContainer(args, callbackContext));
+                        activity.runOnUiThread(callback);
                         break;
                     case GET_BOUNDS:
                         activity.runOnUiThread(() -> {
@@ -1029,6 +1021,24 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
             callbackContext.error(t.getMessage());
         }
         return true;
+    }
+
+    static private JSONObject toJSONRegionState(OfflineController.OfflineRegionState state) {
+        JSONObject progressMsg = new JSONObject();
+        try {
+            progressMsg.put("regionName", state.regionName);
+            progressMsg.put("downloadingProgress", state.downloadingProgress);
+            progressMsg.put("isComplete", state.isComplete);
+            progressMsg.put("requiredResourceCount", state.requiredResourceCount);
+            progressMsg.put("downloadState", state.downloadState == 1 ? "STATE_ACTIVE" : "STATE_INACTIVE");
+            progressMsg.put("completeTileSize", state.completeTileSize);
+            progressMsg.put("completeTileCount", state.completeTileCount);
+            progressMsg.put("completeResourceSize", state.completeResourceSize);
+            progressMsg.put("completedResourceCount", state.completedResourceCount);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return progressMsg;
     }
 
     static private OfflineController getOfflineController(@Nullable Map map, String styleUrl, Activity activity) throws Exception {

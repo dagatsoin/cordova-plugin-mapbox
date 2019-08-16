@@ -21,27 +21,33 @@ class OfflineController {
     private final static String TAG = "MAP_CONTROLLER";
     private String mStyleUrl;
     private OfflineManager mOfflineManager;
-    private HashMap<String, OfflineRegion> mDownloadingOfflineRegionList = new HashMap();
-    private ArrayList<String> mOfflineRegionsNames = new ArrayList<>();
+    private HashMap<String, OfflineRegion> mDownloadingOfflineRegionList = new HashMap<>();
+    private HashMap<String, OfflineRegionState> mOfflineRegionStates = new HashMap<>();
     private final static String JSON_CHARSET = "UTF-8";
     private final static String JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME";
-    private OfflineRegionDownloadState mOfflineRegionDownloadState;
+    private boolean mIsReady = false;
 
-    @Nullable OfflineRegionDownloadState getOfflineRegionDownloadState() {
-        return mOfflineRegionDownloadState;
+    @Nullable
+    OfflineRegionState getOfflineRegionDownloadState(String regionName) {
+        return mOfflineRegionStates.get(regionName);
+    }
+
+    boolean getIsReady() {
+        return mIsReady;
     }
 
     boolean isDownloading() {
         return !mDownloadingOfflineRegionList.isEmpty();
     }
 
-    ArrayList<String> getOfflineRegionsNames() {
-        return mOfflineRegionsNames;
+    ArrayList<OfflineRegionState> getOfflineRegionStates() {
+        return new ArrayList<>(mOfflineRegionStates.values());
     }
 
     OfflineController(Activity activity, String styleUrl) {
         mOfflineManager = OfflineManager.getInstance(activity);
         mStyleUrl = styleUrl;
+        setOfflineRegionStatesFromDB();
     }
 
     private float retinaFactor = Resources.getSystem().getDisplayMetrics().density;
@@ -84,25 +90,15 @@ class OfflineController {
                     // Set up an observer to handle download progress and
                     // notify the user when the region is finished downloading
                     // Start the progression
-                    mOfflineRegionDownloadState = new OfflineRegionDownloadState();
+                    final OfflineRegionState offlineRegionState = new OfflineRegionState("",null);
+                    mOfflineRegionStates.put(regionName, offlineRegionState);
                     offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
                     onProgress.run();
                     offlineRegion.setObserver(new OfflineRegion.OfflineRegionObserver() {
                         @Override
                         public void onStatusChanged(OfflineRegionStatus status) {
                             // Compute a percentage
-                            double percentage = status.getRequiredResourceCount() >= 0 ?
-                                    (100.0 * status.getCompletedResourceCount() / status.getRequiredResourceCount()) :
-                                    0.0;
-
-                            mOfflineRegionDownloadState.downloadingProgress = ((int) Math.round(percentage));
-                            mOfflineRegionDownloadState.completedResourceCount = status.getCompletedResourceCount();
-                            mOfflineRegionDownloadState.completeResourceSize = status.getCompletedResourceSize();
-                            mOfflineRegionDownloadState.completeTileCount = status.getCompletedTileCount();
-                            mOfflineRegionDownloadState.completeTileSize = status.getCompletedTileSize();
-                            mOfflineRegionDownloadState.downloadState = status.getDownloadState();
-                            mOfflineRegionDownloadState.requiredResourceCount = status.getRequiredResourceCount();
-                            mOfflineRegionDownloadState.isComplete = status.isComplete();
+                            offlineRegionState.hydrate(regionName, status);
 
                             if (status.isRequiredResourceCountPrecise()) {
                                 onProgress.run();
@@ -124,6 +120,8 @@ class OfflineController {
                         public void onError(OfflineRegionError error) {
                             Log.e(TAG, "Mapbox download map error: reason: " + error.getReason());
                             Log.e(TAG, "Mapbox download map error: message: " + error.getMessage());
+                            mDownloadingOfflineRegionList.remove(regionName);
+                            mOfflineRegionStates.remove(regionName);
                         }
 
                         @Override
@@ -174,21 +172,39 @@ class OfflineController {
 
     }
 
-    void getOfflineRegions(final Runnable callback) {
+    private void setOfflineRegionStatesFromDB() {
         mOfflineManager.listOfflineRegions(new OfflineManager.ListOfflineRegionsCallback() {
             @Override
             public void onList(final OfflineRegion[] offlineRegions) {
+                int nb = offlineRegions.length;
                 // Clean the last ref array and add all of the region names to the list.
-                mOfflineRegionsNames.clear();
+                mOfflineRegionStates.clear();
                 for (OfflineRegion offlineRegion : offlineRegions) {
-                    mOfflineRegionsNames.add(getRegionName(offlineRegion));
+                    offlineRegion.getStatus(new OfflineRegion.OfflineRegionStatusCallback(){
+
+                        @Override
+                        public void onStatus(OfflineRegionStatus status) {
+                            final String regionName = getRegionName(offlineRegion);
+                            OfflineRegionState offlineRegionState = new OfflineRegionState(regionName, status);
+                            mOfflineRegionStates.put(getRegionName(offlineRegion), offlineRegionState);
+                            if (mOfflineRegionStates.size() == nb) {
+                                mIsReady = true;
+                            }
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            mIsReady = false;
+                            Log.e(TAG, "Error while reading Mapbox local DB");
+                        }
+                    });
                 }
-                callback.run();
             }
 
             @Override
             public void onError(String error) {
-
+                mIsReady = false;
+                Log.e(TAG, "Error while reading Mapbox local DB");
             }
         });
     }
@@ -218,11 +234,14 @@ class OfflineController {
                     selectedRegion.delete(new OfflineRegion.OfflineRegionDeleteCallback() {
                         @Override
                         public void onDelete() {
+                            mOfflineRegionStates.remove(regionName);
                             onDelete.run();
                         }
 
                         @Override
                         public void onError(String error) {
+                            Log.e(TAG, "Error while deleteing item in Mapbox local DB");
+                            mOfflineRegionStates.remove(regionName);
                             onError.run();
                         }
                     });
@@ -231,7 +250,8 @@ class OfflineController {
 
             @Override
             public void onError(String error) {
-
+                Log.e(TAG, "Error while deleteing item in Mapbox local DB");
+                mOfflineRegionStates.remove(regionName);
             }
         });
     }
@@ -252,7 +272,8 @@ class OfflineController {
         return regionName;
     }
 
-    class OfflineRegionDownloadState {
+    class OfflineRegionState {
+        String regionName = "";
         int downloadingProgress = 0;
         boolean isComplete = false;
         long requiredResourceCount = 0;
@@ -261,5 +282,26 @@ class OfflineController {
         long completeTileCount = 0;
         long completeResourceSize = 0;
         long completedResourceCount = 0;
+
+        OfflineRegionState(String _regionName, @Nullable OfflineRegionStatus status) {
+            if (status != null) {
+                hydrate(_regionName, status);
+            }
+        }
+
+        void hydrate(String _regionName, OfflineRegionStatus status) {
+            double percentage = status.getRequiredResourceCount() >= 0
+                ? (100.0 * status.getCompletedResourceCount() / status.getRequiredResourceCount())
+                : 0.0;
+            regionName = _regionName;
+            downloadingProgress = ((int) Math.round(percentage));
+            completedResourceCount = status.getCompletedResourceCount();
+            completeResourceSize = status.getCompletedResourceSize();
+            completeTileCount = status.getCompletedTileCount();
+            completeTileSize = status.getCompletedTileSize();
+            downloadState = status.getDownloadState();
+            requiredResourceCount = status.getRequiredResourceCount();
+            isComplete = status.isComplete();
+        }
     }
 }
