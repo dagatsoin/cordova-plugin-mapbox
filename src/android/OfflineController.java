@@ -90,7 +90,7 @@ class OfflineController {
                     // Set up an observer to handle download progress and
                     // notify the user when the region is finished downloading
                     // Start the progression
-                    final OfflineRegionState offlineRegionState = new OfflineRegionState("",null);
+                    final OfflineRegionState offlineRegionState = new OfflineRegionState(regionName,null);
                     mOfflineRegionStates.put(regionName, offlineRegionState);
                     offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
                     onProgress.run();
@@ -284,6 +284,7 @@ class OfflineController {
         long completedResourceCount = 0;
 
         OfflineRegionState(String _regionName, @Nullable OfflineRegionStatus status) {
+            regionName = _regionName;
             if (status != null) {
                 hydrate(_regionName, status);
             }
