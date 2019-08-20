@@ -292,7 +292,7 @@ class OfflineController {
 
         void hydrate(String _regionName, OfflineRegionStatus status) {
             double percentage = status.getRequiredResourceCount() >= 0
-                ? (100.0 * status.getCompletedResourceCount() / status.getRequiredResourceCount())
+                ? status.getCompletedResourceCount() / status.getRequiredResourceCount()
                 : 0.0;
             regionName = _regionName;
             downloadingProgress = ((int) Math.round(percentage));
