@@ -12,10 +12,8 @@ import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.view.MotionEvent;
 import android.view.animation.BounceInterpolator;
@@ -53,7 +51,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-class MapController extends AppCompatActivity implements MapboxMap.OnMapClickListener {
+class MapController implements MapboxMap.OnMapClickListener {
     @Nullable private String mSelectableFeaturePropType;
     @Nullable private String mSelectedFeatureLayerId;
     @Nullable private String mSelectedFeatureSourceId;
@@ -62,7 +60,6 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
     private MapView mMapView;
     private String mStyleUrl;
     private MapboxMap mMapboxMap;
-    private ArrayList<String> mOfflineRegionsNames = new ArrayList<>();
     private Activity mActivity;
     boolean isReady = false;
     Runnable mapReady;
@@ -103,10 +100,6 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
                         FrameLayout.LayoutParams.MATCH_PARENT
                 ));
 
-        // need to do this to register a receiver which onPause later needs
-        mMapView.onResume();
-        mMapView.onCreate(null);
-
         // Prevent scroll to intercept the touch when pane the map
         if (scrollView != null) {
             mMapView.setOnTouchListener((v, event) -> {
@@ -123,40 +116,49 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
             });
         }
 
+        // Important. As we do not use the activity creation as stated in the Mapbox doc,
+        // we need to call manually the different life cycle.
+        // Otherwise the map won't display entirely.
+        mMapView.onCreate(null);
+        mMapView.onStart();
+        mMapView.onResume();
+
         mMapView.getMapAsync(mapView -> {
             mMapboxMap = mapView;
             mSelectedFeatureSourceId = selectedFeatureSourceId;
             mSelectedFeatureLayerId = selectedFeatureLayerId;
             mSelectableFeaturePropType= selectableFeaturePropType;
             mMapboxMap.addOnMapClickListener(MapController.this);
+
             mapView.setStyle(new Style.Builder().fromUrl(mStyleUrl), _style -> {
                 style = _style;
                 isReady = true;
                 mapReady.run();
             });
         });
+
     }
 
-    public OfflineController getOfflineController() {
+    OfflineController getOfflineController() {
         @Nullable OfflineController offlineController = OfflineControllerPool.get(mStyleUrl);
         return offlineController != null ? offlineController : OfflineControllerPool.create(mActivity, mStyleUrl);
     }
 
-    public void addFeatureCollection(String featureCollectionId, FeatureCollection featureCollection ) {
+    void addFeatureCollection(String featureCollectionId, FeatureCollection featureCollection ) {
         final GeoJsonSource geoJsonSource = new GeoJsonSource(featureCollectionId, featureCollection);
         if (style.getSource(featureCollectionId) == null) {
             addGeoJsonSource(geoJsonSource);
         }
     }
 
-    public void addFeature(String featureId, Feature feature ) {
+    void addFeature(String featureId, Feature feature ) {
         final GeoJsonSource geoJsonSource = new GeoJsonSource(featureId, feature);
         if (style.getSource(featureId) == null) {
             addGeoJsonSource(geoJsonSource);
         }
     }
 
-    public void addGeoJsonSource(String sourceId) {
+    void addGeoJsonSource(String sourceId) {
         if (style.getSource(sourceId) == null) {
             style.addSource(new GeoJsonSource(sourceId));
         }
@@ -169,7 +171,7 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
         }
     }
 
-    public boolean removeSource(String sourceId) {
+    boolean removeSource(String sourceId) {
         try {
             // Throw when source is still in use
             return style.removeSource(sourceId);
@@ -179,7 +181,7 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
         }
     }
 
-    public void setSourceGeoJsonData(String sourceId, FeatureCollection featureCollection) {
+    void setSourceGeoJsonData(String sourceId, FeatureCollection featureCollection) {
         final GeoJsonSource source = style.getSourceAs(sourceId);
         if (source != null) {
             // https://github.com/mapbox/mapbox-gl-native/issues/14565#issuecomment-496923239
@@ -187,14 +189,14 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
         }
     }
 
-    public void setSourceGeoJsonData(String sourceId, Feature feature) {
+    void setSourceGeoJsonData(String sourceId, Feature feature) {
         final GeoJsonSource source = style.getSourceAs(sourceId);
         if (source != null) {
             source.setGeoJson(feature);
         }
     }
 
-    public void addSymbolLayer(
+    void addSymbolLayer(
             String layerId,
             String sourceId,
             Integer minZoom,
@@ -221,11 +223,11 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
         }
     }
 
-    public boolean removeLayer(String layerId) {
+    boolean removeLayer(String layerId) {
         return style.removeLayer(layerId);
     }
 
-    public void addImage(String imageId, JSONObject jsonImage) {
+    void addImage(String imageId, JSONObject jsonImage) {
         try {
             final Bitmap bitmap = createImage(jsonImage);
             style.addImage(imageId, bitmap);
@@ -234,33 +236,33 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
         }
     }
 
-    public void removeImage(String imageId) {
+    void removeImage(String imageId) {
         style.removeImage(imageId);
     }
 
 
-    public void setLayoutPropertyIconImage(String layerId, String imageId) {
+    void setLayoutPropertyIconImage(String layerId, String imageId) {
         final Layer layer = style.getLayer(layerId);
         if (layer != null) {
             layer.setProperties(PropertyFactory.iconImage(imageId));
         }
     }
 
-    public void setLayoutPropertyOffset(String layerId, Float[] offset) {
+    void setLayoutPropertyOffset(String layerId, Float[] offset) {
         final Layer layer = style.getLayer(layerId);
         if (layer != null) {
             layer.setProperties(PropertyFactory.iconOffset(offset));
         }
     }
 
-    public void setLayoutPropertySize(String layerId, float size) {
+    void setLayoutPropertySize(String layerId, float size) {
         final Layer layer = style.getLayer(layerId);
         if (layer != null) {
             layer.setProperties(PropertyFactory.iconSize(size));
         }
     }
 
-    public void setLayoutPropertyIconOverlap(String layerId, boolean isOverlap) {
+    void setLayoutPropertyIconOverlap(String layerId, boolean isOverlap) {
         final Layer layer = style.getLayer(layerId);
         if (layer != null) {
             layer.setProperties(PropertyFactory.iconAllowOverlap(isOverlap));
@@ -553,43 +555,43 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
         }
     }
 
-    public void addOnWillStartLoadingMapListener(Runnable callback) {
+    void addOnWillStartLoadingMapListener(Runnable callback) {
         mMapView.addOnWillStartLoadingMapListener(callback::run);
     }
 
-    public void addOnWillStartRenderingMapListener(Runnable callback) {
+    void addOnWillStartRenderingMapListener(Runnable callback) {
         mMapView.addOnWillStartRenderingMapListener(callback::run);
     }
 
-    public void addOnCameraWillChangeListener(Runnable callback) {
+    void addOnCameraWillChangeListener(Runnable callback) {
         mMapView.addOnCameraWillChangeListener((boolean isAnimated) -> callback.run());
     }
 
-    public void addOnCameraDidChangeListener(Runnable callback) {
+    void addOnCameraDidChangeListener(Runnable callback) {
         mMapView.addOnCameraDidChangeListener((boolean isAnimated) -> callback.run());
     }
 
-    public void addOnDidFinishLoadingStyleListener(Runnable callback) {
+    void addOnDidFinishLoadingStyleListener(Runnable callback) {
         mMapView.addOnDidFinishLoadingStyleListener(callback::run);
     }
 
-    public void addOnSourceChangedListener(Runnable callback) {
+    void addOnSourceChangedListener(Runnable callback) {
         mMapView.addOnSourceChangedListener((String id) -> callback.run());
     }
 
-    public void addOnWillStartRenderingFrameListener(Runnable callback) {
+    void addOnWillStartRenderingFrameListener(Runnable callback) {
         mMapView.addOnWillStartRenderingFrameListener(callback::run);
     }
 
-    public void addOnDidFinishRenderingFrameListener(Runnable callback) {
+    void addOnDidFinishRenderingFrameListener(Runnable callback) {
         mMapView.addOnDidFinishRenderingFrameListener((boolean fully) -> callback.run());
     }
 
-    public void addOnDidFinishLoadingMapListener(Runnable callback) {
+    void addOnDidFinishLoadingMapListener(Runnable callback) {
         mMapView.addOnDidFinishLoadingMapListener(callback::run);
     }
 
-    public void addOnDidFinishRenderingMapListener(Runnable callback) {
+    void addOnDidFinishRenderingMapListener(Runnable callback) {
         mMapView.addOnDidFinishRenderingMapListener((boolean fully) -> callback.run());
     }
 
@@ -654,7 +656,7 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
         mHasSelectedFeature = true;
     }
 
-    public void deselectFeature() {
+    void deselectFeature() {
         if (mSelectedFeatureSourceId == null) return;
 
         final GeoJsonSource source = style.getSourceAs(mSelectedFeatureSourceId);
@@ -680,47 +682,5 @@ class MapController extends AppCompatActivity implements MapboxMap.OnMapClickLis
             callback.run();
             return true;
         }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        mMapView.onStart();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mMapView.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mMapView.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        mMapView.onStop();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mMapView.onLowMemory();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mMapView.onDestroy();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
     }
 }

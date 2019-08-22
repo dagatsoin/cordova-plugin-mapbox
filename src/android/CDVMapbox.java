@@ -204,7 +204,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                     "                        },");
                         }
                         final JSONObject options = args.getJSONObject(1);
-                        @Nullable final String styleUrl = options.optString("styleUrl");
+                        @Nullable final String styleUrl = options.has("styleUrl") ? options.getString("styleUrl") : null;
                         final OfflineController offlineController = getOfflineController(map, styleUrl, activity);
                         final String regionName = options.getString("regionName");
 
@@ -260,13 +260,11 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    final String regionName;
                     try {
                         if (options != null) {
-                            regionName = options.optString("regionName");
-                            final String styleUrl = options.optString("styleUrl");
-                            OfflineController offlineController;
-                            offlineController = getOfflineController(map, styleUrl, activity);
+                            @Nullable final String regionName = options.has("regionName") ? options.getString("regionName") : null;
+                            @Nullable final String styleUrl = options.has("styleUrl") ? options.getString("styleUrl") : null;
+                            OfflineController offlineController = getOfflineController(map, styleUrl, activity);
                             offlineController.pauseDownload(regionName);
                             callbackContext.success();
                         }
@@ -282,13 +280,11 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    final String regionName;
                     if (options != null) {
-                        regionName = options.optString("regionName");
-                        final String styleUrl = options.optString("styleUrl");
-                        OfflineController offlineController;
                         try {
-                            offlineController = getOfflineController(map, styleUrl, activity);
+                            @Nullable final String regionName = options.has("regionName") ? options.getString("regionName") : null;
+                            @Nullable final String styleUrl = options.has("styleUrl") ? options.getString("styleUrl") : null;
+                            OfflineController offlineController = getOfflineController(map, styleUrl, activity);
                             offlineController.resumeDownload(regionName);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -299,7 +295,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
             } else if (GET_OFFLINE_REGION_LIST.equals(action)) {
                 cordova.getThreadPool().execute(() -> {
                     try {
-                        final String styleUrl = args.optString(1);
+                        @Nullable final String styleUrl = args.optString(1).equals("") ? null : args.optString(1);
                         final OfflineController offlineController = getOfflineController(map, styleUrl, activity);
                         final ArrayList<OfflineController.OfflineRegionState> states = offlineController.getOfflineRegionStates();
                         final ArrayList<JSONObject> res = new ArrayList<>();
@@ -317,8 +313,8 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     final JSONObject options;
                     try {
                         options = args.getJSONObject(1);
-                        final String regionName = options.optString("regionName");
-                        final String styleUrl = options.optString("styleUrl");
+                        @Nullable final String regionName = options.has("regionName") ? options.getString("regionName") : null;
+                        @Nullable final String styleUrl = options.has("styleUrl") ? options.getString("styleUrl") : null;
                         final OfflineController offlineController = getOfflineController(map, styleUrl, activity);
                         offlineController.removeOfflineRegion(
                                 regionName,
@@ -352,7 +348,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                 }
 
                 final MapController mapCtrl = map.getMapCtrl();
-                final String styleUrl = args.optString(2);
+                @Nullable final String styleUrl = args.optString(1).equals("") ? null : args.optString(1);
                 final OfflineController offlineController = getOfflineController(map, styleUrl, activity);
                 Runnable callback = () -> map.setContainer(args, callbackContext);
                 switch (action) {
@@ -1027,7 +1023,6 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
         JSONObject progressMsg = new JSONObject();
         try {
             progressMsg.put("regionName", state.regionName);
-            progressMsg.put("downloadingProgress", state.downloadingProgress);
             progressMsg.put("isComplete", state.isComplete);
             progressMsg.put("requiredResourceCount", state.requiredResourceCount);
             progressMsg.put("downloadState", state.downloadState == 1 ? "STATE_ACTIVE" : "STATE_INACTIVE");
@@ -1041,9 +1036,9 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
         return progressMsg;
     }
 
-    static private OfflineController getOfflineController(@Nullable Map map, String styleUrl, Activity activity) throws Exception {
+    static private OfflineController getOfflineController(@Nullable Map map, @Nullable String styleUrl, Activity activity) throws Exception {
         if (map == null) {
-            if (styleUrl.isEmpty()) {
+            if (styleUrl == null || styleUrl.isEmpty()) {
                 throw new Exception("When the Map is not displayed, you need to provide a style url");
             }
             return OfflineControllerPool.get(styleUrl) != null ? OfflineControllerPool.get(styleUrl) : OfflineControllerPool.create(activity, styleUrl);
@@ -1062,5 +1057,6 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
 
     public void onDestroy() {
         MapsManager.onDestroy();
+        OfflineControllerPool.onDestroy();
     }
 }

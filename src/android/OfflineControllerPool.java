@@ -20,4 +20,11 @@ public class OfflineControllerPool {
     static void remove(String styleUrl) {
         mList.remove(styleUrl);
     }
+
+    static void onDestroy() {
+        for (HashMap.Entry<String, OfflineController> entry : mList.entrySet()) {
+            final OfflineController controller = entry.getValue();
+            controller.pauseDownload(null);
+        }
+    }
 }

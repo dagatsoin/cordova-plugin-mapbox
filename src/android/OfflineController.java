@@ -145,28 +145,46 @@ class OfflineController {
         }
     }
 
-    void pauseDownload(String id) {
-        if (id.equals("")) {
+    void pauseDownload(@Nullable String id) {
+        if (id == null) {
             for (OfflineRegion offlineRegion : mDownloadingOfflineRegionList.values()) {
-                offlineRegion.setDownloadState(OfflineRegion.STATE_INACTIVE);
+                // Catch an exception where the region is already deleted
+                try {
+                    offlineRegion.setDownloadState(OfflineRegion.STATE_INACTIVE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             OfflineRegion maybeRegion = mDownloadingOfflineRegionList.get(id);
             if (maybeRegion != null) {
-                maybeRegion.setDownloadState(OfflineRegion.STATE_INACTIVE);
+                try {
+                    maybeRegion.setDownloadState(OfflineRegion.STATE_INACTIVE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-    void resumeDownload(String id) {
-        if (id.equals("")) {
+    void resumeDownload(@Nullable String id) {
+        if (id == null) {
             for (OfflineRegion offlineRegion: mDownloadingOfflineRegionList.values()) {
-                offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
+                // Catch an exception where the region is already deleted
+                try {
+                    offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             OfflineRegion maybeRegion = mDownloadingOfflineRegionList.get(id);
             if (maybeRegion != null) {
-                maybeRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
+                try {
+                   maybeRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -215,36 +233,43 @@ class OfflineController {
      * @param onDelete on success callback
      * @param onError on error callback
      */
-    void removeOfflineRegion(final String regionName, final Runnable onDelete, final Runnable onError) {
+    void removeOfflineRegion(@Nullable final String regionName, final Runnable onDelete, final Runnable onError) {
         mOfflineManager.listOfflineRegions(new OfflineManager.ListOfflineRegionsCallback() {
-            @Override
-            public void onList(final OfflineRegion[] offlineRegions) {
-
-                OfflineRegion selectedRegion = null;
-                for (OfflineRegion region : offlineRegions) {
-                    if(getRegionName(region).equals(regionName)) {
-                        selectedRegion = region;
-                        break;
-                    }
+            private OfflineRegion.OfflineRegionDeleteCallback callback = new OfflineRegion.OfflineRegionDeleteCallback() {
+                @Override
+                public void onDelete() {
+                    mOfflineRegionStates.remove(regionName);
+                    onDelete.run();
                 }
 
-                if (selectedRegion == null) {
+                @Override
+                public void onError(String error) {
+                    Log.e(TAG, "Error while deleteing item in Mapbox local DB");
+                    mOfflineRegionStates.remove(regionName);
                     onError.run();
-                } else {
-                    selectedRegion.delete(new OfflineRegion.OfflineRegionDeleteCallback() {
-                        @Override
-                        public void onDelete() {
-                            mOfflineRegionStates.remove(regionName);
-                            onDelete.run();
-                        }
+                }
+            };
 
-                        @Override
-                        public void onError(String error) {
-                            Log.e(TAG, "Error while deleteing item in Mapbox local DB");
-                            mOfflineRegionStates.remove(regionName);
-                            onError.run();
+            @Override
+            public void onList(final OfflineRegion[] offlineRegions) {
+                if (regionName != null) {
+                    OfflineRegion selectedRegion = null;
+                    for (OfflineRegion region : offlineRegions) {
+                        if (getRegionName(region).equals(regionName)) {
+                            selectedRegion = region;
+                            break;
                         }
-                    });
+                    }
+
+                    if (selectedRegion == null) {
+                        onError.run();
+                    } else {
+                        selectedRegion.delete(callback);
+                    }
+                } else {
+                    for (OfflineRegion region : offlineRegions) {
+                        region.delete(callback);
+                    }
                 }
             }
 
@@ -273,8 +298,7 @@ class OfflineController {
     }
 
     class OfflineRegionState {
-        String regionName = "";
-        int downloadingProgress = 0;
+        String regionName;
         boolean isComplete = false;
         long requiredResourceCount = 0;
         int downloadState = OfflineRegion.STATE_ACTIVE;
@@ -291,11 +315,7 @@ class OfflineController {
         }
 
         void hydrate(String _regionName, OfflineRegionStatus status) {
-            double percentage = status.getRequiredResourceCount() >= 0
-                ? status.getCompletedResourceCount() / status.getRequiredResourceCount()
-                : 0.0;
             regionName = _regionName;
-            downloadingProgress = ((int) Math.round(percentage));
             completedResourceCount = status.getCompletedResourceCount();
             completeResourceSize = status.getCompletedResourceSize();
             completeTileCount = status.getCompletedTileCount();
