@@ -961,9 +961,11 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                         }));
                         break;
                     case ADD_ON_DID_FINISH_RENDERING_MAP_LISTENER:
-                        activity.runOnUiThread(() -> mapCtrl.addOnDidFinishRenderingMapListener(() -> {
+                        activity.runOnUiThread(() -> mapCtrl.addOnDidFinishRenderingMapListener(fully -> {
                             try {
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, mapCtrl.getJSONCameraScreenPosition());
+                                JSONObject json = new JSONObject();
+                                json.put("fully", fully);
+                                PluginResult result = new PluginResult(PluginResult.Status.OK, json);
                                 result.setKeepCallback(true);
                                 callbackContext.sendPluginResult(result);
                             } catch (JSONException e) {

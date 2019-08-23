@@ -591,8 +591,10 @@ class MapController implements MapboxMap.OnMapClickListener {
         mMapView.addOnDidFinishLoadingMapListener(callback::run);
     }
 
-    void addOnDidFinishRenderingMapListener(Runnable callback) {
-        mMapView.addOnDidFinishRenderingMapListener((boolean fully) -> callback.run());
+    void addOnDidFinishRenderingMapListener(RunnableWithArg<Boolean> callback) {
+        mMapView.addOnDidFinishRenderingMapListener((boolean fully) -> {
+            callback.run(fully);
+        });
     }
 
     @Override

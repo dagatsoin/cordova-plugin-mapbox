@@ -45,10 +45,6 @@
         <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     </config-file>
 
-    <config-file target="AndroidManifest.xml" parent="/manifest/application">
-        <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService" />
-    </config-file>
-
     <framework src="src/android/mapbox.gradle" custom="true" type="gradleReference"/>
     <source-file src="src/android/CDVMapbox.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
     <source-file src="src/android/Map.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
@@ -57,6 +53,7 @@
     <source-file src="src/android/OfflineControllerPool.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
     <source-file src="src/android/MapsManager.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
     <source-file src="src/android/PluginLayout.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
+    <source-file src="src/android/RunnableWithArg.java" target-dir="src/com/dagatsoin/plugins/mapbox"/>
     <source-file src="src/android/libs/androidsvg-1.2.1.jar" target-dir="libs" framework="true"  />
 
     <config-file target="res/values/strings.xml" parent="/*">
