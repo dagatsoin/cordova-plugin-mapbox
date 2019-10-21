@@ -237,6 +237,11 @@ module.exports = {
         cordova.exec(callback, errorCallback, "Mapbox", "ADD_MAP_CLICK_CALLBACK", [id]);
     },
 
+    deselect: function (callback, errorCallback, id) {
+        id = id || 0;
+        cordova.exec(callback, errorCallback, "Mapbox", "DESELECT", [id]);
+    },
+
     addImage: function (imageId, image, successCallback, errorCallback, id) {
         id = id || 0;
         cordova.exec(successCallback, errorCallback, "Mapbox", "ADD_IMAGE", [id, imageId, image]);

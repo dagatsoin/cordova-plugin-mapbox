@@ -77,6 +77,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
     private static final String SET_PITCH = "SET_PITCH";
     private static final String SET_ZOOM = "SET_ZOOM";
     private static final String SHOW = "SHOW";
+    private static final String DESELECT = "DESELECT";
     private static final String ZOOM_TO = "ZOOM_TO";
 
     private static final String MAPBOX_ACCESSTOKEN_RESOURCE_KEY = "mapbox_accesstoken";
@@ -811,6 +812,11 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                             }
                         });
                         break;
+                    case DESELECT:
+                        activity.runOnUiThread(() -> {
+                            mapCtrl.deselectFeature();
+                            callbackContext.success();
+                        });
                     case SET_CLICKABLE:
                         activity.runOnUiThread(() -> {
                             try {
