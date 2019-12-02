@@ -303,40 +303,27 @@ class MapController implements MapboxMap.OnMapClickListener {
         try {
             if (imageObject != null) {
                 if (imageObject.has("uri")) {
-                    String stringURI = imageObject.getString("uri");
+                     String fileLocation = imageObject.getString("uri");
 
-                    final Uri uri = Uri.parse(stringURI);
-                    final String uriPath = uri.getPath() != null ? uri.getPath() : "";
-                    final boolean isAsset = uriPath.contains("/android_asset/");
-                    final String filesDir = mActivity.getFilesDir().getPath();
-                    final boolean doesContainFilesDirInPath = uriPath.contains(filesDir);
-                    final int startIndex = isAsset
-                            ? "/android_asset/".length()
-                            : doesContainFilesDirInPath
-                            ? filesDir.length()
-                            : 0;
-                    final int endIndex = uriPath.lastIndexOf('/') + 1;
-                    String path = isAsset
-                            ? uriPath.substring(startIndex, endIndex)
-                            : "www/" + uriPath.substring(startIndex, endIndex);
-                    final String fileName = uri.getLastPathSegment();
+                    if (fileLocation == null) {
+                        throw new Error("Need a file name");
+                    }
 
-                    // We first look in the current asset bundle.
-                    final File iconFile = new File(mActivity.getFilesDir(), path + fileName);
+                    final File iconFile = new File(mActivity.getFilesDir(), fileLocation);
 
                     if (iconFile.exists()) {
                         stream = new FileInputStream(iconFile);
                     }
-                    // If file does not exists we get the original version in the initial asset bundle with AssetsManager
                     else {
                         try {
-                            stream = am.open(path + fileName);
+                            stream = am.open(fileLocation);
                         } catch (IOException e) {
-                            throw new JSONException("File not found: " + uri);
+                            throw new IOException("File does not exists in assets folder or application folder: " + fileLocation);
+
                         }
                     }
 
-                    if (fileName != null && fileName.endsWith(".svg")) {
+                    if (fileLocation.endsWith(".svg")) {
                         bitmapDrawable = createSVG(SVG.getFromInputStream(stream), imageObject.has("width") ? applyRetinaFactor(imageObject.getInt("width")) : 0,
                                 imageObject.has("height") ? applyRetinaFactor(imageObject.getInt("height")) : 0);
                     } else {
