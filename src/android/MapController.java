@@ -11,7 +11,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Base64;
@@ -302,8 +301,8 @@ class MapController implements MapboxMap.OnMapClickListener {
 
         try {
             if (imageObject != null) {
-                if (imageObject.has("uri")) {
-                     String fileLocation = imageObject.getString("uri");
+                if (imageObject.has("path")) {
+                     String fileLocation = imageObject.getString("path");
 
                     if (fileLocation == null) {
                         throw new Error("Need a file name");

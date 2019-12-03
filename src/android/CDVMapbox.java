@@ -787,8 +787,8 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                 if (jsonImage.isNull("height"))
                                     throw new JSONException(action + " no height found");
 
-                                if (jsonImage.isNull("uri"))
-                                    throw new JSONException(action + "no uri found. Cordova Mapbox Plugin does not support ImageData. You need to provide an URI.");
+                                if (jsonImage.isNull("path"))
+                                    throw new JSONException(action + " no path found. Cordova Mapbox Plugin support only local path file. Note that should be a path (\"/foo/bar\"), not an uri (\"file:///foo/bar\")");
 
                                 mapCtrl.addImage(imageId, jsonImage);
                                 callbackContext.success();
