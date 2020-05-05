@@ -11,8 +11,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.Base64;
 import android.view.MotionEvent;
 import android.view.animation.BounceInterpolator;
@@ -37,6 +38,7 @@ import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import org.json.JSONException;
@@ -143,8 +145,12 @@ class MapController implements MapboxMap.OnMapClickListener {
         return offlineController != null ? offlineController : OfflineControllerPool.create(mActivity, mStyleUrl);
     }
 
-    void addFeatureCollection(String featureCollectionId, FeatureCollection featureCollection ) {
-        final GeoJsonSource geoJsonSource = new GeoJsonSource(featureCollectionId, featureCollection);
+    void addFeatureCollection(String featureCollectionId, FeatureCollection featureCollection, boolean isClusterEnabled, Integer clusterMaxZoom, Integer clusterRadius ) {
+        final GeoJsonSource geoJsonSource = new GeoJsonSource(featureCollectionId, featureCollection, new GeoJsonOptions()
+                .withCluster(isClusterEnabled)
+                .withClusterMaxZoom(clusterMaxZoom)
+                .withClusterRadius(clusterRadius)
+        );
         if (style.getSource(featureCollectionId) == null) {
             addGeoJsonSource(geoJsonSource);
         }

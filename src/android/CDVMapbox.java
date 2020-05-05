@@ -3,10 +3,11 @@ package com.dagatsoin.plugins.mapbox;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.PointF;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+
+import androidx.annotation.Nullable;
 
 import com.cocoahero.android.geojson.GeoJSON;
 import com.cocoahero.android.geojson.GeoJSONObject;
@@ -531,13 +532,14 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                     throw new JSONException(action + " only handle GeoJSON");
 
 
-                                final JSONObject sourceData = args.getJSONObject(2).getJSONObject("data");
+                                final JSONObject source = args.getJSONObject(2);
+                                final JSONObject sourceData = source.getJSONObject("data");
 
                                 // We can pass a empty source
                                 if (sourceData != null && sourceData.length() > 0) {
 
                                     // Validate GeoJSON data.
-                                    final GeoJSONObject geoJSON = GeoJSON.parse(args.getJSONObject(2).getJSONObject("data"));
+                                    final GeoJSONObject geoJSON = GeoJSON.parse(source.getJSONObject("data"));
 
                                     // This plugin has limited GeoJSON types. It supports:
                                     // - FeatureCollection of point feature
@@ -552,6 +554,9 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
 
                                     if (isFeatureCollection) {
                                         final JSONArray features = sourceData.getJSONArray("features");
+                                        final boolean isClusterEnabled = !source.isNull("cluster") && source.getBoolean("cluster");
+                                        final int clusterMaxZoom = source.isNull("clusterMaxZoom") ? 14 : source.getInt("clusterMaxZoom");
+                                        final int clusterRadius = source.isNull("clusterRadius") ? 50 : source.getInt("clusterRadius");
                                         if (features.length() > 0) {
                                             final String type = features
                                                     .getJSONObject(0)
@@ -562,7 +567,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                             }
                                         }
                                         final FeatureCollection featureCollection = FeatureCollection.fromJson(sourceData.toString());
-                                        mapCtrl.addFeatureCollection(sourceId, featureCollection);
+                                        mapCtrl.addFeatureCollection(sourceId, featureCollection, isClusterEnabled, clusterMaxZoom, clusterRadius);
                                     } else {
                                         final String type = sourceData
                                                 .getJSONObject("geometry")
