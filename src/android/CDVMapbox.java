@@ -719,12 +719,24 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                                 mapCtrl.setLayoutPropertyOffset(layerId, offset);
                                                 break;
                                             case "icon-size":
-                                                final float size = (float) layout.getDouble(name);
-                                                mapCtrl.setLayoutPropertySize(layerId, size);
+                                                final float iconSize = (float) layout.getDouble(name);
+                                                mapCtrl.setLayoutPropertySize(layerId, iconSize);
                                                 break;
                                             case "icon-allow-overlap":
                                                 final boolean isOverlap = layout.getBoolean(name);
                                                 mapCtrl.setLayoutPropertyIconOverlap(layerId, isOverlap);
+                                                break;
+                                            case "text-field":
+                                                final String fieldId = layout.getString(name);
+                                                mapCtrl.setLayoutPropertyTextField(layerId, fieldId);
+                                                break;
+                                            case "text-size":
+                                                final float textSize = (float) layout.getDouble(name);
+                                                mapCtrl.setLayoutPropertyTextSize(layerId, textSize);
+                                                break;
+                                            case "text-font":
+                                                final String textFont = layout.getString(name);
+                                                mapCtrl.setLayoutPropertyTextFont(layerId, textFont);
                                         }
                                     }
                                 }

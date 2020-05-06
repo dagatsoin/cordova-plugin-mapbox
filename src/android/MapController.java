@@ -48,6 +48,7 @@ import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import org.apache.cordova.LOG;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -74,6 +75,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
+import static com.mapbox.mapboxsdk.utils.FontUtils.extractValidFont;
 
 class MapController implements MapboxMap.OnMapClickListener {
     @Nullable private String mSelectableFeaturePropType;
@@ -391,6 +393,35 @@ class MapController implements MapboxMap.OnMapClickListener {
         final Layer layer = style.getLayer(layerId);
         if (layer != null) {
          layer.setProperties(PropertyFactory.iconAllowOverlap(isOverlap));
+        }
+    }
+
+    void setLayoutPropertyTextField(String layerId, String fieldId) {
+        final Layer layer = style.getLayer(layerId);
+        if (layer != null) {
+            layer.setProperties(PropertyFactory.textField(fieldId));
+        }
+    }
+
+    void setLayoutPropertyTextSize(String layerId, Float size) {
+        final Layer layer = style.getLayer(layerId);
+        if (layer != null) {
+            layer.setProperties(PropertyFactory.textSize(size));
+        }
+    }
+
+    void setLayoutPropertyTextFont(String layerId, String font) {
+        final Layer layer = style.getLayer(layerId);
+        JsonElement json = JsonParser.parseString(font);
+        if (layer != null) {
+            try {
+                // Try to parse expression
+                layer.setProperties(PropertyFactory.textFont(Expression.Converter.convert(json.getAsJsonArray())));
+            } catch (IllegalStateException e) {
+                // It was an array of fonts
+                final String s = font.substring(1, font.length() -1 );
+                layer.setProperties(PropertyFactory.textFont(s.split(",")));
+            }
         }
     }
 
