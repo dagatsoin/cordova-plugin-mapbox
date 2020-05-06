@@ -719,7 +719,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                                 mapCtrl.setLayoutPropertyOffset(layerId, offset);
                                                 break;
                                             case "icon-size":
-                                                final float iconSize = (float) layout.getDouble(name);
+                                                final String iconSize = layout.getString(name);
                                                 mapCtrl.setLayoutPropertySize(layerId, iconSize);
                                                 break;
                                             case "icon-allow-overlap":
@@ -731,7 +731,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                                 mapCtrl.setLayoutPropertyTextField(layerId, fieldId);
                                                 break;
                                             case "text-size":
-                                                final float textSize = (float) layout.getDouble(name);
+                                                final String textSize = layout.getString(name);
                                                 mapCtrl.setLayoutPropertyTextSize(layerId, textSize);
                                                 break;
                                             case "text-font":
@@ -752,6 +752,18 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                                 break;
                                             case "circle-radius":
                                                 mapCtrl.setPaintPropertyCircleRadius(layerId, paintField.getString(name));
+                                                break;
+                                            case "text-color":
+                                                mapCtrl.setPaintPropertyTextColor(layerId, paintField.getString(name));
+                                                break;
+                                            case "text-halo-blur":
+                                                mapCtrl.setPaintPropertyTextHaloBlur(layerId, paintField.getString(name));
+                                                break;
+                                            case "text-halo-color":
+                                                mapCtrl.setPaintPropertyTextHaloColor(layerId, paintField.getString(name));
+                                                break;
+                                            case "text-halo-width":
+                                                mapCtrl.setPaintPropertytextHaloWidth(layerId, paintField.getString(name));
                                                 break;
                                         }
                                     }
@@ -803,7 +815,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                         mapCtrl.setLayoutPropertyOffset(layerId, offset);
                                         break;
                                     case "icon-size":
-                                        final float size = (float) args.getDouble(3);
+                                        final String size = args.getString(3);
                                         mapCtrl.setLayoutPropertySize(layerId, size);
                                         break;
                                     case "icon-allow-overlap":
