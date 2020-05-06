@@ -664,8 +664,8 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                 final JSONObject jsonLayer = args.getJSONObject(1);
 
                                 String layerType = jsonLayer.getString("type");
-                                if (!layerType.equals("symbol"))
-                                    throw new JSONException(action + " only symbol layer are currently supported");
+                                if (!layerType.equals("symbol") && !layerType.equals("circle"))
+                                    throw new JSONException(action + " only symbol layer and circle are currently supported");
 
                                 if (!jsonLayer.has("source"))
                                     throw new JSONException(action + " no source provided");
@@ -683,7 +683,17 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                         beforeId = args.getString(2);
                                     }
                                     final String sourceId = jsonLayer.getString("source");
-                                    mapCtrl.addSymbolLayer(
+                                    if (layerType.equals("symbol")) {
+                                        mapCtrl.addSymbolLayer(
+                                                layerId,
+                                                sourceId,
+                                                minZoom,
+                                                maxZoom,
+                                                filter,
+                                                beforeId
+                                        );
+                                    }
+                                    else mapCtrl.addCircleLayer(
                                             layerId,
                                             sourceId,
                                             minZoom,
@@ -715,6 +725,22 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                             case "icon-allow-overlap":
                                                 final boolean isOverlap = layout.getBoolean(name);
                                                 mapCtrl.setLayoutPropertyIconOverlap(layerId, isOverlap);
+                                        }
+                                    }
+                                }
+
+                                if (jsonLayer.has("paint")) {
+                                    final JSONObject paintField = jsonLayer.getJSONObject("paint");
+                                    Iterator<String> keys = paintField.keys();
+                                    while (keys.hasNext()) {
+                                        String name = keys.next();
+                                        switch (name) {
+                                            case "circle-color":
+                                                mapCtrl.setPaintPropertyCircleColor(layerId, paintField.getString(name));
+                                                break;
+                                            case "circle-radius":
+                                                mapCtrl.setPaintPropertyCircleRadius(layerId, paintField.getString(name));
+                                                break;
                                         }
                                     }
                                 }

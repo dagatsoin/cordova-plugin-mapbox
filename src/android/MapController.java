@@ -15,6 +15,7 @@ import android.graphics.drawable.BitmapDrawable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.Base64;
+import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.animation.BounceInterpolator;
 import android.widget.FrameLayout;
@@ -22,7 +23,10 @@ import android.widget.ScrollView;
 
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGParseException;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -34,13 +38,17 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
+import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.layers.PropertyValue;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,6 +59,21 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.gte;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.has;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.lt;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.toNumber;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
 class MapController implements MapboxMap.OnMapClickListener {
     @Nullable private String mSelectableFeaturePropType;
@@ -201,6 +224,28 @@ class MapController implements MapboxMap.OnMapClickListener {
         }
     }
 
+ /*   void addClusterLayer(String id, Integer level, String color, float radius, String sourceId) {
+        CircleLayer circles = new CircleLayer("cluster-" + sourceId + "-" + id, sourceId);
+        circles.setProperties(
+                circleColor(color),
+                circleRadius(radius)
+        );
+        Expression n = new Expression()
+        Expression pointCount = toNumber(get("point_count"));
+
+        // Add a filter to the cluster layer that hides the circles based on "point_count"
+        circles.setFilter(
+                i == 0
+                        ? all(has("point_count"),
+                        gte(pointCount, literal(layers.get(i).first))
+                ) : all(has("point_count"),
+                        gte(pointCount, literal(layers.get(i).first)),
+                        lt(pointCount, literal(layers.get(i-1).first))
+                )
+        );
+        style.addLayer(circles);
+    }*/
+
     void addSymbolLayer(
             String layerId,
             String sourceId,
@@ -218,6 +263,7 @@ class MapController implements MapboxMap.OnMapClickListener {
             symbolLayer.setFilter(filter);
         }
 
+
         if (beforeId == null || beforeId.isEmpty()) {
             style.addLayer(symbolLayer);
         } else {
@@ -225,6 +271,80 @@ class MapController implements MapboxMap.OnMapClickListener {
                 removeLayer(layerId);
             }
             style.addLayerBelow(symbolLayer, beforeId);
+        }
+
+        /*if (layerId.equals("quests")) {
+
+            // Use the earthquakes GeoJSON source to create three layers: One layer for each cluster category.
+            // Each point range gets a different fill color.
+            ArrayList<Pair<Integer, String>> layers = new ArrayList<>();
+            layers.add(Pair.create(10, "#47bc20"));
+            layers.add(Pair.create(5, "#bc2073"));
+            layers.add(Pair.create(0, "#0d783e"));
+
+            for (int i = 0; i < layers.size(); i++) {
+                //Add clusters' circles
+                CircleLayer circles = new CircleLayer("cluster-" + i, "quests");
+                circles.setProperties(
+                        circleColor(layers.get(i).second),
+                        circleRadius(18f)
+                );
+
+                Expression pointCount = toNumber(get("point_count"));
+
+                // Add a filter to the cluster layer that hides the circles based on "point_count"
+                circles.setFilter(
+                        i == 0
+                                ? all(has("point_count"),
+                                gte(pointCount, literal(layers.get(i).first))
+                        ) : all(has("point_count"),
+                                gte(pointCount, literal(layers.get(i).first)),
+                                lt(pointCount, literal(layers.get(i-1).first))
+                        )
+                );
+                style.addLayer(circles);
+            }
+
+
+            SymbolLayer countLayer = new SymbolLayer("clusterNb", "quests");
+            countLayer.setProperties(
+                    textField(Expression.toString(get("point_count"))),
+                    textSize(16f),
+                    textColor("#000"),
+                    textIgnorePlacement(true),
+                    textAllowOverlap(true)
+            );
+            style.addLayer(countLayer);
+        }*/
+    }
+
+    void addCircleLayer(
+            String layerId,
+            String sourceId,
+            Integer minZoom,
+            Integer maxZoom,
+            @Nullable Expression filter,
+            @Nullable String beforeId
+    ) {
+        if (style.getLayer(layerId) != null) return;
+
+        CircleLayer circles = new CircleLayer(layerId, sourceId);
+
+        circles.setMinZoom(minZoom);
+        circles.setMaxZoom(maxZoom);
+
+        if (filter != null) {
+            circles.setFilter(filter);
+        }
+
+
+        if (beforeId == null || beforeId.isEmpty()) {
+            style.addLayer(circles);
+        } else {
+            if (style.getLayer(layerId) != null) {
+                removeLayer(layerId);
+            }
+            style.addLayerBelow(circles, beforeId);
         }
     }
 
@@ -270,7 +390,35 @@ class MapController implements MapboxMap.OnMapClickListener {
     void setLayoutPropertyIconOverlap(String layerId, boolean isOverlap) {
         final Layer layer = style.getLayer(layerId);
         if (layer != null) {
-            layer.setProperties(PropertyFactory.iconAllowOverlap(isOverlap));
+         layer.setProperties(PropertyFactory.iconAllowOverlap(isOverlap));
+        }
+    }
+
+    void setPaintPropertyCircleColor(String layerId, String value) {
+        final Layer layer = style.getLayer(layerId);
+        JsonElement json = JsonParser.parseString(value);
+        if (layer != null) {
+            try {
+                // Could be an array expression
+                layer.setProperties(PropertyFactory.circleColor(Expression.Converter.convert(json.getAsJsonArray())));
+            } catch (IllegalStateException e) {
+                // Or just a string
+                layer.setProperties(PropertyFactory.circleColor(value));
+            }
+        }
+    }
+
+    void setPaintPropertyCircleRadius(String layerId, String value) {
+        final Layer layer = style.getLayer(layerId);
+        JsonElement json = JsonParser.parseString(value);
+        if (layer != null) {
+            try {
+                // Could be an array expression
+                layer.setProperties(PropertyFactory.circleRadius(Expression.Converter.convert(json.getAsJsonArray())));
+            } catch (IllegalStateException e) {
+                // Or just a string
+                layer.setProperties(PropertyFactory.circleRadius(json.getAsFloat()));
+            }
         }
     }
 
