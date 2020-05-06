@@ -11,8 +11,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.Base64;
 import android.view.MotionEvent;
 import android.view.animation.BounceInterpolator;
@@ -22,6 +23,7 @@ import android.widget.ScrollView;
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGParseException;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -33,10 +35,12 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
+import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import org.json.JSONException;
@@ -143,8 +147,12 @@ class MapController implements MapboxMap.OnMapClickListener {
         return offlineController != null ? offlineController : OfflineControllerPool.create(mActivity, mStyleUrl);
     }
 
-    void addFeatureCollection(String featureCollectionId, FeatureCollection featureCollection ) {
-        final GeoJsonSource geoJsonSource = new GeoJsonSource(featureCollectionId, featureCollection);
+    void addFeatureCollection(String featureCollectionId, FeatureCollection featureCollection, boolean isClusterEnabled, Integer clusterMaxZoom, Integer clusterRadius ) {
+        final GeoJsonSource geoJsonSource = new GeoJsonSource(featureCollectionId, featureCollection, new GeoJsonOptions()
+                .withCluster(isClusterEnabled)
+                .withClusterMaxZoom(clusterMaxZoom)
+                .withClusterRadius(clusterRadius)
+        );
         if (style.getSource(featureCollectionId) == null) {
             addGeoJsonSource(geoJsonSource);
         }
@@ -212,6 +220,7 @@ class MapController implements MapboxMap.OnMapClickListener {
             symbolLayer.setFilter(filter);
         }
 
+
         if (beforeId == null || beforeId.isEmpty()) {
             style.addLayer(symbolLayer);
         } else {
@@ -219,6 +228,36 @@ class MapController implements MapboxMap.OnMapClickListener {
                 removeLayer(layerId);
             }
             style.addLayerBelow(symbolLayer, beforeId);
+        }
+    }
+
+    void addCircleLayer(
+            String layerId,
+            String sourceId,
+            Integer minZoom,
+            Integer maxZoom,
+            @Nullable Expression filter,
+            @Nullable String beforeId
+    ) {
+        if (style.getLayer(layerId) != null) return;
+
+        CircleLayer circles = new CircleLayer(layerId, sourceId);
+
+        circles.setMinZoom(minZoom);
+        circles.setMaxZoom(maxZoom);
+
+        if (filter != null) {
+            circles.setFilter(filter);
+        }
+
+
+        if (beforeId == null || beforeId.isEmpty()) {
+            style.addLayer(circles);
+        } else {
+            if (style.getLayer(layerId) != null) {
+                removeLayer(layerId);
+            }
+            style.addLayerBelow(circles, beforeId);
         }
     }
 
@@ -254,17 +293,137 @@ class MapController implements MapboxMap.OnMapClickListener {
         }
     }
 
-    void setLayoutPropertySize(String layerId, float size) {
+    void setLayoutPropertySize(String layerId, String value) {
         final Layer layer = style.getLayer(layerId);
         if (layer != null) {
-            layer.setProperties(PropertyFactory.iconSize(size));
+            try {
+                // Could be an array expression
+                layer.setProperties(PropertyFactory.iconSize(Expression.Converter.convert(value)));
+            } catch (JsonSyntaxException|NullPointerException e) {
+                // Or just a float
+                layer.setProperties(PropertyFactory.iconSize(Float.valueOf(value)));
+            }
         }
     }
 
     void setLayoutPropertyIconOverlap(String layerId, boolean isOverlap) {
         final Layer layer = style.getLayer(layerId);
         if (layer != null) {
-            layer.setProperties(PropertyFactory.iconAllowOverlap(isOverlap));
+         layer.setProperties(PropertyFactory.iconAllowOverlap(isOverlap));
+        }
+    }
+
+    void setLayoutPropertyTextField(String layerId, String fieldId) {
+        final Layer layer = style.getLayer(layerId);
+        if (layer != null) {
+            layer.setProperties(PropertyFactory.textField(fieldId));
+        }
+    }
+
+    void setLayoutPropertyTextSize(String layerId, String size) {
+        final Layer layer = style.getLayer(layerId);
+        if (layer != null) {
+            try {
+                // Try to parse expression
+                layer.setProperties(PropertyFactory.textSize(Expression.Converter.convert(size)));
+            } catch (JsonSyntaxException|NullPointerException e) {
+                // It is a float
+                layer.setProperties(PropertyFactory.textSize(Float.valueOf(size)));
+            }
+        }
+    }
+
+    void setLayoutPropertyTextFont(String layerId, String font) {
+        final Layer layer = style.getLayer(layerId);
+        if (layer != null) {
+            try {
+                // Try to parse expression
+                layer.setProperties(PropertyFactory.textFont(Expression.Converter.convert(font)));
+            } catch (JsonSyntaxException|NullPointerException e) {
+                // It was an array of fonts
+                final String s = font.substring(1, font.length() -1 );
+                layer.setProperties(PropertyFactory.textFont(s.split(",")));
+            }
+        }
+    }
+
+    void setPaintPropertyCircleColor(String layerId, String value) {
+        final Layer layer = style.getLayer(layerId);
+
+        if (layer != null) {
+            try {
+                // Could be an array expression
+                layer.setProperties(PropertyFactory.circleColor(Expression.Converter.convert(value)));
+            } catch (JsonSyntaxException|NullPointerException e) {
+                // Or just a string
+                layer.setProperties(PropertyFactory.circleColor(value));
+            }
+        }
+    }
+
+    void setPaintPropertyCircleRadius(String layerId, String value) {
+        final Layer layer = style.getLayer(layerId);
+        if (layer != null) {
+            try {
+                // Could be an array expression
+                layer.setProperties(PropertyFactory.circleRadius(Expression.Converter.convert(value)));
+            } catch (JsonSyntaxException|NullPointerException e) {
+                // Or just a float
+                layer.setProperties(PropertyFactory.circleRadius(Float.valueOf(value)));
+            }
+        }
+    }
+
+    void setPaintPropertyTextColor(String layerId, String value) {
+        final Layer layer = style.getLayer(layerId);
+
+        if (layer != null) {
+            try {
+                // Could be an array expression
+                layer.setProperties(PropertyFactory.textColor(Expression.Converter.convert(value)));
+            } catch (JsonSyntaxException|NullPointerException e) {
+                // Or just a string
+                layer.setProperties(PropertyFactory.textColor(value));
+            }
+        }
+    }
+
+    void setPaintPropertyTextHaloBlur(String layerId, String value) {
+        final Layer layer = style.getLayer(layerId);
+        if (layer != null) {
+            try {
+                // Could be an array expression
+                layer.setProperties(PropertyFactory.textHaloBlur(Expression.Converter.convert(value)));
+            } catch (JsonSyntaxException|NullPointerException e) {
+                // Or just a float
+                layer.setProperties(PropertyFactory.textHaloBlur(Float.valueOf(value)));
+            }
+        }
+    }
+
+    void setPaintPropertyTextHaloColor(String layerId, String value) {
+        final Layer layer = style.getLayer(layerId);
+        if (layer != null) {
+            try {
+                // Could be an array expression
+                layer.setProperties(PropertyFactory.textHaloColor(Expression.Converter.convert(value)));
+            } catch (JsonSyntaxException|NullPointerException e) {
+                // Or just a string
+                layer.setProperties(PropertyFactory.textHaloColor(value));
+            }
+        }
+    }
+
+    void setPaintPropertytextHaloWidth(String layerId, String value) {
+        final Layer layer = style.getLayer(layerId);
+        if (layer != null) {
+            try {
+                // Could be an array expression
+                layer.setProperties(PropertyFactory.textHaloWidth(Expression.Converter.convert(value)));
+            } catch (JsonSyntaxException|NullPointerException e) {
+                // Or just a float
+                layer.setProperties(PropertyFactory.textHaloWidth(Float.valueOf(value)));
+            }
         }
     }
 

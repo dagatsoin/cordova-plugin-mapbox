@@ -3,10 +3,11 @@ package com.dagatsoin.plugins.mapbox;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.PointF;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+
+import androidx.annotation.Nullable;
 
 import com.cocoahero.android.geojson.GeoJSON;
 import com.cocoahero.android.geojson.GeoJSONObject;
@@ -531,13 +532,14 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                     throw new JSONException(action + " only handle GeoJSON");
 
 
-                                final JSONObject sourceData = args.getJSONObject(2).getJSONObject("data");
+                                final JSONObject source = args.getJSONObject(2);
+                                final JSONObject sourceData = source.getJSONObject("data");
 
                                 // We can pass a empty source
                                 if (sourceData != null && sourceData.length() > 0) {
 
                                     // Validate GeoJSON data.
-                                    final GeoJSONObject geoJSON = GeoJSON.parse(args.getJSONObject(2).getJSONObject("data"));
+                                    final GeoJSONObject geoJSON = GeoJSON.parse(source.getJSONObject("data"));
 
                                     // This plugin has limited GeoJSON types. It supports:
                                     // - FeatureCollection of point feature
@@ -552,6 +554,9 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
 
                                     if (isFeatureCollection) {
                                         final JSONArray features = sourceData.getJSONArray("features");
+                                        final boolean isClusterEnabled = !source.isNull("cluster") && source.getBoolean("cluster");
+                                        final int clusterMaxZoom = source.isNull("clusterMaxZoom") ? 14 : source.getInt("clusterMaxZoom");
+                                        final int clusterRadius = source.isNull("clusterRadius") ? 50 : source.getInt("clusterRadius");
                                         if (features.length() > 0) {
                                             final String type = features
                                                     .getJSONObject(0)
@@ -562,7 +567,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                             }
                                         }
                                         final FeatureCollection featureCollection = FeatureCollection.fromJson(sourceData.toString());
-                                        mapCtrl.addFeatureCollection(sourceId, featureCollection);
+                                        mapCtrl.addFeatureCollection(sourceId, featureCollection, isClusterEnabled, clusterMaxZoom, clusterRadius);
                                     } else {
                                         final String type = sourceData
                                                 .getJSONObject("geometry")
@@ -659,8 +664,8 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                 final JSONObject jsonLayer = args.getJSONObject(1);
 
                                 String layerType = jsonLayer.getString("type");
-                                if (!layerType.equals("symbol"))
-                                    throw new JSONException(action + " only symbol layer are currently supported");
+                                if (!layerType.equals("symbol") && !layerType.equals("circle"))
+                                    throw new JSONException(action + " only symbol layer and circle are currently supported");
 
                                 if (!jsonLayer.has("source"))
                                     throw new JSONException(action + " no source provided");
@@ -678,7 +683,17 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                         beforeId = args.getString(2);
                                     }
                                     final String sourceId = jsonLayer.getString("source");
-                                    mapCtrl.addSymbolLayer(
+                                    if (layerType.equals("symbol")) {
+                                        mapCtrl.addSymbolLayer(
+                                                layerId,
+                                                sourceId,
+                                                minZoom,
+                                                maxZoom,
+                                                filter,
+                                                beforeId
+                                        );
+                                    }
+                                    else mapCtrl.addCircleLayer(
                                             layerId,
                                             sourceId,
                                             minZoom,
@@ -704,12 +719,52 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                                 mapCtrl.setLayoutPropertyOffset(layerId, offset);
                                                 break;
                                             case "icon-size":
-                                                final float size = (float) layout.getDouble(name);
-                                                mapCtrl.setLayoutPropertySize(layerId, size);
+                                                final String iconSize = layout.getString(name);
+                                                mapCtrl.setLayoutPropertySize(layerId, iconSize);
                                                 break;
                                             case "icon-allow-overlap":
                                                 final boolean isOverlap = layout.getBoolean(name);
                                                 mapCtrl.setLayoutPropertyIconOverlap(layerId, isOverlap);
+                                                break;
+                                            case "text-field":
+                                                final String fieldId = layout.getString(name);
+                                                mapCtrl.setLayoutPropertyTextField(layerId, fieldId);
+                                                break;
+                                            case "text-size":
+                                                final String textSize = layout.getString(name);
+                                                mapCtrl.setLayoutPropertyTextSize(layerId, textSize);
+                                                break;
+                                            case "text-font":
+                                                final String textFont = layout.getString(name);
+                                                mapCtrl.setLayoutPropertyTextFont(layerId, textFont);
+                                        }
+                                    }
+                                }
+
+                                if (jsonLayer.has("paint")) {
+                                    final JSONObject paintField = jsonLayer.getJSONObject("paint");
+                                    Iterator<String> keys = paintField.keys();
+                                    while (keys.hasNext()) {
+                                        String name = keys.next();
+                                        switch (name) {
+                                            case "circle-color":
+                                                mapCtrl.setPaintPropertyCircleColor(layerId, paintField.getString(name));
+                                                break;
+                                            case "circle-radius":
+                                                mapCtrl.setPaintPropertyCircleRadius(layerId, paintField.getString(name));
+                                                break;
+                                            case "text-color":
+                                                mapCtrl.setPaintPropertyTextColor(layerId, paintField.getString(name));
+                                                break;
+                                            case "text-halo-blur":
+                                                mapCtrl.setPaintPropertyTextHaloBlur(layerId, paintField.getString(name));
+                                                break;
+                                            case "text-halo-color":
+                                                mapCtrl.setPaintPropertyTextHaloColor(layerId, paintField.getString(name));
+                                                break;
+                                            case "text-halo-width":
+                                                mapCtrl.setPaintPropertytextHaloWidth(layerId, paintField.getString(name));
+                                                break;
                                         }
                                     }
                                 }
@@ -760,7 +815,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                         mapCtrl.setLayoutPropertyOffset(layerId, offset);
                                         break;
                                     case "icon-size":
-                                        final float size = (float) args.getDouble(3);
+                                        final String size = args.getString(3);
                                         mapCtrl.setLayoutPropertySize(layerId, size);
                                         break;
                                     case "icon-allow-overlap":
