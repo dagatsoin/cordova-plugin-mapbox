@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.RectF;
-import android.support.annotation.Nullable;
+
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import androidx.annotation.Nullable;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaArgs;
