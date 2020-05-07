@@ -2,9 +2,8 @@ package com.dagatsoin.plugins.mapbox;
 
 import android.app.Activity;
 import android.content.res.Resources;
+import android.support.annotation.Nullable;
 import android.util.Log;
-
-import androidx.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.offline.OfflineManager;

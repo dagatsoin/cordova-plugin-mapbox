@@ -3,11 +3,10 @@ package com.dagatsoin.plugins.mapbox;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.PointF;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
-
-import androidx.annotation.Nullable;
 
 import com.cocoahero.android.geojson.GeoJSON;
 import com.cocoahero.android.geojson.GeoJSONObject;
