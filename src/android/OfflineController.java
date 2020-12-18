@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.res.Resources;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.animation.AnimationUtils;
 
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
@@ -82,7 +83,8 @@ class OfflineController {
             String json = jsonObject.toString();
             final byte[] metadata = json.getBytes(JSON_CHARSET);
             // Create the offline region and launch the download
-            mOfflineManager.createOfflineRegion(definition, metadata, new OfflineManager.CreateOfflineRegionCallback() {
+            Throttle throttle = new Throttle(1000)
+;            mOfflineManager.createOfflineRegion(definition, metadata, new OfflineManager.CreateOfflineRegionCallback() {
                 @Override
                 public void onCreate(OfflineRegion offlineRegion) {
                     Log.d(TAG, "Offline region created: " + regionName);
@@ -101,11 +103,13 @@ class OfflineController {
                             offlineRegionState.hydrate(regionName, status);
 
                             if (status.isRequiredResourceCountPrecise()) {
-                                onProgress.run();
+                                throttle.attempt(onProgress);
                             }
 
                             if (status.isComplete()) {
                                 // Download complete
+                                offlineRegion.setDownloadState(OfflineRegion.STATE_INACTIVE);
+                                onProgress.run();
                                 mDownloadingOfflineRegionList.remove(regionName);
                             }
 
@@ -181,7 +185,7 @@ class OfflineController {
             OfflineRegion maybeRegion = mDownloadingOfflineRegionList.get(id);
             if (maybeRegion != null) {
                 try {
-                   maybeRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
+                    maybeRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -324,5 +328,31 @@ class OfflineController {
             requiredResourceCount = status.getRequiredResourceCount();
             isComplete = status.isComplete();
         }
+    }
+
+    class Throttle {
+        private long mLastFiredTimestamp;
+        private long mInterval;
+
+        public Throttle(long interval) {
+            mInterval = interval;
+        }
+
+        public void attempt(Runnable runnable) {
+            if (hasSatisfiedInterval()) {
+                runnable.run();
+                mLastFiredTimestamp = getNow();
+            }
+        }
+
+        private boolean hasSatisfiedInterval() {
+            long elapsed = getNow() - mLastFiredTimestamp;
+            return elapsed >= mInterval;
+        }
+
+        private long getNow() {
+            return AnimationUtils.currentAnimationTimeMillis();
+        }
+
     }
 }
