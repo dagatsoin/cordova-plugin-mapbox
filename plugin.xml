@@ -23,7 +23,7 @@
     <engine name="cordova-plugman" version=">=4.2.0"/><!-- needed for gradleReference support -->
   </engines>
 
-  <js-module src="www/Mapbox.js" name="Mapbox">
+  <js-module src="www/cordova-plugin-mapbox.js" name="cordova-plugin-mapbox">
     <clobbers target="Mapbox" />
   </js-module>
 

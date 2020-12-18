@@ -38,6 +38,10 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
     private static final String ADD_LAYER = "ADD_LAYER";
     private static final String ADD_MAP_CLICK_CALLBACK = "ADD_MAP_CLICK_CALLBACK";
     private static final String ADD_SOURCE = "ADD_SOURCE";
+    private static final String ADD_ON_MOVE_LISTENER = "ADD_ON_MOVE_LISTENER";
+    private static final String ADD_ON_FLING_LISTENER = "ADD_ON_FLING_LISTENER";
+    private static final String ADD_ON_ROTATE_LISTENER = "ADD_ON_ROTATE_LISTENER";
+    private static final String ADD_ON_SCALE_LISTENER = "ADD_ON_SCALE_LISTENER";
     private static final String ADD_ON_WILL_START_LOADING_MAP_LISTENER = "ADD_ON_WILL_START_LOADING_MAP_LISTENER";
     private static final String ADD_ON_WILL_START_RENDERING_MAP_LISTENER = "ADD_ON_WILL_START_RENDERING_MAP_LISTENER";
     private static final String ADD_ON_CAMERA_WILL_CHANGE_LISTENER = "ADD_ON_CAMERA_WILL_CHANGE_LISTENER";
@@ -762,7 +766,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                                 mapCtrl.setPaintPropertyTextHaloColor(layerId, paintField.getString(name));
                                                 break;
                                             case "text-halo-width":
-                                                mapCtrl.setPaintPropertytextHaloWidth(layerId, paintField.getString(name));
+                                                mapCtrl.setPaintPropertyTextHaloWidth(layerId, paintField.getString(name));
                                                 break;
                                         }
                                     }

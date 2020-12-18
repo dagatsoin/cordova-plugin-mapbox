@@ -24,6 +24,9 @@ import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGParseException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.mapbox.android.gestures.MoveGestureDetector;
+import com.mapbox.android.gestures.RotateGestureDetector;
+import com.mapbox.android.gestures.StandardScaleGestureDetector;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -43,6 +46,7 @@ import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -66,7 +70,7 @@ class MapController implements MapboxMap.OnMapClickListener {
     private Activity mActivity;
     boolean isReady = false;
     Runnable mapReady;
-    private FeatureCollection mSelectedFeatureCollection =  FeatureCollection.fromFeatures(new ArrayList<>());
+    private final FeatureCollection mSelectedFeatureCollection =  FeatureCollection.fromFeatures(new ArrayList<>());
     private boolean mHasSelectedFeature;
 
     MapView getMapView() {
@@ -309,7 +313,7 @@ class MapController implements MapboxMap.OnMapClickListener {
     void setLayoutPropertyIconOverlap(String layerId, boolean isOverlap) {
         final Layer layer = style.getLayer(layerId);
         if (layer != null) {
-         layer.setProperties(PropertyFactory.iconAllowOverlap(isOverlap));
+            layer.setProperties(PropertyFactory.iconAllowOverlap(isOverlap));
         }
     }
 
@@ -414,20 +418,20 @@ class MapController implements MapboxMap.OnMapClickListener {
         }
     }
 
-    void setPaintPropertytextHaloWidth(String layerId, String value) {
+    void setPaintPropertyTextHaloWidth(String layerId, String value) {
         final Layer layer = style.getLayer(layerId);
         if (layer != null) {
             try {
                 // Could be an array expression
                 layer.setProperties(PropertyFactory.textHaloWidth(Expression.Converter.convert(value)));
-            } catch (JsonSyntaxException|NullPointerException e) {
+            } catch (JsonSyntaxException |NullPointerException e) {
                 // Or just a float
                 layer.setProperties(PropertyFactory.textHaloWidth(Float.valueOf(value)));
             }
         }
     }
 
-    private float retinaFactor = Resources.getSystem().getDisplayMetrics().density;
+    private final float retinaFactor = Resources.getSystem().getDisplayMetrics().density;
 
     private int applyRetinaFactor(long d) {
         return Math.round(d * retinaFactor);
@@ -461,7 +465,7 @@ class MapController implements MapboxMap.OnMapClickListener {
         try {
             if (imageObject != null) {
                 if (imageObject.has("path")) {
-                     String fileLocation = imageObject.getString("path");
+                    String fileLocation = imageObject.getString("path");
 
                     if (fileLocation == null) {
                         throw new Error("Need a file name");
@@ -607,6 +611,21 @@ class MapController implements MapboxMap.OnMapClickListener {
         return mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
     }
 
+    private static class JSONLatLngBounds {
+        final JSONArray sw = new JSONArray();
+        final JSONArray ne = new JSONArray();
+        JSONLatLngBounds(LatLngBounds latLngBounds) throws JSONException {
+            sw.put(latLngBounds.getSouthWest().getLongitude());
+            sw.put(latLngBounds.getSouthWest().getLatitude());
+            ne.put(latLngBounds.getNorthEast().getLongitude());
+            ne.put(latLngBounds.getNorthEast().getLatitude());
+        }
+    }
+
+    JSONLatLngBounds getJSONBounds(LatLngBounds latLngBounds) throws JSONException {
+        return new JSONLatLngBounds(latLngBounds);
+    }
+
     PointF convertCoordinates(LatLng coords) {
         return mMapboxMap.getProjection().toScreenLocation(coords);
     }
@@ -737,8 +756,106 @@ class MapController implements MapboxMap.OnMapClickListener {
     }
 
     void addOnDidFinishRenderingMapListener(RunnableWithArg<Boolean> callback) {
-        mMapView.addOnDidFinishRenderingMapListener((boolean fully) -> {
-            callback.run(fully);
+        mMapView.addOnDidFinishRenderingMapListener(callback::run);
+    }
+
+    void addOnMoveListener(RunnableWithArg<MapEventPayload> callback) {
+        mMapboxMap.addOnMoveListener(new MapboxMap.OnMoveListener() {
+            @Override
+            public void onMoveBegin(@NonNull MoveGestureDetector detector) {
+                try {
+                    callback.run(new MapEventPayload(MapEventType.OnMoveStart, getBounds()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onMove(@NonNull MoveGestureDetector detector) {
+                try {
+                    callback.run(new MapEventPayload(MapEventType.OnMove, getBounds()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onMoveEnd(@NonNull MoveGestureDetector detector) {
+                try {
+                    callback.run(new MapEventPayload(MapEventType.OnMoveEnd, getBounds()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+    void addOnFlingListener(RunnableWithArg<MapEventPayload> callback) {
+        mMapboxMap.addOnFlingListener(() -> {
+            try {
+                callback.run(new MapEventPayload(MapEventType.OnFling, getBounds()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+    void addOnRotateListener(RunnableWithArg<MapEventPayload> callback) {
+        mMapboxMap.addOnRotateListener(new MapboxMap.OnRotateListener() {
+            @Override
+            public void onRotateBegin(@NonNull RotateGestureDetector detector) {
+                try {
+                    callback.run(new MapEventPayload(MapEventType.OnRotateStart, getBounds()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onRotate(@NonNull RotateGestureDetector detector) {
+                try {
+                    callback.run(new MapEventPayload(MapEventType.OnRotate, getBounds()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onRotateEnd(@NonNull RotateGestureDetector detector) {
+                try {
+                    callback.run(new MapEventPayload(MapEventType.OnRotateEnd, getBounds()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+    void addOnScaleListener(RunnableWithArg<MapEventPayload> callback) {
+        mMapboxMap.addOnScaleListener(new MapboxMap.OnScaleListener() {
+            @Override
+            public void onScaleBegin(@NonNull StandardScaleGestureDetector detector) {
+                try {
+                    callback.run(new MapEventPayload(MapEventType.OnScaleStart, getBounds()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onScale(@NonNull StandardScaleGestureDetector detector) {
+                try {
+                    callback.run(new MapEventPayload(MapEventType.OnScale, getBounds()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onScaleEnd(@NonNull StandardScaleGestureDetector detector) {
+                try {
+                    callback.run(new MapEventPayload(MapEventType.OnScaleEnd, getBounds()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         });
     }
 
@@ -778,7 +895,7 @@ class MapController implements MapboxMap.OnMapClickListener {
         return false;
     }
 
-    private TimeInterpolator interpolator = new BounceInterpolator();
+    private final TimeInterpolator interpolator = new BounceInterpolator();
 
     private void selectFeature(final Feature feature) {
         if (mSelectedFeatureLayerId == null || mSelectedFeatureSourceId == null) return;
@@ -814,8 +931,41 @@ class MapController implements MapboxMap.OnMapClickListener {
         mHasSelectedFeature = false;
     }
 
+    public enum MapEventType {
+        OnMoveStart("OnMoveStart"),
+        OnMove("OnMove"),
+        OnMoveEnd("OnMoveEnd"),
+        OnRotateStart("OnRotateStart"),
+        OnRotate("OnRotate"),
+        OnRotateEnd("OnRotateEnd"),
+        OnScaleStart("OnScaleStart"),
+        OnScale("OnScale"),
+        OnScaleEnd("OnScaleEnd"),
+        OnFling("OnFling");
+
+        private final String eventType;
+
+        MapEventType(String type) {
+            this.eventType = type;
+        }
+
+        public String getType() {
+            return eventType;
+        }
+    }
+
+    public class MapEventPayload {
+        final public MapEventType type;
+        final public JSONLatLngBounds latLngBounds;
+
+        public MapEventPayload(MapEventType _mapEventType, LatLngBounds _latLngBounds) throws JSONException {
+            type = _mapEventType;
+            latLngBounds = getJSONBounds(_latLngBounds);
+        }
+    }
+
     private class MapClickListener implements MapboxMap.OnMapClickListener {
-        private Runnable callback;
+        private final Runnable callback;
 
         MapClickListener(Runnable cb) {
             callback = cb;

@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "outDir": "www/",
+    "types": ["cordova", "geojson"],
+    "declaration": true 
+  },
+  "compileOnSave": true,
+  "files": ["src/js/cordova-plugin-mapbox.ts"]
+}

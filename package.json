@@ -1,9 +1,10 @@
 {
-  "version": "1.2.0",
+  "version": "0.0.2",
   "name": "cordova-plugin-mapbox",
   "cordova_name": "Mapbox",
   "description": "Mapbox plugin for Cordova 7+ (ANDROID ONLY)",
   "license": "MIT",
+  "types": "www/cordova-plugin-mapbox.d.ts",
   "keywords": [],
   "platforms": [
     "android",
@@ -12,5 +13,22 @@
   "engines": {
     "name": "cordova",
     "version": ">=7.0"
+  },
+  "scripts": {
+    "dev": "tsc -w",
+    "build": "tsc && npm run doc",
+    "doc": "typedoc --plugin typedoc-plugin-markdown --out doc/ --inputFiles src/js/cordova-plugin-mapbox.ts --excludeExternals --excludeNotExported --readme none --mode file"
+  },
+  "devDependencies": {
+    "@types/cordova": "0.0.34",
+    "@types/geojson": "^7946.0.7",
+    "@typescript-eslint/eslint-plugin": "^4.9.0",
+    "@typescript-eslint/parser": "^4.9.0",
+    "eslint": "^7.14.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "typedoc": "^0.19.2",
+    "typedoc-plugin-markdown": "^3.1.1",
+    "typescript": "^4.1.2"
   }
 }
