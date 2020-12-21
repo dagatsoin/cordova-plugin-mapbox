@@ -21,13 +21,11 @@ import org.json.JSONObject;
  * Created by vikti on 24/06/2016.
  *
  * This file handle a single Map.
- * He has a visual responsibility only: hide, show, resize...
+ * It has a layout responsibility: hide, show, resize...
  * All map actions are handled by the controller and called from CDVMapbox.java to ensure
  * a decoupling and easily switch to GoogleMap or whatever in the futur.
  */
-public class Map {
-
-    private int mId;
+public class MapLayout {
     private CDVMapbox mPlugRef;
     private FrameLayout mLayersGroup;
     private JSONObject mMapDivLayoutJSON;
@@ -44,7 +42,6 @@ public class Map {
     ViewGroup getViewGroup(){
         return mLayersGroup;
     }
-    public int getId(){return mId;}
 
     /**
      * Create a map without any layout set
@@ -53,8 +50,7 @@ public class Map {
      * @param activity the main parent activity
      * @param callbackContext command callback context
      */
-    public Map(int id, final CordovaArgs args, CDVMapbox plugRef, Activity activity, CallbackContext callbackContext) {
-        mId = id;
+    public MapLayout(final CordovaArgs args, CDVMapbox plugRef, Activity activity, CallbackContext callbackContext) {
         mPlugRef = plugRef;
         mCdvWebView = mPlugRef.webView;
         Context _context = mCdvWebView.getView().getContext();
@@ -66,7 +62,7 @@ public class Map {
         @Nullable final String selectedFeatureSourceId;
         @Nullable final String selectableFeaturePropType;
         try {
-            options = args.getJSONObject(1);
+            options = args.getJSONObject(0);
             HTMLs = options.isNull("HTMLs") ? new JSONArray() : options.getJSONArray("HTMLs");
             if(options.isNull("rect")) throw new JSONException("Map constructor need a rect in the JSONObject options argument.");
             selectedFeatureLayerId  = options.has("selectedFeatureLayerId") ? options.getString("selectedFeatureLayerId") : null;
@@ -92,9 +88,8 @@ public class Map {
                 mPlugRef.pluginLayout.getScrollView()
         );
 
-        // The view container. Contains maps and addons views.
-        mLayersGroup = new FrameLayout(_context);
-        mLayersGroup.addView(mMapCtrl.getMapView());
+        // The view container. Contains map and touch wrapper views.
+        mLayersGroup = mMapCtrl.getMapView();
     }
 
 
@@ -124,7 +119,6 @@ public class Map {
 
     public void onScroll(int x, int y){
         mPlugRef.pluginLayout.setMapDrawingRect(
-                mId,
                 toRect(mMapDivLayoutJSON, x, y)
         );
     }
@@ -135,7 +129,6 @@ public class Map {
         }
 
         mPlugRef.pluginLayout.setMapDrawingRect(
-                mId,
                 toRect(mMapDivLayoutJSON, mCdvWebView.getView().getScrollX(), mCdvWebView.getView().getScrollY())
         );
 
@@ -155,7 +148,7 @@ public class Map {
     public void setContainer(CordovaArgs args, CallbackContext callbackContext){
 
         try {
-            JSONObject options = args.getJSONObject(1);
+            JSONObject options = args.getJSONObject(0);
 
             if(options.isNull("rect")){
                 callbackContext.error("Map.setContainer(... Need a rect");
@@ -227,5 +220,10 @@ public class Map {
         PluginResult pluginResult = new PluginResult(PluginResult.Status.NO_RESULT);
         pluginResult.setKeepCallback(true);
         callbackContext.sendPluginResult(pluginResult);
+    }
+
+    public void onResume() {
+        mMapCtrl.getMapView().onResume();
+        mMapCtrl.getMapView().onStart();
     }
 }

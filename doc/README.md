@@ -108,7 +108,7 @@
 
 Ƭ  **Bounds**: { ne: [number, number] ; sw: [number, number]  }
 
-*Defined in [cordova-plugin-mapbox.ts:36](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L36)*
+*Defined in [cordova-plugin-mapbox.ts:36](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L36)*
 
 #### Type declaration:
 
@@ -123,7 +123,7 @@ ___
 
 Ƭ  **CameraOptions**: { around: [LngLat](README.md#lnglat) ; bearing: number ; center: [LngLat](README.md#lnglat) ; pitch: number ; zoom: number  }
 
-*Defined in [cordova-plugin-mapbox.ts:90](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L90)*
+*Defined in [cordova-plugin-mapbox.ts:90](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L90)*
 
 #### Type declaration:
 
@@ -141,7 +141,7 @@ ___
 
 Ƭ  **CameraPosition**: { bearing: number ; target: [Coords](README.md#coords) ; tilt: number ; zoom: number  }
 
-*Defined in [cordova-plugin-mapbox.ts:98](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L98)*
+*Defined in [cordova-plugin-mapbox.ts:98](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L98)*
 
 #### Type declaration:
 
@@ -158,7 +158,7 @@ ___
 
 Ƭ  **Coords**: { lat: number ; lng: number  }
 
-*Defined in [cordova-plugin-mapbox.ts:124](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L124)*
+*Defined in [cordova-plugin-mapbox.ts:124](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L124)*
 
 #### Type declaration:
 
@@ -173,7 +173,7 @@ ___
 
 Ƭ  **DownloadParams**: { bounds: [Bounds](README.md#bounds) ; maxZoom: number ; minZoom: number ; regionName: string ; styleUrl?: string  }
 
-*Defined in [cordova-plugin-mapbox.ts:169](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L169)*
+*Defined in [cordova-plugin-mapbox.ts:169](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L169)*
 
 #### Type declaration:
 
@@ -191,7 +191,7 @@ ___
 
 Ƭ  **DownloadState**: { completeResourceSize: number ; completeTileCount: number ; completeTileSize: number ; completedResourceCount: number ; downloadState: \"STATE\_ACTIVE\" \| \"STATE\_INACTIVE\" ; isComplete: boolean ; regionName: string ; requiredResourceCount: number  }
 
-*Defined in [cordova-plugin-mapbox.ts:54](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L54)*
+*Defined in [cordova-plugin-mapbox.ts:54](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L54)*
 
 #### Type declaration:
 
@@ -212,7 +212,7 @@ ___
 
 Ƭ  **Expression**: Array<string \| boolean \| number \| [Expression](README.md#expression)\>
 
-*Defined in [cordova-plugin-mapbox.ts:52](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L52)*
+*Defined in [cordova-plugin-mapbox.ts:52](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L52)*
 
 ___
 
@@ -220,7 +220,7 @@ ___
 
 Ƭ  **ImageProperties**: { height: number ; path: string ; width: number  }
 
-*Defined in [cordova-plugin-mapbox.ts:140](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L140)*
+*Defined in [cordova-plugin-mapbox.ts:140](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L140)*
 
 The properties of an image used by the Mapbox map.
 The path is relative to the app assets folder.
@@ -241,7 +241,7 @@ ___
 
 Ƭ  **Layer**: { filter?: [Expression](README.md#expression) ; id: string ; layout?: Partial<{ icon-allow-overlap: boolean ; icon-image: string ; icon-offset: [number, number] ; icon-size: number \| [Expression](README.md#expression) ; text-field: string ; text-font: string[] ; text-size: number \| [Expression](README.md#expression)  }\> ; maxzoom?: number ; minzoom?: number ; paint?: Partial<{ text-color: string \| [Expression](README.md#expression) ; text-halo-blur: number \| [Expression](README.md#expression) ; text-halo-color: string \| [Expression](README.md#expression) ; text-halo-width: number \| [Expression](README.md#expression)  }\> ; source: string ; sourcelayer?: string ; type?: [LayerType](README.md#layertype)  }
 
-*Defined in [cordova-plugin-mapbox.ts:65](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L65)*
+*Defined in [cordova-plugin-mapbox.ts:65](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L65)*
 
 #### Type declaration:
 
@@ -263,7 +263,7 @@ ___
 
 Ƭ  **LayerType**: \"symbol\"
 
-*Defined in [cordova-plugin-mapbox.ts:41](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L41)*
+*Defined in [cordova-plugin-mapbox.ts:41](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L41)*
 
 ___
 
@@ -271,7 +271,7 @@ ___
 
 Ƭ  **LayoutPropertyName**: \"icon-image\" \| \"icon-offset\" \| \"icon-size\" \| \"icon-allow-overlap\" \| \"text-field\" \| \"text-size\" \| \"text-font\"
 
-*Defined in [cordova-plugin-mapbox.ts:25](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L25)*
+*Defined in [cordova-plugin-mapbox.ts:25](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L25)*
 
 ___
 
@@ -279,7 +279,7 @@ ___
 
 Ƭ  **LngLat**: [number, number]
 
-*Defined in [cordova-plugin-mapbox.ts:122](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L122)*
+*Defined in [cordova-plugin-mapbox.ts:122](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L122)*
 
 ___
 
@@ -287,7 +287,7 @@ ___
 
 Ƭ  **MapEventListener**: (payload: [MapEventPayload](README.md#mapeventpayload)) => void
 
-*Defined in [cordova-plugin-mapbox.ts:34](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L34)*
+*Defined in [cordova-plugin-mapbox.ts:34](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L34)*
 
 ___
 
@@ -295,7 +295,7 @@ ___
 
 Ƭ  **MapEventPayload**: { latLngBounds: [Bounds](README.md#bounds) ; type: [MapEventType](enums/mapeventtype.md)  }
 
-*Defined in [cordova-plugin-mapbox.ts:20](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L20)*
+*Defined in [cordova-plugin-mapbox.ts:20](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L20)*
 
 #### Type declaration:
 
@@ -310,7 +310,7 @@ ___
 
 Ƭ  **MapOptions**: { additionalDomElements?: HTMLElement[] ; cameraPosition?: any ; disablePitch?: boolean ; disableRotation?: boolean ; disableScroll?: boolean ; disableTilt?: boolean ; disableZoom?: boolean ; domContainer: HTMLElement ; hideAttribution?: boolean ; hideCompass?: boolean ; hideLogo?: boolean ; selectableFeaturePropType?: string ; selectedFeatureLayerId?: string ; selectedFeatureSourceId?: string ; style: string  }
 
-*Defined in [cordova-plugin-mapbox.ts:146](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L146)*
+*Defined in [cordova-plugin-mapbox.ts:146](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L146)*
 
 #### Type declaration:
 
@@ -338,7 +338,7 @@ ___
 
 Ƭ  **MapboxContainerParams**: { additionalDomElements?: HTMLElement[] ; domContainer: HTMLElement  }
 
-*Defined in [cordova-plugin-mapbox.ts:164](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L164)*
+*Defined in [cordova-plugin-mapbox.ts:164](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L164)*
 
 #### Type declaration:
 
@@ -353,7 +353,7 @@ ___
 
 Ƭ  **OfflineRegionParams**: { regionName?: string ; styleUrl?: string  }
 
-*Defined in [cordova-plugin-mapbox.ts:177](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L177)*
+*Defined in [cordova-plugin-mapbox.ts:177](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L177)*
 
 #### Type declaration:
 
@@ -368,7 +368,7 @@ ___
 
 Ƭ  **ScreenCoords**: { x: number ; y: number  }
 
-*Defined in [cordova-plugin-mapbox.ts:129](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L129)*
+*Defined in [cordova-plugin-mapbox.ts:129](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L129)*
 
 #### Type declaration:
 
@@ -383,7 +383,7 @@ ___
 
 Ƭ  **Source**<T, P\>: { cluster?: boolean ; clusterMaxZoom?: number ; clusterRadius?: number ; data: [SourceData](README.md#sourcedata)<T, P\> ; type: \"geojson\"  }
 
-*Defined in [cordova-plugin-mapbox.ts:114](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L114)*
+*Defined in [cordova-plugin-mapbox.ts:114](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L114)*
 
 #### Type parameters:
 
@@ -408,7 +408,7 @@ ___
 
 Ƭ  **SourceData**<T, P\>: {} \| FeatureCollection<T, P\> \| Feature<T, P\>
 
-*Defined in [cordova-plugin-mapbox.ts:106](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L106)*
+*Defined in [cordova-plugin-mapbox.ts:106](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L106)*
 
 #### Type parameters:
 
@@ -423,7 +423,7 @@ Name | Type |
 
 • `Const` **MAPBOX**: \"Mapbox\" = "Mapbox"
 
-*Defined in [cordova-plugin-mapbox.ts:722](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L722)*
+*Defined in [cordova-plugin-mapbox.ts:661](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L661)*
 
 ___
 
@@ -431,25 +431,24 @@ ___
 
 •  **cordova**: Cordova
 
-*Defined in [cordova-plugin-mapbox.ts:720](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L720)*
+*Defined in [cordova-plugin-mapbox.ts:659](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L659)*
 
 ## Functions
 
 ### addImage
 
-▸ `Const`**addImage**(`imageId`: string, `image`: [ImageProperties](README.md#imageproperties), `successCallback`: () => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**addImage**(`imageId`: string, `image`: [ImageProperties](README.md#imageproperties), `successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1079](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1079)*
+*Defined in [cordova-plugin-mapbox.ts:995](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L995)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`imageId` | string | - |
-`image` | [ImageProperties](README.md#imageproperties) | - |
-`successCallback` | () => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`imageId` | string |
+`image` | [ImageProperties](README.md#imageproperties) |
+`successCallback` | () => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -457,19 +456,18 @@ ___
 
 ### addLayer
 
-▸ `Const`**addLayer**(`layerObject`: [Layer](README.md#layer), `beforeId`: number, `successCallback`: () => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**addLayer**(`layerObject`: [Layer](README.md#layer), `beforeId`: number, `successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1105](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1105)*
+*Defined in [cordova-plugin-mapbox.ts:1017](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1017)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`layerObject` | [Layer](README.md#layer) | - |
-`beforeId` | number | - |
-`successCallback` | () => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`layerObject` | [Layer](README.md#layer) |
+`beforeId` | number |
+`successCallback` | () => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -477,17 +475,16 @@ ___
 
 ### addMapClickCallback
 
-▸ `Const`**addMapClickCallback**(`callback`: (featureCollection: FeatureCollection<GeoJSON.GeometryObject\>) => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**addMapClickCallback**(`callback`: (featureCollection: FeatureCollection<GeoJSON.GeometryObject\>) => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1061](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1061)*
+*Defined in [cordova-plugin-mapbox.ts:980](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L980)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`callback` | (featureCollection: FeatureCollection<GeoJSON.GeometryObject\>) => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`callback` | (featureCollection: FeatureCollection<GeoJSON.GeometryObject\>) => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -497,7 +494,7 @@ ___
 
 ▸ `Const`**addOnCameraDidChangeListener**(`listener`: () => void, `id?`: number): void
 
-*Defined in [cordova-plugin-mapbox.ts:1395](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1395)*
+*Defined in [cordova-plugin-mapbox.ts:1276](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1276)*
 
 This event is triggered whenever the displayed map region finished changing without an animation.
 
@@ -516,7 +513,7 @@ ___
 
 ▸ `Const`**addOnCameraWillChangeListener**(`listener`: () => void, `id?`: number): void
 
-*Defined in [cordova-plugin-mapbox.ts:1382](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1382)*
+*Defined in [cordova-plugin-mapbox.ts:1263](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1263)*
 
 This event is triggered whenever the displayed map region is about to change without animation.
 
@@ -535,7 +532,7 @@ ___
 
 ▸ `Const`**addOnDidFinishLoadingMapListener**(`listener`: () => void, `id?`: number): void
 
-*Defined in [cordova-plugin-mapbox.ts:1460](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1460)*
+*Defined in [cordova-plugin-mapbox.ts:1341](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1341)*
 
 This is triggered when the map has successfully loaded a new map style.
 
@@ -554,7 +551,7 @@ ___
 
 ▸ `Const`**addOnDidFinishLoadingStyleListener**(`listener`: () => void, `id?`: number): void
 
-*Defined in [cordova-plugin-mapbox.ts:1408](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1408)*
+*Defined in [cordova-plugin-mapbox.ts:1289](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1289)*
 
 Triggered when a style has finished loading.
 
@@ -573,7 +570,7 @@ ___
 
 ▸ `Const`**addOnDidFinishRenderingFrameListener**(`listener`: () => void, `id?`: number): void
 
-*Defined in [cordova-plugin-mapbox.ts:1447](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1447)*
+*Defined in [cordova-plugin-mapbox.ts:1328](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1328)*
 
 This event is triggered when the map finished rendering a frame.
 
@@ -592,7 +589,7 @@ ___
 
 ▸ **addOnDidFinishRenderingMapListener**(`listener`: (fully: boolean) => void, `id?`: number): void
 
-*Defined in [cordova-plugin-mapbox.ts:1473](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1473)*
+*Defined in [cordova-plugin-mapbox.ts:1354](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1354)*
 
 This event is triggered when the map is fully rendered.
 
@@ -611,7 +608,7 @@ ___
 
 ▸ `Const`**addOnFlingListener**(`listener`: [MapEventListener](README.md#mapeventlistener), `id?`: number): void
 
-*Defined in [cordova-plugin-mapbox.ts:1337](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1337)*
+*Defined in [cordova-plugin-mapbox.ts:1218](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1218)*
 
 #### Parameters:
 
@@ -628,7 +625,7 @@ ___
 
 ▸ `Const`**addOnMoveListener**(`listener`: [MapEventListener](README.md#mapeventlistener), `id?`: number): void
 
-*Defined in [cordova-plugin-mapbox.ts:1341](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1341)*
+*Defined in [cordova-plugin-mapbox.ts:1222](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1222)*
 
 #### Parameters:
 
@@ -645,7 +642,7 @@ ___
 
 ▸ `Const`**addOnRotateListener**(`listener`: [MapEventListener](README.md#mapeventlistener), `id?`: number): void
 
-*Defined in [cordova-plugin-mapbox.ts:1345](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1345)*
+*Defined in [cordova-plugin-mapbox.ts:1226](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1226)*
 
 #### Parameters:
 
@@ -662,7 +659,7 @@ ___
 
 ▸ `Const`**addOnScaleListener**(`listener`: [MapEventListener](README.md#mapeventlistener), `id?`: number): void
 
-*Defined in [cordova-plugin-mapbox.ts:1349](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1349)*
+*Defined in [cordova-plugin-mapbox.ts:1230](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1230)*
 
 #### Parameters:
 
@@ -679,7 +676,7 @@ ___
 
 ▸ `Const`**addOnSourceChangedListener**(`listener`: () => void, `id?`: number): void
 
-*Defined in [cordova-plugin-mapbox.ts:1421](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1421)*
+*Defined in [cordova-plugin-mapbox.ts:1302](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1302)*
 
 Triggered when a source changes.
 
@@ -698,7 +695,7 @@ ___
 
 ▸ `Const`**addOnWillStartLoadingMapListener**(`listener`: () => void, `id?`: number): void
 
-*Defined in [cordova-plugin-mapbox.ts:1356](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1356)*
+*Defined in [cordova-plugin-mapbox.ts:1237](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1237)*
 
 This event is triggered when the map is about to start loading a new map style.
 
@@ -717,7 +714,7 @@ ___
 
 ▸ `Const`**addOnWillStartRenderingFrameListener**(`listener`: () => void, `id?`: number): void
 
-*Defined in [cordova-plugin-mapbox.ts:1434](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1434)*
+*Defined in [cordova-plugin-mapbox.ts:1315](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1315)*
 
 This event is triggered when the map will start rendering a frame.
 
@@ -736,7 +733,7 @@ ___
 
 ▸ `Const`**addOnWillStartRenderingMapListener**(`listener`: () => void, `id?`: number): void
 
-*Defined in [cordova-plugin-mapbox.ts:1369](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1369)*
+*Defined in [cordova-plugin-mapbox.ts:1250](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1250)*
 
 This event is triggered when the map will start rendering the map.
 
@@ -753,19 +750,18 @@ ___
 
 ### addSource
 
-▸ `Const`**addSource**(`sourceId`: string, `source`: [Source](README.md#source)<any, any\>, `successCallback`: () => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**addSource**(`sourceId`: string, `source`: [Source](README.md#source)<any, any\>, `successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1148](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1148)*
+*Defined in [cordova-plugin-mapbox.ts:1055](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1055)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`sourceId` | string | - |
-`source` | [Source](README.md#source)<any, any\> | - |
-`successCallback` | () => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`sourceId` | string |
+`source` | [Source](README.md#source)<any, any\> |
+`successCallback` | () => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -773,18 +769,17 @@ ___
 
 ### convertCoordinates
 
-▸ `Const`**convertCoordinates**(`coords`: { lat: number ; lng: number  }, `resultCallback`: (\_point: [ScreenCoords](README.md#screencoords)) => void, `errorCallback`: (\_e: string) => void, `id?`: number): void
+▸ `Const`**convertCoordinates**(`coords`: { lat: number ; lng: number  }, `resultCallback`: (\_point: [ScreenCoords](README.md#screencoords)) => void, `errorCallback`: (\_e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1310](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1310)*
+*Defined in [cordova-plugin-mapbox.ts:1194](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1194)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`coords` | { lat: number ; lng: number  } | - |
-`resultCallback` | (\_point: [ScreenCoords](README.md#screencoords)) => void | - |
-`errorCallback` | (\_e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`coords` | { lat: number ; lng: number  } |
+`resultCallback` | (\_point: [ScreenCoords](README.md#screencoords)) => void |
+`errorCallback` | (\_e: string) => void |
 
 **Returns:** void
 
@@ -792,18 +787,17 @@ ___
 
 ### convertPoint
 
-▸ `Const`**convertPoint**(`point`: [ScreenCoords](README.md#screencoords), `resultCallback`: (\_coords: { lat: number ; lng: number  }) => void, `errorCallback`: (\_e: string) => void, `id?`: number): void
+▸ `Const`**convertPoint**(`point`: [ScreenCoords](README.md#screencoords), `resultCallback`: (\_coords: { lat: number ; lng: number  }) => void, `errorCallback`: (\_e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1325](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1325)*
+*Defined in [cordova-plugin-mapbox.ts:1208](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1208)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`point` | [ScreenCoords](README.md#screencoords) | - |
-`resultCallback` | (\_coords: { lat: number ; lng: number  }) => void | - |
-`errorCallback` | (\_e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`point` | [ScreenCoords](README.md#screencoords) |
+`resultCallback` | (\_coords: { lat: number ; lng: number  }) => void |
+`errorCallback` | (\_e: string) => void |
 
 **Returns:** void
 
@@ -811,18 +805,17 @@ ___
 
 ### deleteOfflineRegion
 
-▸ `Const`**deleteOfflineRegion**(`options`: [OfflineRegionParams](README.md#offlineregionparams), `_successCallback`: (result: { isDelete: boolean  }) => void, `_errorCallback`: (e: string) => void, `_id?`: number): void
+▸ `Const`**deleteOfflineRegion**(`options`: [OfflineRegionParams](README.md#offlineregionparams), `_successCallback`: (result: { isDelete: boolean  }) => void, `_errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1004](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1004)*
+*Defined in [cordova-plugin-mapbox.ts:932](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L932)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`options` | [OfflineRegionParams](README.md#offlineregionparams) | - |
-`_successCallback` | (result: { isDelete: boolean  }) => void | - |
-`_errorCallback` | (e: string) => void | - |
-`_id` | number | 0 |
+Name | Type |
+------ | ------ |
+`options` | [OfflineRegionParams](README.md#offlineregionparams) |
+`_successCallback` | (result: { isDelete: boolean  }) => void |
+`_errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -830,17 +823,16 @@ ___
 
 ### deselect
 
-▸ `Const`**deselect**(`callback?`: () => void, `errorCallback?`: (\_e: string) => void, `id?`: number): void
+▸ `Const`**deselect**(`callback?`: () => void, `errorCallback?`: (\_e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1071](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1071)*
+*Defined in [cordova-plugin-mapbox.ts:988](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L988)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`callback?` | () => void | - |
-`errorCallback?` | (\_e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`callback?` | () => void |
+`errorCallback?` | (\_e: string) => void |
 
 **Returns:** void
 
@@ -848,15 +840,14 @@ ___
 
 ### destroy
 
-▸ `Const`**destroy**(`id`: number, `successCallback`: () => void, `errorCallback`: (e: string) => void): void
+▸ `Const`**destroy**(`successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:943](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L943)*
+*Defined in [cordova-plugin-mapbox.ts:876](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L876)*
 
 #### Parameters:
 
 Name | Type |
 ------ | ------ |
-`id` | number |
 `successCallback` | () => void |
 `errorCallback` | (e: string) => void |
 
@@ -866,18 +857,17 @@ ___
 
 ### downloadRegion
 
-▸ `Const`**downloadRegion**(`options`: [DownloadParams](README.md#downloadparams), `statusCallback`: (state: [DownloadState](README.md#downloadstate)) => void, `errorCallback`: (e: string \| { reason: \"REGION\_EXISTS\"  }) => void, `id?`: number): void
+▸ `Const`**downloadRegion**(`options`: [DownloadParams](README.md#downloadparams), `statusCallback`: (state: [DownloadState](README.md#downloadstate)) => void, `errorCallback`: (e: string \| { reason: \"REGION\_EXISTS\"  }) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:972](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L972)*
+*Defined in [cordova-plugin-mapbox.ts:902](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L902)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`options` | [DownloadParams](README.md#downloadparams) | - |
-`statusCallback` | (state: [DownloadState](README.md#downloadstate)) => void | - |
-`errorCallback` | (e: string \| { reason: \"REGION\_EXISTS\"  }) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`options` | [DownloadParams](README.md#downloadparams) |
+`statusCallback` | (state: [DownloadState](README.md#downloadstate)) => void |
+`errorCallback` | (e: string \| { reason: \"REGION\_EXISTS\"  }) => void |
 
 **Returns:** void
 
@@ -887,7 +877,7 @@ ___
 
 ▸ **flatElements**(`elements`: HTMLElement[]): any[]
 
-*Defined in [cordova-plugin-mapbox.ts:843](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L843)*
+*Defined in [cordova-plugin-mapbox.ts:782](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L782)*
 
 #### Parameters:
 
@@ -901,18 +891,17 @@ ___
 
 ### flyTo
 
-▸ `Const`**flyTo**(`options`: { cameraPosition: Partial<[CameraPosition](README.md#cameraposition)\> & { duration: number  }  }, `successCallback`: () => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**flyTo**(`options`: { cameraPosition: Partial<[CameraPosition](README.md#cameraposition)\> & { duration: number  }  }, `successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1188](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1188)*
+*Defined in [cordova-plugin-mapbox.ts:1089](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1089)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`options` | { cameraPosition: Partial<[CameraPosition](README.md#cameraposition)\> & { duration: number  }  } | - |
-`successCallback` | () => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`options` | { cameraPosition: Partial<[CameraPosition](README.md#cameraposition)\> & { duration: number  }  } |
+`successCallback` | () => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -922,7 +911,7 @@ ___
 
 ▸ **getAllChildren**(`el`: HTMLElement): any[]
 
-*Defined in [cordova-plugin-mapbox.ts:813](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L813)*
+*Defined in [cordova-plugin-mapbox.ts:752](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L752)*
 
 #### Parameters:
 
@@ -936,17 +925,16 @@ ___
 
 ### getBounds
 
-▸ `Const`**getBounds**(`resultCallback`: (\_bounds: [Bounds](README.md#bounds)) => void, `errorCallback`: (\_e: string) => void, `id?`: number): void
+▸ `Const`**getBounds**(`resultCallback`: (\_bounds: [Bounds](README.md#bounds)) => void, `errorCallback`: (\_e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1288](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1288)*
+*Defined in [cordova-plugin-mapbox.ts:1174](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1174)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`resultCallback` | (\_bounds: [Bounds](README.md#bounds)) => void | - |
-`errorCallback` | (\_e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`resultCallback` | (\_bounds: [Bounds](README.md#bounds)) => void |
+`errorCallback` | (\_e: string) => void |
 
 **Returns:** void
 
@@ -954,17 +942,16 @@ ___
 
 ### getCameraPosition
 
-▸ `Const`**getCameraPosition**(`resultCallback`: (cameraPosition: [CameraPosition](README.md#cameraposition)) => void, `errorCallback`: (\_e: string) => void, `id?`: number): void
+▸ `Const`**getCameraPosition**(`resultCallback`: (cameraPosition: [CameraPosition](README.md#cameraposition)) => void, `errorCallback`: (\_e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1296](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1296)*
+*Defined in [cordova-plugin-mapbox.ts:1181](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1181)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`resultCallback` | (cameraPosition: [CameraPosition](README.md#cameraposition)) => void | - |
-`errorCallback` | (\_e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`resultCallback` | (cameraPosition: [CameraPosition](README.md#cameraposition)) => void |
+`errorCallback` | (\_e: string) => void |
 
 **Returns:** void
 
@@ -972,17 +959,16 @@ ___
 
 ### getCenter
 
-▸ `Const`**getCenter**(`resultCallback`: (center: [Coords](README.md#coords)) => void, `errorCallback`: (\_e: string) => void, `id?`: number): void
+▸ `Const`**getCenter**(`resultCallback`: (center: [Coords](README.md#coords)) => void, `errorCallback`: (\_e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1212](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1212)*
+*Defined in [cordova-plugin-mapbox.ts:1109](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1109)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`resultCallback` | (center: [Coords](README.md#coords)) => void | - |
-`errorCallback` | (\_e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`resultCallback` | (center: [Coords](README.md#coords)) => void |
+`errorCallback` | (\_e: string) => void |
 
 **Returns:** void
 
@@ -992,7 +978,7 @@ ___
 
 ▸ **getContainerChildrenOverlayElements**(`el`: HTMLElement): any[]
 
-*Defined in [cordova-plugin-mapbox.ts:777](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L777)*
+*Defined in [cordova-plugin-mapbox.ts:716](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L716)*
 
 #### Parameters:
 
@@ -1008,7 +994,7 @@ ___
 
 ▸ **getDivRect**(`el`: HTMLElement): object
 
-*Defined in [cordova-plugin-mapbox.ts:850](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L850)*
+*Defined in [cordova-plugin-mapbox.ts:789](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L789)*
 
 #### Parameters:
 
@@ -1029,18 +1015,17 @@ ___
 
 ### getOfflineRegionList
 
-▸ `Const`**getOfflineRegionList**(`styleUrl`: string, `_successCallback`: (regionNames: string[]) => void, `_errorCallback`: (e: string) => void, `_id?`: number): void
+▸ `Const`**getOfflineRegionList**(`styleUrl`: string, `_successCallback`: (regionNames: string[]) => void, `_errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:984](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L984)*
+*Defined in [cordova-plugin-mapbox.ts:912](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L912)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`styleUrl` | string | - |
-`_successCallback` | (regionNames: string[]) => void | - |
-`_errorCallback` | (e: string) => void | - |
-`_id` | number | 0 |
+Name | Type |
+------ | ------ |
+`styleUrl` | string |
+`_successCallback` | (regionNames: string[]) => void |
+`_errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1050,7 +1035,7 @@ ___
 
 ▸ **getOverlayElements**(`el`: HTMLElement): any[]
 
-*Defined in [cordova-plugin-mapbox.ts:787](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L787)*
+*Defined in [cordova-plugin-mapbox.ts:726](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L726)*
 
 #### Parameters:
 
@@ -1066,7 +1051,7 @@ ___
 
 ▸ **getPageRect**(): object
 
-*Defined in [cordova-plugin-mapbox.ts:869](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L869)*
+*Defined in [cordova-plugin-mapbox.ts:808](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L808)*
 
 **Returns:** object
 
@@ -1081,17 +1066,16 @@ ___
 
 ### getPitch
 
-▸ `Const`**getPitch**(`resultCallback`: (pitch: number) => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**getPitch**(`resultCallback`: (pitch: number) => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1244](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1244)*
+*Defined in [cordova-plugin-mapbox.ts:1136](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1136)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`resultCallback` | (pitch: number) => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`resultCallback` | (pitch: number) => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1099,17 +1083,16 @@ ___
 
 ### getZoom
 
-▸ `Const`**getZoom**(`resultCallback`: (zoom: number) => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**getZoom**(`resultCallback`: (zoom: number) => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1266](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1266)*
+*Defined in [cordova-plugin-mapbox.ts:1155](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1155)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`resultCallback` | (zoom: number) => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`resultCallback` | (zoom: number) => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1117,17 +1100,16 @@ ___
 
 ### hide
 
-▸ `Const`**hide**(`id?`: number, `successCallback?`: () => void, `errorCallback?`: (e: string) => void): void
+▸ `Const`**hide**(`successCallback?`: () => void, `errorCallback?`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:935](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L935)*
+*Defined in [cordova-plugin-mapbox.ts:869](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L869)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`id` | number | 0 |
-`successCallback?` | () => void | - |
-`errorCallback?` | (e: string) => void | - |
+Name | Type |
+------ | ------ |
+`successCallback?` | () => void |
+`errorCallback?` | (e: string) => void |
 
 **Returns:** void
 
@@ -1135,18 +1117,17 @@ ___
 
 ### pauseDownload
 
-▸ `Const`**pauseDownload**(`options`: [OfflineRegionParams](README.md#offlineregionparams), `_successCallback`: () => void, `_errorCallback`: (e: string) => void, `_id?`: number): void
+▸ `Const`**pauseDownload**(`options`: [OfflineRegionParams](README.md#offlineregionparams), `_successCallback`: () => void, `_errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1024](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1024)*
+*Defined in [cordova-plugin-mapbox.ts:951](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L951)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`options` | [OfflineRegionParams](README.md#offlineregionparams) | - |
-`_successCallback` | () => void | - |
-`_errorCallback` | (e: string) => void | - |
-`_id` | number | 0 |
+Name | Type |
+------ | ------ |
+`options` | [OfflineRegionParams](README.md#offlineregionparams) |
+`_successCallback` | () => void |
+`_errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1154,18 +1135,17 @@ ___
 
 ### removeImage
 
-▸ `Const`**removeImage**(`imageId`: string, `successCallback`: () => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**removeImage**(`imageId`: string, `successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1093](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1093)*
+*Defined in [cordova-plugin-mapbox.ts:1007](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1007)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`imageId` | string | - |
-`successCallback` | () => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`imageId` | string |
+`successCallback` | () => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1173,18 +1153,17 @@ ___
 
 ### removeLayer
 
-▸ `Const`**removeLayer**(`layerId`: string, `successCallback`: () => void, `errorCallback`: (\_e: string) => void, `id?`: number): void
+▸ `Const`**removeLayer**(`layerId`: string, `successCallback`: () => void, `errorCallback`: (\_e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1136](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1136)*
+*Defined in [cordova-plugin-mapbox.ts:1045](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1045)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`layerId` | string | - |
-`successCallback` | () => void | - |
-`errorCallback` | (\_e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`layerId` | string |
+`successCallback` | () => void |
+`errorCallback` | (\_e: string) => void |
 
 **Returns:** void
 
@@ -1192,18 +1171,17 @@ ___
 
 ### removeSource
 
-▸ `Const`**removeSource**(`sourceId`: string, `successCallback`: () => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**removeSource**(`sourceId`: string, `successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1162](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1162)*
+*Defined in [cordova-plugin-mapbox.ts:1067](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1067)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`sourceId` | string | - |
-`successCallback` | () => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`sourceId` | string |
+`successCallback` | () => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1211,18 +1189,17 @@ ___
 
 ### resumeDownload
 
-▸ `Const`**resumeDownload**(`options`: [OfflineRegionParams](README.md#offlineregionparams), `_successCallback`: () => void, `_errorCallback`: (e: string) => void, `_id?`: number): void
+▸ `Const`**resumeDownload**(`options`: [OfflineRegionParams](README.md#offlineregionparams), `_successCallback`: () => void, `_errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1043](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1043)*
+*Defined in [cordova-plugin-mapbox.ts:966](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L966)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`options` | [OfflineRegionParams](README.md#offlineregionparams) | - |
-`_successCallback` | () => void | - |
-`_errorCallback` | (e: string) => void | - |
-`_id` | number | 0 |
+Name | Type |
+------ | ------ |
+`options` | [OfflineRegionParams](README.md#offlineregionparams) |
+`_successCallback` | () => void |
+`_errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1230,18 +1207,17 @@ ___
 
 ### scrollMap
 
-▸ `Const`**scrollMap**(`delta`: [number, number], `successCallback`: (center: [Coords](README.md#coords)) => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**scrollMap**(`delta`: [number, number], `successCallback`: (center: [Coords](README.md#coords)) => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1220](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1220)*
+*Defined in [cordova-plugin-mapbox.ts:1116](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1116)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`delta` | [number, number] | - |
-`successCallback` | (center: [Coords](README.md#coords)) => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`delta` | [number, number] |
+`successCallback` | (center: [Coords](README.md#coords)) => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1249,18 +1225,17 @@ ___
 
 ### setCenter
 
-▸ `Const`**setCenter**(`center`: [LngLat](README.md#lnglat), `successCallback`: () => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**setCenter**(`center`: [LngLat](README.md#lnglat), `successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1200](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1200)*
+*Defined in [cordova-plugin-mapbox.ts:1099](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1099)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`center` | [LngLat](README.md#lnglat) | - |
-`successCallback` | () => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`center` | [LngLat](README.md#lnglat) |
+`successCallback` | () => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1268,18 +1243,17 @@ ___
 
 ### setClickable
 
-▸ `Const`**setClickable**(`clickable`: boolean, `successCallback`: () => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**setClickable**(`clickable`: boolean, `successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:923](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L923)*
+*Defined in [cordova-plugin-mapbox.ts:859](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L859)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`clickable` | boolean | - |
-`successCallback` | () => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`clickable` | boolean |
+`successCallback` | () => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1287,18 +1261,17 @@ ___
 
 ### setContainer
 
-▸ `Const`**setContainer**(`params`: [MapboxContainerParams](README.md#mapboxcontainerparams), `successCallback`: () => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**setContainer**(`params`: [MapboxContainerParams](README.md#mapboxcontainerparams), `successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:951](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L951)*
+*Defined in [cordova-plugin-mapbox.ts:883](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L883)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`params` | [MapboxContainerParams](README.md#mapboxcontainerparams) | - |
-`successCallback` | () => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`params` | [MapboxContainerParams](README.md#mapboxcontainerparams) |
+`successCallback` | () => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1306,18 +1279,17 @@ ___
 
 ### setDebug
 
-▸ `Const`**setDebug**(`debug`: boolean, `successCallback`: () => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**setDebug**(`debug`: boolean, `successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:910](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L910)*
+*Defined in [cordova-plugin-mapbox.ts:848](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L848)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`debug` | boolean | - |
-`successCallback` | () => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`debug` | boolean |
+`successCallback` | () => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1325,19 +1297,18 @@ ___
 
 ### setGeoJson
 
-▸ `Const`**setGeoJson**(`sourceId`: string, `geoJson`: [SourceData](README.md#sourcedata)<any, any\>, `successCallback`: () => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**setGeoJson**(`sourceId`: string, `geoJson`: [SourceData](README.md#sourcedata)<any, any\>, `successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1174](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1174)*
+*Defined in [cordova-plugin-mapbox.ts:1077](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1077)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`sourceId` | string | - |
-`geoJson` | [SourceData](README.md#sourcedata)<any, any\> | - |
-`successCallback` | () => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`sourceId` | string |
+`geoJson` | [SourceData](README.md#sourcedata)<any, any\> |
+`successCallback` | () => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1345,20 +1316,19 @@ ___
 
 ### setLayoutProperty
 
-▸ `Const`**setLayoutProperty**(`layerId`: string, `name`: [LayoutPropertyName](README.md#layoutpropertyname), `value`: any, `successCallback`: () => void, `errorCallback?`: (\_e: string) => void, `id?`: number): void
+▸ `Const`**setLayoutProperty**(`layerId`: string, `name`: [LayoutPropertyName](README.md#layoutpropertyname), `value`: any, `successCallback`: () => void, `errorCallback?`: (\_e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1119](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1119)*
+*Defined in [cordova-plugin-mapbox.ts:1029](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1029)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`layerId` | string | - |
-`name` | [LayoutPropertyName](README.md#layoutpropertyname) | - |
-`value` | any | - |
-`successCallback` | () => void | - |
-`errorCallback?` | (\_e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`layerId` | string |
+`name` | [LayoutPropertyName](README.md#layoutpropertyname) |
+`value` | any |
+`successCallback` | () => void |
+`errorCallback?` | (\_e: string) => void |
 
 **Returns:** void
 
@@ -1366,18 +1336,17 @@ ___
 
 ### setPitch
 
-▸ `Const`**setPitch**(`pitch`: number, `successCallback`: () => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**setPitch**(`pitch`: number, `successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1232](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1232)*
+*Defined in [cordova-plugin-mapbox.ts:1126](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1126)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`pitch` | number | - |
-`successCallback` | () => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`pitch` | number |
+`successCallback` | () => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1387,7 +1356,7 @@ ___
 
 ▸ **setRandomId**(): string
 
-*Defined in [cordova-plugin-mapbox.ts:809](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L809)*
+*Defined in [cordova-plugin-mapbox.ts:748](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L748)*
 
 **Returns:** string
 
@@ -1395,19 +1364,18 @@ ___
 
 ### setZoom
 
-▸ `Const`**setZoom**(`zoom`: number, `options`: any, `successCallback`: () => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**setZoom**(`zoom`: number, `options`: any, `successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1252](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1252)*
+*Defined in [cordova-plugin-mapbox.ts:1143](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1143)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`zoom` | number | - |
-`options` | any | - |
-`successCallback` | () => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`zoom` | number |
+`options` | any |
+`successCallback` | () => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1415,18 +1383,17 @@ ___
 
 ### show
 
-▸ `Const`**show**(`options`: [MapOptions](README.md#mapoptions), `successCallback`: () => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**show**(`options`: [MapOptions](README.md#mapoptions), `successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:890](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L890)*
+*Defined in [cordova-plugin-mapbox.ts:829](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L829)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`options` | [MapOptions](README.md#mapoptions) | - |
-`successCallback` | () => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`options` | [MapOptions](README.md#mapoptions) |
+`successCallback` | () => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void
 
@@ -1436,7 +1403,7 @@ ___
 
 ▸ **toOverlayElement**(`el`: HTMLElement): object
 
-*Defined in [cordova-plugin-mapbox.ts:797](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L797)*
+*Defined in [cordova-plugin-mapbox.ts:736](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L736)*
 
 #### Parameters:
 
@@ -1455,18 +1422,17 @@ ___
 
 ### zoomTo
 
-▸ `Const`**zoomTo**(`zoom`: number, `options`: any, `successCallback`: () => void, `errorCallback`: (e: string) => void, `id?`: number): void
+▸ `Const`**zoomTo**(`zoom`: number, `options`: any, `successCallback`: () => void, `errorCallback`: (e: string) => void): void
 
-*Defined in [cordova-plugin-mapbox.ts:1274](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L1274)*
+*Defined in [cordova-plugin-mapbox.ts:1162](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L1162)*
 
 #### Parameters:
 
-Name | Type | Default value |
------- | ------ | ------ |
-`zoom` | number | - |
-`options` | any | - |
-`successCallback` | () => void | - |
-`errorCallback` | (e: string) => void | - |
-`id` | number | 0 |
+Name | Type |
+------ | ------ |
+`zoom` | number |
+`options` | any |
+`successCallback` | () => void |
+`errorCallback` | (e: string) => void |
 
 **Returns:** void

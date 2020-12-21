@@ -962,6 +962,13 @@ class MapController implements MapboxMap.OnMapClickListener {
             type = _mapEventType;
             latLngBounds = getJSONBounds(_latLngBounds);
         }
+
+        public JSONObject toJSON() throws JSONException {
+            JSONObject payload = new JSONObject();
+            payload.put("type", this.type.eventType);
+            payload.put("latLngBounds", this.latLngBounds);
+            return payload;
+        }
     }
 
     private class MapClickListener implements MapboxMap.OnMapClickListener {

@@ -140,40 +140,35 @@ export interface Mapbox {
      * @param options
      * @param successCallback called when the map is displayed
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    show(options: MapOptions, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
+    show(options: MapOptions, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
-     * Display a red line around clickable HTML elements for debug purpose.
+     * Colorize clickable HTML elements with for debug purpose.
      * @param isDebug
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    setDebug(isDebug: boolean, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
+    setDebug(isDebug: boolean, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Set a map as clickable. If false, the user won't be abble to move the map
      * with gesture.
      * @param isClickable
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    setClickable(isClickable: boolean, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
+    setClickable(isClickable: boolean, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Hide the map. The map is still in memory.
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      * @param successCallback called on success
      * @param errorCallback called in case of error
      */
-    hide(id?: number, successCallback?: () => void, errorCallback?: (e: string) => void): void;
+    hide(successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Destroy a map and free the memory.
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      * @param successCallback called on success
      * @param errorCallback called in case of error
      */
-    destroy(id?: number, successCallback?: () => void, errorCallback?: (e: string) => void): void;
+    destroy(successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Set the HTML container of the Map. It will resize
      * the map to fit in the container and update the clickable
@@ -181,7 +176,6 @@ export interface Mapbox {
      * @param params
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
     setContainer(params: MapboxContainerParams, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
     /**
@@ -189,35 +183,31 @@ export interface Mapbox {
      * @param options
      * @param successCallback a success callback taking a [[DowlloadState]] in argument
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
     downloadRegion(options: DownloadParams, statusCallback: (state: DownloadState) => void, errorCallback?: (e: string | {
         reason: 'REGION_EXISTS';
-    }) => void, id?: number): void;
+    }) => void): void;
     /**
      * Get the availble names of offline region.
      * @param styleUrl the Mapbox style URL
      * @param successCallback a callback taking a string Array of region names.
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    getOfflineRegionList(styleUrl?: string, successCallback?: (regionNames: string[]) => void, errorCallback?: (e: string) => void, id?: number): void;
+    getOfflineRegionList(styleUrl?: string, successCallback?: (regionNames: string[]) => void, errorCallback?: (e: string) => void): void;
     /**
      * Delete an offline region
      * @param params
      * @param successCallback a callback taking the result object of the deletion
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
     deleteOfflineRegion(params?: OfflineRegionParams, successCallback?: (result: {
         isDelete: boolean;
-    }) => void, errorCallback?: (e: string) => void, id?: number): void;
+    }) => void, errorCallback?: (e: string) => void): void;
     /**
      * Pause the download of a region
      * @param options
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
     pauseDownload(options?: OfflineRegionParams, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
     /**
@@ -225,23 +215,20 @@ export interface Mapbox {
      * @param options
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    resumeDownload(options?: OfflineRegionParams, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
+    resumeDownload(options?: OfflineRegionParams, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Add a map click callback to the native map.
      * @param callback the click callback taking a collection of JSON feature geometry objects.
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
     addMapClickCallback(callback?: (featureCollection: GeoJSON.FeatureCollection<GeoJSON.GeometryObject>) => void, errorCallback?: (e: string) => void, id?: number): void;
     /**
      * Deselect the current feature of the map.
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    deselect(callback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
+    deselect(callback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Add an image to the map style. For instance, a marker image.
      * You must add the image before referencing it in a resource.
@@ -249,26 +236,23 @@ export interface Mapbox {
      * @param image
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    addImage(imageId: string, image: ImageProperties, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
+    addImage(imageId: string, image: ImageProperties, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Remove an image from the map style.
      * @param imageId
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    removeImage(imageId: string, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
+    removeImage(imageId: string, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Add a layer to the map style
      * @param layer
      * @param beforeId the layer will be added below
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    addLayer(layer: Layer, beforeId?: number, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
+    addLayer(layer: Layer, beforeId?: number, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Set a layout property for a layer
      * @param layerId
@@ -276,49 +260,43 @@ export interface Mapbox {
      * @param value the property value
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    setLayoutProperty(layerId: string, name: LayoutPropertyName, value: any, successCallback?: () => void, errorCallback?: (_e: string) => void, id?: number): void;
+    setLayoutProperty(layerId: string, name: LayoutPropertyName, value: any, successCallback?: () => void, errorCallback?: (_e: string) => void): void;
     /**
      * Remove a layer from the map style
      * @param layerId
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    removeLayer(layerId: string, successCallback?: () => void, errorCallback?: (_e: string) => void, id?: number): void;
+    removeLayer(layerId: string, successCallback?: () => void, errorCallback?: (_e: string) => void): void;
     /**
      * Add a source to the map style
      * @param sourceId
      * @param source
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    addSource(sourceId: string, source: Source<any, any>, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
+    addSource(sourceId: string, source: Source<any, any>, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Remove a source from the map style
      * @param sourceId
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    removeSource(sourceId: string, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
+    removeSource(sourceId: string, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Set the data of a source. Use this when you want to animate data.
      * @param sourceId
      * @param geoJson
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    setGeoJson(sourceId: string, geoJson: SourceData<any, any>, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
+    setGeoJson(sourceId: string, geoJson: SourceData<any, any>, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Smoothly jump to a position on the map.
      * @param options
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
     flyTo(options: {
         cameraPosition: Partial<CameraPosition> & {
@@ -330,39 +308,34 @@ export interface Mapbox {
      * @param center the new coordinautes
      * @param successCallback called when animation start
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    setCenter(center: LngLat, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
+    setCenter(center: LngLat, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Get the [[Coords]] of the map center.
      * @param resultCallback takes a [[Coords]] argument.
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    getCenter(resultCallback: (center: Coords) => void, errorCallback?: (_e: string) => void, id?: number): void;
+    getCenter(resultCallback: (center: Coords) => void, errorCallback?: (_e: string) => void): void;
     /**
      * Animate a camera translation.
      * @param delta
      * @param successCallback called when animation start
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    scrollMap(delta: [number, number], successCallback: (center: Coords) => void, errorCallback?: (e: string) => void, id?: number): void;
+    scrollMap(delta: [number, number], successCallback: (center: Coords) => void, errorCallback?: (e: string) => void): void;
     /**
      * Set the map pitch (not animated)
      * @param pitch
      * @param successCallback called on success
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    setPitch(pitch: number, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
+    setPitch(pitch: number, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Get the current map pitch
      * @param resultCallback takes a the current pitch as argument.
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    getPitch(resultCallback?: (pitch: number) => void, errorCallback?: (e: string) => void, id?: number): void;
+    getPitch(resultCallback?: (pitch: number) => void, errorCallback?: (e: string) => void): void;
     /**
      * Set the zoom of the map (not animated)
      * @param zoom
@@ -371,12 +344,11 @@ export interface Mapbox {
      * @param errorCallback
      * @param id
      */
-    setZoom(zoom: number, options?: any, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
+    setZoom(zoom: number, options?: any, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Return the current map zoom
      * @param resultCallback takes a the current zoom as argument.
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
     getZoom(resultCallback?: (zoom: number) => void, errorCallback?: (e: string) => void, id?: number): void;
     /**
@@ -385,45 +357,40 @@ export interface Mapbox {
      * @param options
      * @param successCallback called when animation start
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    zoomTo(zoom: number, options?: any, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
+    zoomTo(zoom: number, options?: any, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Get the current map bounds
      * @param resultCallback takes the map [[Bounds]] as argument
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
     getBounds(resultCallback?: (_bounds: Bounds) => void, errorCallback?: (_e: string) => void, id?: number): void;
     /**
      * Get the current map camera position
      * @param resultCallback takes the map [[CameraPosition]] as argument
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
-    getCameraPosition(resultCallback: (cameraPosition: CameraPosition) => void, errorCallback?: (_e: string) => void, id?: number): void;
+    getCameraPosition(resultCallback: (cameraPosition: CameraPosition) => void, errorCallback?: (_e: string) => void): void;
     /**
      * Convert [[Coords]] to [[ScreenCoords]]
      * @param coords
      * @param resultCallback takes the [[ScreenCoords]] as argument
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
     convertCoordinates(coords: {
         lat: number;
         lng: number;
-    }, resultCallback?: (_point: ScreenCoords) => void, errorCallback?: (_e: string) => void, id?: number): void;
+    }, resultCallback?: (_point: ScreenCoords) => void, errorCallback?: (_e: string) => void): void;
     /**
      * Convert [[ScreenCoords]] to [[Coords]]
      * @param point
      * @param successCallback takes the [[Coords]] as argument
      * @param errorCallback called in case of error
-     * @param id the unique id of the map when multi maps is needed. Default to 0.
      */
     convertPoint(point: ScreenCoords, successCallback?: (_coords: {
         lat: number;
         lng: number;
-    }) => void, errorCallback?: (_e: string) => void, id?: number): void;
+    }) => void, errorCallback?: (_e: string) => void): void;
     /**
      * Adds a callback that's invoked when the map is flinged.
      * The user performs a bold move gesture and the maps move with more inertia.

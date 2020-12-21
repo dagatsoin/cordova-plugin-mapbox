@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import android.support.annotation.Nullable;
 import android.view.View;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -23,38 +23,32 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
-//todo handle multimap
-//todo change _mapRect to a Hash to store link a _mapRect to a map id
-//todo rename vars which reference to a map use to decouple this class
-//todo store set of HTMLs in a Map
-
 public class PluginLayout extends FrameLayout  {
-    private View _webView;
-    private ViewGroup _root;
+    private final View _webView;
+    private boolean _isSet = false;
+    private final ViewGroup _root;
     private RectF _mapRect = new RectF();
-    private Context _context;
-    private FrontLayerLayout _frontLayer;
-    private ScrollView _scrollView = null;
-    private FrameLayout _scrollFrameLayout = null;
-    private View _backgroundView = null;
-    private TouchableWrapper _touchableWrapper;
-    private ViewGroup _mapsGroup = null;
+    private final FrontLayerLayout _frontLayer;
+    private final ScrollView _scrollView;
+    private final FrameLayout _scrollFrameLayout;
+    private final View _backgroundView;
+    private final TouchableWrapper _touchableWrapper;
+    @Nullable private ViewGroup _viewGroup;
     private boolean _isScrolling = false;
     private ViewGroup.LayoutParams _orgLayoutParams = null;
     private boolean _isDebug = false;
     private boolean _isClickable = true;
-    private Map<String, RectF> _HTMLNodes = new HashMap<String, RectF>();
-    private Activity _activity = null;
+    private final Map<String, RectF> _HTMLNodes;
+    private final Activity _activity;
 
     public ScrollView getScrollView(){return _scrollView;}
 
-    @SuppressLint("NewApi")
     public PluginLayout(View webView, Activity activity) {
         super(webView.getContext());
         _activity = activity;
         _webView = webView;
         _root = (ViewGroup) _webView.getParent();
-        _context = _webView.getContext();
+        Context _context = _webView.getContext();
         _frontLayer = new FrontLayerLayout(_context);
 
         _scrollView = new ScrollView(_context);
@@ -75,15 +69,17 @@ public class PluginLayout extends FrameLayout  {
 
         this._touchableWrapper = new TouchableWrapper(_context);
 
+        _HTMLNodes = new HashMap<>();
     }
 
     public void setHTMLElement(String domId, float left, float top, float right, float bottom) {
-        RectF rect = null;
+        RectF rect;
         if (this._HTMLNodes.containsKey(domId)) {
             rect = this._HTMLNodes.get(domId);
         } else {
             rect = new RectF();
         }
+        assert rect != null;
         rect.left = left;
         rect.top = top;
         rect.right = right;
@@ -93,12 +89,7 @@ public class PluginLayout extends FrameLayout  {
             this.inValidate();
         }
     }
-    public void deleteHTMLElement(String domId) {
-        this._HTMLNodes.remove(domId);
-        if (_isDebug) {
-            this.inValidate();
-        }
-    }
+
     public void clearHTMLElement() {
         this._HTMLNodes.clear();
         if (_isDebug) {
@@ -113,12 +104,11 @@ public class PluginLayout extends FrameLayout  {
         }
     }
 
-    //todo compute width height to handle multiple maps
     public void updateViewPosition() {
-        if (_mapsGroup == null) {
+        if (_viewGroup == null) {
             return;
         }
-        ViewGroup.LayoutParams lParams = _mapsGroup.getLayoutParams();
+        ViewGroup.LayoutParams lParams = _viewGroup.getLayoutParams();
         int scrollY = _webView.getScrollY();
         int scrollX = _webView.getScrollX();
 
@@ -128,14 +118,14 @@ public class PluginLayout extends FrameLayout  {
             params.height = (int) _mapRect.height();
             params.x = (int) _mapRect.left - scrollX;
             params.y = (int) _mapRect.top + scrollY;
-            _mapsGroup.setLayoutParams(params);
+            _viewGroup.setLayoutParams(params);
         } else if (lParams instanceof LinearLayout.LayoutParams) {
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) lParams;
             params.width = (int) _mapRect.width();
             params.height = (int) _mapRect.height();
             params.topMargin = (int) _mapRect.top + scrollY;
             params.leftMargin = (int) _mapRect.left - scrollX;;
-            _mapsGroup.setLayoutParams(params);
+            _viewGroup.setLayoutParams(params);
         } else if (lParams instanceof FrameLayout.LayoutParams) {
             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) lParams;
             params.width = (int) _mapRect.width();
@@ -143,11 +133,11 @@ public class PluginLayout extends FrameLayout  {
             params.topMargin = (int) _mapRect.top + scrollY;
             params.leftMargin = (int) _mapRect.left - scrollX;;
             params.gravity = Gravity.TOP;
-            _mapsGroup.setLayoutParams(params);
+            _viewGroup.setLayoutParams(params);
         }
         if (android.os.Build.VERSION.SDK_INT < 11) {
             // Force redraw
-            _mapsGroup.requestLayout(); //todo watch this line if nothing is resized
+            _viewGroup.requestLayout(); //todo watch this line if nothing is resized
         }
         _frontLayer.invalidate();
     }
@@ -162,7 +152,7 @@ public class PluginLayout extends FrameLayout  {
     /**
      * Add a map rectangle to the drawing zone
      */
-    public void setMapDrawingRect(int id, RectF mapRect) {
+    public void setMapDrawingRect(RectF mapRect) {
         _setDrawingZone(mapRect);
     }
 
@@ -174,63 +164,58 @@ public class PluginLayout extends FrameLayout  {
         }
     }
 
-    public void detachMapsGroup() {
-        if (_mapsGroup == null) {
+    public void detachViewGroup() {
+        if (!_isSet) {
             return;
         }
         _root.removeView(this);
         this.removeView(_frontLayer);
         _frontLayer.removeView(_webView);
 
-        _scrollFrameLayout.removeView(_mapsGroup);
-        _mapsGroup.removeView(this._touchableWrapper);
+        _scrollFrameLayout.removeView(_viewGroup);
+        _viewGroup.removeView(this._touchableWrapper);
 
         this.removeView(_scrollView);
         _scrollView.removeView(_scrollFrameLayout);
         if (_orgLayoutParams != null) {
-            _mapsGroup.setLayoutParams(_orgLayoutParams);
+            _viewGroup.setLayoutParams(_orgLayoutParams);
         }
 
         _root.addView(_webView);
-        _mapsGroup = null;
+        _viewGroup = null;
         _activity.getWindow().getDecorView().requestFocus();
         _webView.setBackgroundColor(Color.WHITE);
+        _isSet = false;
     }
 
     /**
-     * Don't care about scroll distance, just place mapsGroup in the right layer.
-     * @param mapsGroup the ViewGroup embedding the maps
+     * Build the view hierarchy.
+     * Get all the current sub views of this view controller and pass it under the Plugin Layer.
+     * Then, all user touch will be first intercepted by the plugin layer
+     * which will decide whether or not it is a map action.
+     * @param viewToEmbed the ViewGroup embedding the
      */
-    public void attachMapsGroup(ViewGroup mapsGroup) {
+    public void buildViewHierarchy(View viewToEmbed) {
         _webView.setBackgroundColor(Color.TRANSPARENT);
-        if("org.xwalk.core.XWalkView".equals(_webView.getClass().getName())
-                || "org.crosswalk.engine.XWalkCordovaView".equals(_webView.getClass().getName())) {
-            try {
-                /* _webView.setZOrderOnTop(true)
-                 * Called just in time as with _root.setBackground(...) the color
-                 * come in front and take the whole screen */
-                _webView.getClass().getMethod("setZOrderOnTop", boolean.class).invoke(_webView, true);
-            }
-            catch(Exception e) {
-                e.printStackTrace();
-            }
-        }
         _scrollView.setHorizontalScrollBarEnabled(false);
         _scrollView.setVerticalScrollBarEnabled(false);
 
-        _scrollView.scrollTo(_webView.getScrollX(), _webView.getScrollY());
-        if (_mapsGroup == mapsGroup) {
-            return;
-        } else {
-            detachMapsGroup();
-        }
-        _mapsGroup = mapsGroup;
+        _viewGroup = new FrameLayout(_webView.getContext());
+        _viewGroup.setLayoutParams(
+                new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT
+                )
+        );
 
-        /* Get all the current sub views of this view controller and pass it under the Plugin Layer.
-         * Then, all user touch will be first intercepted by the plugin layer
-         * which will decide whether or not it is a map action.
-         */
-        ViewGroup.LayoutParams lParams = _mapsGroup.getLayoutParams();
+        _scrollView.scrollTo(_webView.getScrollX(), _webView.getScrollY());
+        if (_isSet) {
+            return;
+        }
+
+        _viewGroup.addView(viewToEmbed);
+
+        ViewGroup.LayoutParams lParams = viewToEmbed.getLayoutParams();
         _orgLayoutParams = null;
         if (lParams != null) {
             _orgLayoutParams = new ViewGroup.LayoutParams(lParams);
@@ -239,8 +224,8 @@ public class PluginLayout extends FrameLayout  {
         _scrollView.addView(_scrollFrameLayout);
         this.addView(_scrollView);
 
-        mapsGroup.addView(this._touchableWrapper);
-        _scrollFrameLayout.addView(mapsGroup);
+        _viewGroup.addView(this._touchableWrapper);
+        _scrollFrameLayout.addView(_viewGroup);
 
         _frontLayer.addView(_webView);
         this.addView(_frontLayer);
@@ -249,13 +234,8 @@ public class PluginLayout extends FrameLayout  {
 
         _scrollView.setHorizontalScrollBarEnabled(true);
         _scrollView.setVerticalScrollBarEnabled(true);
-    }
 
-    public void setPageSize(int width, int height) {
-        android.view.ViewGroup.LayoutParams lParams = _backgroundView.getLayoutParams();
-        lParams.width = width;
-        lParams.height = height;
-        _backgroundView.setLayoutParams(lParams);
+        _isSet = true;
     }
 
     public void scrollTo(int x, int y){
@@ -280,7 +260,7 @@ public class PluginLayout extends FrameLayout  {
 
         @Override
         public boolean onInterceptTouchEvent(MotionEvent event) {
-            if (!_isClickable || _mapsGroup == null || _mapsGroup.getVisibility() != View.VISIBLE) {
+            if (!_isClickable || _viewGroup == null || _viewGroup.getVisibility() != View.VISIBLE) {
                 _webView.requestFocus(View.FOCUS_DOWN);
                 return false;
             }

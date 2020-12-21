@@ -29,7 +29,7 @@ It also exports the types of arguments used in the API for development purpose.
 
 •  **OnFling**:  = "OnFling"
 
-*Defined in [cordova-plugin-mapbox.ts:17](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L17)*
+*Defined in [cordova-plugin-mapbox.ts:17](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L17)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 •  **OnMove**:  = "OnMove"
 
-*Defined in [cordova-plugin-mapbox.ts:9](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L9)*
+*Defined in [cordova-plugin-mapbox.ts:9](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L9)*
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 •  **OnMoveEnd**:  = "OnMoveEnd"
 
-*Defined in [cordova-plugin-mapbox.ts:10](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L10)*
+*Defined in [cordova-plugin-mapbox.ts:10](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L10)*
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 •  **OnMoveStart**:  = "OnMoveStart"
 
-*Defined in [cordova-plugin-mapbox.ts:8](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L8)*
+*Defined in [cordova-plugin-mapbox.ts:8](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L8)*
 
 ___
 
@@ -61,7 +61,7 @@ ___
 
 •  **OnRotate**:  = "OnRotate"
 
-*Defined in [cordova-plugin-mapbox.ts:12](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L12)*
+*Defined in [cordova-plugin-mapbox.ts:12](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L12)*
 
 ___
 
@@ -69,7 +69,7 @@ ___
 
 •  **OnRotateEnd**:  = "OnRotateEnd"
 
-*Defined in [cordova-plugin-mapbox.ts:13](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L13)*
+*Defined in [cordova-plugin-mapbox.ts:13](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L13)*
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 •  **OnRotateStart**:  = "OnRotateStart"
 
-*Defined in [cordova-plugin-mapbox.ts:11](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L11)*
+*Defined in [cordova-plugin-mapbox.ts:11](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L11)*
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 •  **OnScale**:  = "OnScale"
 
-*Defined in [cordova-plugin-mapbox.ts:15](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L15)*
+*Defined in [cordova-plugin-mapbox.ts:15](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L15)*
 
 ___
 
@@ -93,7 +93,7 @@ ___
 
 •  **OnScaleEnd**:  = "OnScaleEnd"
 
-*Defined in [cordova-plugin-mapbox.ts:16](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L16)*
+*Defined in [cordova-plugin-mapbox.ts:16](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L16)*
 
 ___
 
@@ -101,4 +101,4 @@ ___
 
 •  **OnScaleStart**:  = "OnScaleStart"
 
-*Defined in [cordova-plugin-mapbox.ts:14](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bce9504/src/js/cordova-plugin-mapbox.ts#L14)*
+*Defined in [cordova-plugin-mapbox.ts:14](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/bd345cd/src/js/cordova-plugin-mapbox.ts#L14)*

@@ -185,26 +185,22 @@ export interface Mapbox {
    * @param options 
    * @param successCallback called when the map is displayed
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   show(
     options: MapOptions,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void
   /**
    * Colorize clickable HTML elements with for debug purpose.
    * @param isDebug
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   setDebug(
     isDebug: boolean,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void
   /**
    * Set a map as clickable. If false, the user won't be abble to move the map
@@ -212,33 +208,27 @@ export interface Mapbox {
    * @param isClickable 
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   setClickable(
     isClickable: boolean,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void 
   /**
    * Hide the map. The map is still in memory.
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    * @param successCallback called on success
    * @param errorCallback called in case of error
    */
   hide(
-    id?: number,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
   ): void 
   /**
    * Destroy a map and free the memory.
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    * @param successCallback called on success
    * @param errorCallback called in case of error
    */
   destroy(
-    id?: number,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
   ): void 
@@ -249,7 +239,6 @@ export interface Mapbox {
    * @param params 
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   setContainer(
     params: MapboxContainerParams,
@@ -262,46 +251,39 @@ export interface Mapbox {
    * @param options 
    * @param successCallback a success callback taking a [[DowlloadState]] in argument
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   downloadRegion(
     options: DownloadParams,
     statusCallback: (state: DownloadState) => void,
     errorCallback?: (e: string | { reason: 'REGION_EXISTS' }) => void,
-    id?: number,
   ): void
   /**
    * Get the availble names of offline region.
    * @param styleUrl the Mapbox style URL
    * @param successCallback a callback taking a string Array of region names.
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   getOfflineRegionList(
     styleUrl?: string,
     successCallback?: (regionNames: string[]) => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void 
   /**
    * Delete an offline region
    * @param params 
    * @param successCallback a callback taking the result object of the deletion
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   deleteOfflineRegion(
     params?: OfflineRegionParams,
     successCallback?: (result: { isDelete: boolean }) => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void
   /**
    * Pause the download of a region
    * @param options 
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   pauseDownload(
     options?: OfflineRegionParams,
@@ -314,19 +296,16 @@ export interface Mapbox {
    * @param options 
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   resumeDownload(
     options?: OfflineRegionParams,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void
   /**
    * Add a map click callback to the native map.
    * @param callback the click callback taking a collection of JSON feature geometry objects.
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   addMapClickCallback(
     callback?: (featureCollection: GeoJSON.FeatureCollection<GeoJSON.GeometryObject>) => void,
@@ -337,12 +316,10 @@ export interface Mapbox {
    * Deselect the current feature of the map.
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   deselect(
     callback?: () => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void
   /**
    * Add an image to the map style. For instance, a marker image.
@@ -351,27 +328,23 @@ export interface Mapbox {
    * @param image 
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   addImage(
     imageId: string,
     image: ImageProperties,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void
   /**
    * Remove an image from the map style.
    * @param imageId 
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   removeImage(
     imageId: string,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void
   /**
    * Add a layer to the map style
@@ -379,14 +352,12 @@ export interface Mapbox {
    * @param beforeId the layer will be added below
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   addLayer(
     layer: Layer,
     beforeId?: number,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void
   /**
    * Set a layout property for a layer
@@ -395,7 +366,6 @@ export interface Mapbox {
    * @param value the property value
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */ 
   setLayoutProperty(
     layerId: string,
@@ -403,20 +373,17 @@ export interface Mapbox {
     value: any,
     successCallback?: () => void,
     errorCallback?: (_e: string) => void,
-    id?: number,
   ): void 
   /**
    * Remove a layer from the map style
    * @param layerId 
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   removeLayer(
     layerId: string,
     successCallback?: () => void,
     errorCallback?: (_e: string) => void,
-    id?: number,
   ): void
   /**
    * Add a source to the map style
@@ -424,27 +391,23 @@ export interface Mapbox {
    * @param source 
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   addSource(
     sourceId: string,
     source: Source<any, any>,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void 
   /**
    * Remove a source from the map style
    * @param sourceId 
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   removeSource(
     sourceId: string,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void
   /**
    * Set the data of a source. Use this when you want to animate data.
@@ -452,21 +415,18 @@ export interface Mapbox {
    * @param geoJson 
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   setGeoJson(
     sourceId: string,
     geoJson: SourceData<any, any>,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void
   /**
    * Smoothly jump to a position on the map.
    * @param options 
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   flyTo(
     options: {
@@ -481,61 +441,51 @@ export interface Mapbox {
    * @param center the new coordinautes
    * @param successCallback called when animation start
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   setCenter(
     center: LngLat,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void
   /**
    * Get the [[Coords]] of the map center.
    * @param resultCallback takes a [[Coords]] argument.
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   getCenter(
     resultCallback: (center: Coords) => void,
     errorCallback?: (_e: string) => void,
-    id?: number,
   ): void
   /**
    * Animate a camera translation.
    * @param delta 
    * @param successCallback called when animation start
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   scrollMap(
     delta: [number, number],
     successCallback: (center: Coords) => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void 
   /**
    * Set the map pitch (not animated)
    * @param pitch 
    * @param successCallback called on success
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   setPitch(
     pitch: number,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void
   /**
    * Get the current map pitch
    * @param resultCallback takes a the current pitch as argument.
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   getPitch(
     resultCallback?: (pitch: number) => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void
   /**
    * Set the zoom of the map (not animated)
@@ -550,13 +500,11 @@ export interface Mapbox {
     options?: any,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void
   /**
    * Return the current map zoom
    * @param resultCallback takes a the current zoom as argument.
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   getZoom(
     resultCallback?: (zoom: number) => void,
@@ -569,20 +517,17 @@ export interface Mapbox {
    * @param options 
    * @param successCallback called when animation start
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   zoomTo(
     zoom: number,
     options?: any,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
-    id?: number,
   ): void
   /**
    * Get the current map bounds
    * @param resultCallback takes the map [[Bounds]] as argument
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   getBounds(
     resultCallback?: (_bounds: Bounds) => void,
@@ -593,19 +538,16 @@ export interface Mapbox {
    * Get the current map camera position
    * @param resultCallback takes the map [[CameraPosition]] as argument
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   getCameraPosition(
     resultCallback: (cameraPosition: CameraPosition) => void,
     errorCallback?: (_e: string) => void,
-    id?: number,
   ): void
   /**
    * Convert [[Coords]] to [[ScreenCoords]]
    * @param coords 
    * @param resultCallback takes the [[ScreenCoords]] as argument
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   convertCoordinates(
     coords: {
@@ -614,20 +556,17 @@ export interface Mapbox {
     },
     resultCallback?: (_point: ScreenCoords) => void,
     errorCallback?: (_e: string) => void,
-    id?: number,
   ): void
   /**
    * Convert [[ScreenCoords]] to [[Coords]]
    * @param point 
    * @param successCallback takes the [[Coords]] as argument
    * @param errorCallback called in case of error
-   * @param id the unique id of the map when multi maps is needed. Default to 0.
    */
   convertPoint(
     point: ScreenCoords,
     successCallback?: (_coords: { lat: number; lng: number }) => void,
     errorCallback?: (_e: string) => void,
-    id?: number,
   ): void
   /**
    * Adds a callback that's invoked when the map is flinged.
@@ -891,7 +830,6 @@ export const show: Mapbox['show'] = function(
   options,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   const nativeOptions = {
     ...options,
@@ -904,18 +842,16 @@ export const show: Mapbox['show'] = function(
     nativeOptions.HTMLs.push(...flatElements(options.additionalDomElements))
     delete nativeOptions.additionalDomElements
   }
-  cordova.exec(successCallback, errorCallback, MAPBOX, Command.SHOW, [id, nativeOptions])
+  cordova.exec(successCallback, errorCallback, MAPBOX, Command.SHOW, [nativeOptions])
 }
 
 export const setDebug: Mapbox['setDebug'] = function(
   debug,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   // Convert value to int
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.SET_DEBUG, [
-    id,
     Number(debug),
   ])
 }
@@ -924,35 +860,30 @@ export const setClickable: Mapbox['setClickable'] = function(
   clickable,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.SET_CLICKABLE, [
-    id,
     clickable,
   ])
 }
 
 export const hide: Mapbox['hide'] = function(
-  id = 0,
   successCallback?: () => void,
   errorCallback?: (e: string) => void,
 ): void {
-  cordova.exec(successCallback, errorCallback, MAPBOX, Command.HIDE, [id])
+  cordova.exec(successCallback, errorCallback, MAPBOX, Command.HIDE, [])
 }
 
 export const destroy: Mapbox['destroy'] = function(
-  id,
   successCallback,
   errorCallback,
 ): void {
-  cordova.exec(successCallback, errorCallback, MAPBOX, Command.DESTROY, [id])
+  cordova.exec(successCallback, errorCallback, MAPBOX, Command.DESTROY, [])
 }
 
 export const setContainer: Mapbox['setContainer'] = function(
   params,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   const container = {
     HTMLs: getContainerChildrenOverlayElements(params.domContainer),
@@ -964,7 +895,6 @@ export const setContainer: Mapbox['setContainer'] = function(
   }
 
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.SET_CONTAINER, [
-    id,
     container,
   ])
 }
@@ -973,10 +903,8 @@ export const downloadRegion: Mapbox['downloadRegion'] = function(
   options,
   statusCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(statusCallback, errorCallback, MAPBOX, Command.DOWNLOAD_REGION, [
-    id,
     options,
   ])
 }
@@ -985,7 +913,7 @@ export const getOfflineRegionList: Mapbox['getOfflineRegionList'] = function(
   styleUrl,
   _successCallback,
   _errorCallback,
-  _id = 0,
+
 ): void {
   const _styleUrl = typeof arguments[0] === 'string' ? arguments[0] : null
   const successCallback = styleUrl === null ? arguments[0] : arguments[1]
@@ -997,7 +925,7 @@ export const getOfflineRegionList: Mapbox['getOfflineRegionList'] = function(
     errorCallback,
     MAPBOX,
     Command.GET_OFFLINE_REGION_LIST,
-    [id, _styleUrl],
+    [_styleUrl],
   )
 }
 
@@ -1005,19 +933,18 @@ export const deleteOfflineRegion: Mapbox['deleteOfflineRegion'] = function(
   options,
   _successCallback,
   _errorCallback,
-  _id = 0,
+
 ): void {
   const _options = typeof arguments[0] === 'object' ? arguments[0] : null
   const successCallback = options === null ? arguments[0] : arguments[1]
   const errorCallback = options === null ? arguments[1] : arguments[2]
-  const id = options === null ? arguments[2] || 0 : arguments[3] || 0
 
   cordova.exec(
     successCallback,
     errorCallback,
     MAPBOX,
     Command.DELETE_OFFLINE_REGION,
-    [id, _options],
+    [_options],
   )
 }
 
@@ -1025,16 +952,12 @@ export const pauseDownload: Mapbox['pauseDownload'] = function(
   options,
   _successCallback,
   _errorCallback,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _id = 0,
 ): void {
   const _options = typeof arguments[0] === 'object' ? arguments[0] : null
   const successCallback = options === null ? arguments[0] : arguments[1]
   const errorCallback = options === null ? arguments[1] : arguments[2]
-  const id = options === null ? arguments[2] || 0 : arguments[3] || 0
 
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.PAUSE_DOWNLOAD, [
-    id,
     _options,
   ])
 }
@@ -1044,16 +967,12 @@ export const resumeDownload: Mapbox['resumeDownload'] = function(
   options,
   _successCallback,
   _errorCallback,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _id = 0,
 ): void {
   const _options = typeof arguments[0] === 'object' ? arguments[0] : null
   const successCallback = options === null ? arguments[0] : arguments[1]
   const errorCallback = options === null ? arguments[1] : arguments[2]
-  const id = options === null ? arguments[2] || 0 : arguments[3] || 0
 
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.RESUME_DOWNLOAD, [
-    id,
     _options,
   ])
 }
@@ -1061,19 +980,16 @@ export const resumeDownload: Mapbox['resumeDownload'] = function(
 export const addMapClickCallback: Mapbox['addMapClickCallback'] = function(
   callback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(callback, errorCallback, MAPBOX, Command.ADD_MAP_CLICK_CALLBACK, [
-    id,
   ])
 }
 
 export const deselect: Mapbox['deselect'] = function(
   callback?: () => void,
   errorCallback?: (_e: string) => void,
-  id = 0,
 ): void {
-  cordova.exec(callback, errorCallback, MAPBOX, Command.DESELECT, [id])
+  cordova.exec(callback, errorCallback, MAPBOX, Command.DESELECT, [])
 }
 
 export const addImage: Mapbox['addImage'] = function(
@@ -1081,10 +997,8 @@ export const addImage: Mapbox['addImage'] = function(
   image,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.ADD_IMAGE, [
-    id,
     imageId,
     image,
   ])
@@ -1094,10 +1008,8 @@ export const removeImage: Mapbox['removeImage'] = function(
   imageId,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.REMOVE_IMAGE, [
-    id,
     imageId,
   ])
 }
@@ -1107,10 +1019,8 @@ export const addLayer: Mapbox['addLayer'] = function(
   beforeId,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.ADD_LAYER, [
-    id,
     layerObject,
     beforeId,
   ])
@@ -1122,14 +1032,13 @@ export const setLayoutProperty: Mapbox['setLayoutProperty'] = function(
   value,
   successCallback,
   errorCallback?,
-  id = 0,
 ): void {
   cordova.exec(
     successCallback,
     errorCallback,
     MAPBOX,
     Command.SET_LAYOUT_PROPERTY,
-    [id, layerId, name, value],
+    [layerId, name, value],
   )
 }
 
@@ -1137,10 +1046,8 @@ export const removeLayer: Mapbox['removeLayer'] = function(
   layerId,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.REMOVE_LAYER, [
-    id,
     layerId,
   ])
 }
@@ -1150,10 +1057,8 @@ export const addSource: Mapbox['addSource'] = function(
   source,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.ADD_SOURCE, [
-    id,
     sourceId,
     source,
   ])
@@ -1163,10 +1068,8 @@ export const removeSource: Mapbox['removeSource'] = function(
   sourceId,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.REMOVE_SOURCE, [
-    id,
     sourceId,
   ])
 }
@@ -1176,10 +1079,8 @@ export const setGeoJson: Mapbox['setGeoJson'] = function(
   geoJson,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.SET_GEO_JSON, [
-    id,
     sourceId,
     geoJson,
   ])
@@ -1189,10 +1090,8 @@ export const flyTo: Mapbox['flyTo'] =  function(
   options,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.FLY_TO, [
-    id,
     options,
   ])
 }
@@ -1201,10 +1100,8 @@ export const setCenter: Mapbox['setCenter'] = function(
   center,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.SET_CENTER, [
-    id,
     center,
   ])
 }
@@ -1212,19 +1109,16 @@ export const setCenter: Mapbox['setCenter'] = function(
 export const getCenter: Mapbox['getCenter'] = function(
   resultCallback,
   errorCallback,
-  id = 0,
 ): void {
-  cordova.exec(resultCallback, errorCallback, MAPBOX, Command.GET_CENTER, [id])
+  cordova.exec(resultCallback, errorCallback, MAPBOX, Command.GET_CENTER, [])
 }
 
 export const scrollMap: Mapbox['scrollMap'] = function(
   delta: [number, number],
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.SCROLL_MAP, [
-    id,
     delta,
   ])
 }
@@ -1233,10 +1127,8 @@ export const setPitch: Mapbox['setPitch'] = function(
   pitch,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.SET_PITCH, [
-    id,
     pitch,
   ])
 }
@@ -1244,9 +1136,8 @@ export const setPitch: Mapbox['setPitch'] = function(
 export const getPitch: Mapbox['getPitch'] = function(
   resultCallback,
   errorCallback,
-  id = 0,
 ): void {
-  cordova.exec(resultCallback, errorCallback, MAPBOX, Command.GET_PITCH, [id])
+  cordova.exec(resultCallback, errorCallback, MAPBOX, Command.GET_PITCH, [])
 }
 
 export const setZoom: Mapbox['setZoom'] = function(
@@ -1254,10 +1145,8 @@ export const setZoom: Mapbox['setZoom'] = function(
   options,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.SET_ZOOM, [
-    id,
     zoom,
     options,
   ])
@@ -1266,9 +1155,8 @@ export const setZoom: Mapbox['setZoom'] = function(
 export const getZoom: Mapbox['getZoom'] = function(
   resultCallback,
   errorCallback,
-  id = 0,
 ): void {
-  cordova.exec(resultCallback, errorCallback, MAPBOX, Command.GET_ZOOM, [id])
+  cordova.exec(resultCallback, errorCallback, MAPBOX, Command.GET_ZOOM, [])
 }
 
 export const zoomTo: Mapbox['zoomTo'] = function(
@@ -1276,10 +1164,8 @@ export const zoomTo: Mapbox['zoomTo'] = function(
   options,
   successCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(successCallback, errorCallback, MAPBOX, Command.ZOOM_TO, [
-    id,
     zoom,
     options,
   ])
@@ -1288,22 +1174,20 @@ export const zoomTo: Mapbox['zoomTo'] = function(
 export const getBounds: Mapbox['getBounds'] = function(
   resultCallback,
   errorCallback,
-  id = 0,
 ): void {
-  cordova.exec(resultCallback, errorCallback, MAPBOX, Command.GET_BOUNDS, [id])
+  cordova.exec(resultCallback, errorCallback, MAPBOX, Command.GET_BOUNDS, [])
 }
 
 export const getCameraPosition: Mapbox['getCameraPosition'] = function(
   resultCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(
     resultCallback,
     errorCallback,
     MAPBOX,
     Command.GET_CAMERA_POSITION,
-    [id],
+    [],
   )
 }
 
@@ -1311,14 +1195,13 @@ export const convertCoordinates: Mapbox['convertCoordinates'] = function(
   coords,
   resultCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(
     resultCallback,
     errorCallback,
     MAPBOX,
     Command.CONVERT_COORDINATES,
-    [id, coords],
+    [coords],
   )
 }
 
@@ -1326,28 +1209,26 @@ export const convertPoint: Mapbox['convertPoint'] = function(
   point,
   resultCallback,
   errorCallback,
-  id = 0,
 ): void {
   cordova.exec(resultCallback, errorCallback, MAPBOX, Command.CONVERT_POINT, [
-    id,
     point,
   ])
 }
 
 export const addOnFlingListener: Mapbox['addOnFlingListener'] = function (listener, id = 0) {
-  cordova.exec(listener, null, MAPBOX, Command.ADD_ON_FLING_LISTENER, [id])
+  cordova.exec(listener, null, MAPBOX, Command.ADD_ON_FLING_LISTENER, [])
 }
 
 export const addOnMoveListener: Mapbox['addOnMoveListener'] = function (listener, id = 0) {
-  cordova.exec(listener, null, MAPBOX, Command.ADD_ON_MOVE_LISTENER, [id])
+  cordova.exec(listener, null, MAPBOX, Command.ADD_ON_MOVE_LISTENER, [])
 }
 
 export const addOnRotateListener: Mapbox['addOnRotateListener'] = function (listener, id = 0) {
-  cordova.exec(listener, null, MAPBOX, Command.ADD_ON_ROTATE_LISTENER, [id])
+  cordova.exec(listener, null, MAPBOX, Command.ADD_ON_ROTATE_LISTENER, [])
 }
 
 export const addOnScaleListener: Mapbox['addOnScaleListener'] = function (listener, id = 0) {
-  cordova.exec(listener, null, MAPBOX, Command.ADD_ON_SCALE_LISTENER, [id])
+  cordova.exec(listener, null, MAPBOX, Command.ADD_ON_SCALE_LISTENER, [])
 }
 
 /**
@@ -1359,7 +1240,7 @@ export const addOnWillStartLoadingMapListener: Mapbox['addOnWillStartLoadingMapL
     null,
     MAPBOX,
     Command.ADD_ON_WILL_START_LOADING_MAP_LISTENER,
-    [id],
+    [],
   )
 }
 
@@ -1372,7 +1253,7 @@ export const addOnWillStartRenderingMapListener: Mapbox['addOnWillStartRendering
     null,
     MAPBOX,
     Command.ADD_ON_WILL_START_RENDERING_MAP_LISTENER,
-    [id],
+    [],
   )
 }
 
@@ -1385,7 +1266,7 @@ export const addOnCameraWillChangeListener: Mapbox['addOnCameraWillChangeListene
     null,
     MAPBOX,
     Command.ADD_ON_CAMERA_WILL_CHANGE_LISTENER,
-    [id],
+    [],
   )
 }
 
@@ -1398,7 +1279,7 @@ export const addOnCameraDidChangeListener: Mapbox['addOnCameraDidChangeListener'
     null,
     MAPBOX,
     Command.ADD_ON_CAMERA_DID_CHANGE_LISTENER,
-    [id],
+    [],
   )
 }
 
@@ -1411,7 +1292,7 @@ export const addOnDidFinishLoadingStyleListener: Mapbox['addOnDidFinishLoadingSt
     null,
     MAPBOX,
     Command.ADD_ON_DID_FINISH_LOADING_STYLE_LISTENER,
-    [id],
+    [],
   )
 }
 
@@ -1424,7 +1305,7 @@ export const addOnSourceChangedListener: Mapbox['addOnSourceChangedListener'] = 
     null,
     MAPBOX,
     Command.ADD_ON_SOURCE_CHANGED_LISTENER,
-    [id],
+    [],
   )
 }
 
@@ -1437,7 +1318,7 @@ export const addOnWillStartRenderingFrameListener: Mapbox['addOnWillStartRenderi
     null,
     MAPBOX,
     Command.ADD_ON_WILL_START_RENDERING_FRAME_LISTENER,
-    [id],
+    [],
   )
 }
 
@@ -1450,7 +1331,7 @@ export const addOnDidFinishRenderingFrameListener: Mapbox['addOnDidFinishRenderi
     null,
     MAPBOX,
     Command.ADD_ON_DID_FINISH_RENDERING_FRAME_LISTENER,
-    [id],
+    [],
   )
 }
 
@@ -1463,7 +1344,7 @@ export const addOnDidFinishLoadingMapListener: Mapbox['addOnDidFinishLoadingMapL
     null,
     MAPBOX,
     Command.ADD_ON_DID_FINISH_LOADING_MAP_LISTENER,
-    [id],
+    [],
   )
 }
 
@@ -1476,6 +1357,6 @@ export function addOnDidFinishRenderingMapListener(listener: (fully: boolean) =>
     null,
     MAPBOX,
     Command.ADD_ON_DID_FINISH_RENDERING_MAP_LISTENER,
-    [id],
+    [],
   )
 }

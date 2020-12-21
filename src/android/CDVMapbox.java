@@ -6,7 +6,6 @@ import android.graphics.PointF;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
 
 import com.cocoahero.android.geojson.GeoJSON;
 import com.cocoahero.android.geojson.GeoJSONObject;
@@ -31,9 +30,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrollChangedListener {
-
-    FrameLayout mapsGroup;
-
     private static final String ADD_IMAGE = "ADD_IMAGE";
     private static final String ADD_LAYER = "ADD_LAYER";
     private static final String ADD_MAP_CLICK_CALLBACK = "ADD_MAP_CLICK_CALLBACK";
@@ -87,12 +83,13 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
     private static final String MAPBOX_ACCESSTOKEN_RESOURCE_KEY = "mapbox_accesstoken";
     private CordovaWebView _webView;
     private Activity activity;
+    @Nullable MapLayout mapLayout;
 
     PluginLayout pluginLayout;
 
     /**
      * Handler listening to scroll changes.
-     * Important! Both pluginLayout and maps have to be updated.
+     * Important! Both plugin layout and map layout have to be updated.
      */
     @Override
     public void onScrollChanged() {
@@ -103,9 +100,8 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
         int scrollY = _webView.getView().getScrollY();
 
         pluginLayout.scrollTo(scrollX, scrollY);
-
-        for (int i = 0; i < MapsManager.getCount(); i++) {
-            MapsManager.getMap(i).onScroll(scrollX, scrollY);
+        if(mapLayout != null) {
+            mapLayout.onScroll(scrollX, scrollY);
         }
     }
 
@@ -118,11 +114,6 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
         _webView.getView().getViewTreeObserver().addOnScrollChangedListener(CDVMapbox.this);
 
         /*
-         * Init MapsManager. It handles multiple maps.
-         */
-        MapsManager.init(this, activity);
-
-        /*
          * Init the plugin layer responsible to capture touch events.
          * It permits to have Dom Elements on top of the map.
          * If a touch event occurs in one of the embed rectangles and outside of a inner html element,
@@ -130,16 +121,6 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
          * If not, the user surely want to access the UIWebView.
          */
         pluginLayout = new PluginLayout(_webView.getView(), activity);
-
-
-        // Create the maps container.
-        mapsGroup = new FrameLayout(webView.getContext());
-        mapsGroup.setLayoutParams(
-                new FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.WRAP_CONTENT
-                )
-        );
 
         try {
             int mapboxAccesstokenResourceId = cordova.getActivity().getResources().getIdentifier(MAPBOX_ACCESSTOKEN_RESOURCE_KEY, "string", cordova.getActivity().getPackageName());
@@ -154,19 +135,11 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
 
     public boolean execute(final String action, final CordovaArgs args, final CallbackContext callbackContext) {
         try {
-            if (args.isNull(0)) {
-                callbackContext.error(action + " needs a map id");
-                return true;
-            }
-
-            final int id = args.getInt(0);
-            @Nullable final Map map = MapsManager.getMap(id);
-
             if (SHOW.equals(action)) {
-                if (map != null) {
-                    if (map.getMapCtrl().getMapView().getVisibility() == View.GONE) {
+                if (mapLayout != null) {
+                    if (mapLayout.getMapCtrl().getMapView().getVisibility() == View.GONE) {
                         activity.runOnUiThread(() -> {
-                            map.getMapCtrl().getMapView().setVisibility(View.VISIBLE);
+                            mapLayout.getMapCtrl().getMapView().setVisibility(View.VISIBLE);
                             callbackContext.success();
                         });
                     } else {
@@ -174,7 +147,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     }
                 } else {
                     activity.runOnUiThread(() -> {
-                        final Map aMap = MapsManager.createMap(args, id, callbackContext);
+                        mapLayout = new MapLayout(args, this, activity, callbackContext);
                         /* If it is the first map, we set the general layout.
                          * Arrange the layers. The final order is:
                          * - root (Application View)
@@ -183,23 +156,22 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                          *       - webView
                          *     - scrollView
                          *       - scrollFrameLayout
-                         *         - mapsGroup
+                         *         - map
                          *         - background
                          */
 
-                        if (MapsManager.getCount() == 1) {
-                            pluginLayout.attachMapsGroup(mapsGroup);
-                        }
-                        aMap.setContainer(args, callbackContext);
-                        mapsGroup.addView(aMap.getViewGroup());
-                        aMap.getMapCtrl().mapReady = callbackContext::success;
+                        pluginLayout.buildViewHierarchy(mapLayout.getViewGroup());
+                        mapLayout.setContainer(args, callbackContext);
+
+                        // Wait for the map to be ready then callback JS
+                        mapLayout.getMapCtrl().mapReady = callbackContext::success;
                     });
                 }
                 return true;
             } else if (DOWNLOAD_REGION.equals(action)) {
                 cordova.getThreadPool().execute(() -> {
                     try {
-                        if (args.isNull(1)) {
+                        if (args.isNull(0)) {
                             throw new JSONException(action + " needs options object type of {\n" +
                                     "                            regionName: string // must be unique.\n" +
                                     "                            styleUrl?: string // only when the map is not display yet or the style is different from the current one.\n" +
@@ -208,9 +180,9 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                     "                            maxZoom: number\n" +
                                     "                        },");
                         }
-                        final JSONObject options = args.getJSONObject(1);
+                        final JSONObject options = args.getJSONObject(0);
                         @Nullable final String styleUrl = options.has("styleUrl") ? options.getString("styleUrl") : null;
-                        final OfflineController offlineController = getOfflineController(map, styleUrl, activity);
+                        final OfflineController offlineController = getOfflineController(mapLayout, styleUrl, activity);
                         final String regionName = options.getString("regionName");
 
                         final JSONObject jsonBounds = options.getJSONObject("bounds");
@@ -261,7 +233,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                 cordova.getThreadPool().execute(() -> {
                     JSONObject options = null;
                     try {
-                        options = args.getJSONObject(1);
+                        options = args.getJSONObject(0);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -269,7 +241,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                         if (options != null) {
                             @Nullable final String regionName = options.has("regionName") ? options.getString("regionName") : null;
                             @Nullable final String styleUrl = options.has("styleUrl") ? options.getString("styleUrl") : null;
-                            OfflineController offlineController = getOfflineController(map, styleUrl, activity);
+                            OfflineController offlineController = getOfflineController(mapLayout, styleUrl, activity);
                             offlineController.pauseDownload(regionName);
                             callbackContext.success();
                         }
@@ -281,7 +253,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                 cordova.getThreadPool().execute(() -> {
                     JSONObject options = null;
                     try {
-                        options = args.getJSONObject(1);
+                        options = args.getJSONObject(0);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -289,7 +261,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                         try {
                             @Nullable final String regionName = options.has("regionName") ? options.getString("regionName") : null;
                             @Nullable final String styleUrl = options.has("styleUrl") ? options.getString("styleUrl") : null;
-                            OfflineController offlineController = getOfflineController(map, styleUrl, activity);
+                            OfflineController offlineController = getOfflineController(mapLayout, styleUrl, activity);
                             offlineController.resumeDownload(regionName);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -300,8 +272,8 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
             } else if (GET_OFFLINE_REGION_LIST.equals(action)) {
                 cordova.getThreadPool().execute(() -> {
                     try {
-                        @Nullable final String styleUrl = args.optString(1).equals("") ? null : args.optString(1);
-                        final OfflineController offlineController = getOfflineController(map, styleUrl, activity);
+                        @Nullable final String styleUrl = args.optString(0).equals("") ? null : args.optString(0);
+                        final OfflineController offlineController = getOfflineController(mapLayout, styleUrl, activity);
                         final ArrayList<OfflineController.OfflineRegionState> states = offlineController.getOfflineRegionStates();
                         final ArrayList<JSONObject> res = new ArrayList<>();
                         for (OfflineController.OfflineRegionState state: states) {
@@ -317,10 +289,10 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                 cordova.getThreadPool().execute(() -> {
                     final JSONObject options;
                     try {
-                        options = args.getJSONObject(1);
+                        options = args.getJSONObject(0);
                         @Nullable final String regionName = options.has("regionName") ? options.getString("regionName") : null;
                         @Nullable final String styleUrl = options.has("styleUrl") ? options.getString("styleUrl") : null;
-                        final OfflineController offlineController = getOfflineController(map, styleUrl, activity);
+                        final OfflineController offlineController = getOfflineController(mapLayout, styleUrl, activity);
                         offlineController.removeOfflineRegion(
                                 regionName,
                                 () -> {
@@ -347,20 +319,20 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
 
 
                 // need a map for all following actions
-                if (map == null || !map.getMapCtrl().isReady) {
+                if (mapLayout == null || !mapLayout.getMapCtrl().isReady) {
                     callbackContext.error(new JSONObject("{error: 'MAP_IS_NOT_READY'}"));
                     return true;
                 }
 
-                final MapController mapCtrl = map.getMapCtrl();
-                @Nullable final String styleUrl = args.optString(1).equals("") ? null : args.optString(1);
-                final OfflineController offlineController = getOfflineController(map, styleUrl, activity);
-                Runnable callback = () -> map.setContainer(args, callbackContext);
+                final MapController mapCtrl = mapLayout.getMapCtrl();
+                @Nullable final String styleUrl = args.optString(0).equals("") ? null : args.optString(0);
+                final OfflineController offlineController = getOfflineController(mapLayout, styleUrl, activity);
+                Runnable callback = () -> mapLayout.setContainer(args, callbackContext);
                 switch (action) {
                     case HIDE:
                         activity.runOnUiThread(() -> {
-                            map.getMapCtrl().getMapView().setVisibility(View.GONE);
-                            map.getMapCtrl().deselectFeature();
+                            mapLayout.getMapCtrl().getMapView().setVisibility(View.GONE);
+                            mapLayout.getMapCtrl().deselectFeature();
                             if (offlineController.isDownloading())
                                 offlineController.pauseDownload("");
                             callbackContext.success();
@@ -370,11 +342,8 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                         activity.runOnUiThread(() -> {
                             if (offlineController.isDownloading())
                                 offlineController.pauseDownload("");
-                            mapsGroup.removeView(map.getViewGroup());
-                            MapsManager.removeMap(id);
-                            if (MapsManager.getCount() == 0) {
-                                pluginLayout.detachMapsGroup();
-                            }
+                            mapLayout = null;
+                            pluginLayout.detachViewGroup();
                         });
                         break;
                     case RESIZE:
@@ -392,10 +361,10 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case SET_ZOOM:
                         activity.runOnUiThread(() -> {
                             try {
-                                if (args.isNull(1)) {
+                                if (args.isNull(0)) {
                                     throw new JSONException(action + "needs a zoom level");
                                 }
-                                double zoom = args.getDouble(1);
+                                double zoom = args.getDouble(0);
                                 mapCtrl.setZoom(zoom);
                                 callbackContext.success();
                             } catch (JSONException e) {
@@ -407,10 +376,10 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case ZOOM_TO:  // todo allow AnimationOptions
                         activity.runOnUiThread(() -> {
                             try {
-                                if (args.isNull(1)) {
+                                if (args.isNull(0)) {
                                     throw new JSONException(action + "needs a zoom level");
                                 }
-                                double zoom = args.getDouble(1);
+                                double zoom = args.getDouble(0);
                                 mapCtrl.zoomTo(zoom);
                                 callbackContext.success();
                             } catch (JSONException e) {
@@ -437,10 +406,10 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case SET_CENTER:
                         activity.runOnUiThread(() -> {
                             try {
-                                if (args.isNull(1)) {
+                                if (args.isNull(0)) {
                                     throw new JSONException(action + "need a [long, lat] coordinates");
                                 }
-                                JSONArray center = args.getJSONArray(1);
+                                JSONArray center = args.getJSONArray(0);
                                 mapCtrl.setCenter(center.getDouble(0), center.getDouble(1));
                                 callbackContext.success();
                             } catch (JSONException e) {
@@ -452,10 +421,10 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case SCROLL_MAP:
                         activity.runOnUiThread(() -> {
                             try {
-                                if (args.isNull(1)) {
+                                if (args.isNull(0)) {
                                     throw new JSONException(action + "need a [x, y] screen coordinates");
                                 }
-                                JSONArray delta = args.getJSONArray(1);
+                                JSONArray delta = args.getJSONArray(0);
                                 mapCtrl.scrollMap(delta.getLong(0), delta.getLong(1));
                                 callbackContext.success();
                             } catch (JSONException e) {
@@ -467,10 +436,10 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case SET_PITCH:
                         activity.runOnUiThread(() -> {
                             try {
-                                if (args.isNull(1)) {
+                                if (args.isNull(0)) {
                                     throw new JSONException(action + " need a pitch value");
                                 }
-                                mapCtrl.setTilt(args.getDouble(1));
+                                mapCtrl.setTilt(args.getDouble(0));
                                 callbackContext.success();
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -492,7 +461,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case FLY_TO:
                         activity.runOnUiThread(() -> {
                             try {
-                                JSONObject options = args.isNull(1) ? null : args.getJSONObject(1);
+                                JSONObject options = args.isNull(0) ? null : args.getJSONObject(0);
                                 if (options == null || options.isNull("cameraPosition"))
                                     callbackContext.error("Need a camera position");
                                 else {
@@ -507,14 +476,14 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                         break;
                     case ADD_MAP_CLICK_CALLBACK:
                         activity.runOnUiThread(() -> {
-                            map.mMarkerCallbackContext = callbackContext;
+                            mapLayout.mMarkerCallbackContext = callbackContext;
                             mapCtrl.addMapClickCallback(() -> {
-                                if (map.mMarkerCallbackContext != null) {
+                                if (mapLayout.mMarkerCallbackContext != null) {
                                     try {
                                         JSONObject json = new JSONObject(mapCtrl.getSelecteFeatureCollection());
                                         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, json);
                                         pluginResult.setKeepCallback(true);
-                                        map.mMarkerCallbackContext.sendPluginResult(pluginResult);
+                                        mapLayout.mMarkerCallbackContext.sendPluginResult(pluginResult);
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                         callbackContext.error("action " + e.getMessage());
@@ -526,16 +495,16 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case ADD_SOURCE:
                         activity.runOnUiThread(() -> {
                             try {
-                                final String sourceId = args.getString(1);
+                                final String sourceId = args.getString(0);
                                 if (sourceId.isEmpty())
                                     throw new JSONException(action + " need a source ID");
-                                if (args.isNull(2))
+                                if (args.isNull(1))
                                     throw new JSONException(action + " no source provided");
-                                if (!args.getJSONObject(2).getString("type").equals("geojson"))
+                                if (!args.getJSONObject(1).getString("type").equals("geojson"))
                                     throw new JSONException(action + " only handle GeoJSON");
 
 
-                                final JSONObject source = args.getJSONObject(2);
+                                final JSONObject source = args.getJSONObject(1);
                                 final JSONObject sourceData = source.getJSONObject("data");
 
                                 // We can pass a empty source
@@ -595,19 +564,19 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case SET_GEO_JSON:
                         activity.runOnUiThread(() -> {
                             try {
-                                final String sourceId = args.getString(1);
+                                final String sourceId = args.getString(0);
                                 if (sourceId.isEmpty())
                                     throw new JSONException(action + " need a source ID");
-                                if (args.isNull(2))
+                                if (args.isNull(1))
                                     throw new JSONException(action + " no geojson data provided");
 
                                 // Validate GeoJSON data.
-                                final GeoJSONObject geoJSON = GeoJSON.parse(args.getJSONObject(2));
+                                final GeoJSONObject geoJSON = GeoJSON.parse(args.getJSONObject(1));
 
                                 // This plugin has limited GeoJSON types. It supports:
                                 // - FeatureCollection of point feature
                                 // - Single point feature
-                                final JSONObject sourceData = args.getJSONObject(2);
+                                final JSONObject sourceData = args.getJSONObject(1);
                                 final String sourceType = geoJSON.getType();
                                 final boolean isFeatureCollection = sourceType.equals("FeatureCollection");
                                 final boolean isFeature = sourceType.equals("Feature");
@@ -649,11 +618,11 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case REMOVE_SOURCE:
                         activity.runOnUiThread(() -> {
                             try {
-                                if (args.isNull(1))
+                                if (args.isNull(0))
                                     throw new JSONException(action + " no id provided");
 
                                 final JSONObject result = new JSONObject()
-                                        .put("success", mapCtrl.removeSource(args.getString(1)));
+                                        .put("success", mapCtrl.removeSource(args.getString(0)));
                                 callbackContext.success(result);
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -664,7 +633,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case ADD_LAYER:
                         activity.runOnUiThread(() -> {
                             try {
-                                final JSONObject jsonLayer = args.getJSONObject(1);
+                                final JSONObject jsonLayer = args.getJSONObject(0);
 
                                 String layerType = jsonLayer.getString("type");
                                 if (!layerType.equals("symbol") && !layerType.equals("circle"))
@@ -682,8 +651,8 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                 final boolean isRefSource = !jsonLayer.optString("source", "").isEmpty();
                                 if (isRefSource) {
                                     String beforeId = null;
-                                    if (args.getString(2) != null && !args.getString(2).equals("null")) {
-                                        beforeId = args.getString(2);
+                                    if (args.getString(1) != null && !args.getString(1).equals("null")) {
+                                        beforeId = args.getString(1);
                                     }
                                     final String sourceId = jsonLayer.getString("source");
                                     if (layerType.equals("symbol")) {
@@ -781,11 +750,11 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case REMOVE_LAYER:
                         activity.runOnUiThread(() -> {
                             try {
-                                if (args.isNull(1))
+                                if (args.isNull(0))
                                     throw new JSONException(action + " no id provided");
 
                                 final JSONObject result = new JSONObject()
-                                        .put("success", mapCtrl.removeLayer(args.getString(1)));
+                                        .put("success", mapCtrl.removeLayer(args.getString(0)));
                                 callbackContext.success(result);
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -796,33 +765,33 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case SET_LAYOUT_PROPERTY:
                         activity.runOnUiThread(() -> {
                             try {
-                                final String layerId = args.optString(1);
+                                final String layerId = args.optString(0);
                                 if (layerId.isEmpty())
                                     throw new JSONException(action + " no layerId provided");
 
-                                final String name = args.optString(2);
+                                final String name = args.optString(1);
                                 if (name.isEmpty())
                                     throw new JSONException(action + " no property name provided");
 
-                                if (args.isNull(3))
+                                if (args.isNull(2))
                                     throw new JSONException(action + " no value provided");
 
                                 switch (name) {
                                     case "icon-image":
-                                        final String imageId = args.getString(3);
+                                        final String imageId = args.getString(2);
                                         mapCtrl.setLayoutPropertyIconImage(layerId, imageId);
                                         break;
                                     case "icon-offset":
-                                        final JSONArray jsonOffsetArray = args.getJSONArray(3);
+                                        final JSONArray jsonOffsetArray = args.getJSONArray(2);
                                         final Float[] offset = {(float) jsonOffsetArray.getDouble(0), (float) jsonOffsetArray.getDouble(1)};
                                         mapCtrl.setLayoutPropertyOffset(layerId, offset);
                                         break;
                                     case "icon-size":
-                                        final String size = args.getString(3);
+                                        final String size = args.getString(2);
                                         mapCtrl.setLayoutPropertySize(layerId, size);
                                         break;
                                     case "icon-allow-overlap":
-                                        final boolean isOverlap = args.getBoolean(3);
+                                        final boolean isOverlap = args.getBoolean(2);
                                         mapCtrl.setLayoutPropertyIconOverlap(layerId, isOverlap);
                                 }
 
@@ -836,8 +805,8 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case ADD_IMAGE:
                         activity.runOnUiThread(() -> {
                             try {
-                                final String imageId = args.getString(1);
-                                final JSONObject jsonImage = args.getJSONObject(2);
+                                final String imageId = args.getString(0);
+                                final JSONObject jsonImage = args.getJSONObject(1);
 
                                 if (jsonImage.isNull("width"))
                                     throw new JSONException(action + " no width found");
@@ -859,10 +828,10 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case REMOVE_IMAGE:
                         activity.runOnUiThread(() -> {
                             try {
-                                if (args.isNull(1))
+                                if (args.isNull(0))
                                     throw new JSONException(action + " no id provided");
 
-                                mapCtrl.removeImage(args.getString(1));
+                                mapCtrl.removeImage(args.getString(0));
                                 callbackContext.success();
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -878,7 +847,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case SET_CLICKABLE:
                         activity.runOnUiThread(() -> {
                             try {
-                                pluginLayout.setClickable(args.getBoolean(1));
+                                pluginLayout.setClickable(args.getBoolean(0));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                                 callbackContext.error("action " + e.getMessage());
@@ -888,7 +857,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case SET_DEBUG:
                         activity.runOnUiThread(() -> {
                             try {
-                                pluginLayout.setDebug(args.getInt(1) != 0);
+                                pluginLayout.setDebug(args.getInt(0) != 0);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                                 callbackContext.error("action " + e.getMessage());
@@ -898,7 +867,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case CONVERT_COORDINATES:
                         activity.runOnUiThread(() -> {
                             try {
-                                JSONObject coords = args.getJSONObject(1);
+                                JSONObject coords = args.getJSONObject(0);
                                 PointF point = mapCtrl.convertCoordinates(new LatLng(
                                         coords.getDouble("lat"),
                                         coords.getDouble("lng")
@@ -913,7 +882,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case CONVERT_POINT:
                         activity.runOnUiThread(() -> {
                             try {
-                                JSONObject point = args.getJSONObject(1);
+                                JSONObject point = args.getJSONObject(0);
                                 LatLng latLng = mapCtrl.convertPoint(new PointF(
                                         (float) point.getDouble("x"),
                                         (float) point.getDouble("y")
@@ -1074,6 +1043,51 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                             }
                         });
                         break;
+
+                    case ADD_ON_MOVE_LISTENER:
+                        activity.runOnUiThread(() -> mapCtrl.addOnMoveListener(payload -> {
+                            try {
+                                PluginResult result = new PluginResult(PluginResult.Status.OK, payload.toJSON());
+                                result.setKeepCallback(true);
+                                callbackContext.sendPluginResult(result);
+                            } catch (JSONException e) {
+                                callbackContext.error(e.getMessage());
+                                e.printStackTrace();
+                            }
+                        }));
+                    case ADD_ON_FLING_LISTENER:
+                        activity.runOnUiThread(() -> mapCtrl.addOnFlingListener(payload -> {
+                            try {
+                                PluginResult result = new PluginResult(PluginResult.Status.OK, payload.toJSON());
+                                result.setKeepCallback(true);
+                                callbackContext.sendPluginResult(result);
+                            } catch (JSONException e) {
+                                callbackContext.error(e.getMessage());
+                                e.printStackTrace();
+                            }
+                        }));
+                    case ADD_ON_ROTATE_LISTENER:
+                        activity.runOnUiThread(() -> mapCtrl.addOnRotateListener(payload -> {
+                            try {
+                                PluginResult result = new PluginResult(PluginResult.Status.OK, payload.toJSON());
+                                result.setKeepCallback(true);
+                                callbackContext.sendPluginResult(result);
+                            } catch (JSONException e) {
+                                callbackContext.error(e.getMessage());
+                                e.printStackTrace();
+                            }
+                        }));
+                    case ADD_ON_SCALE_LISTENER:
+                        activity.runOnUiThread(() -> mapCtrl.addOnScaleListener(payload -> {
+                            try {
+                                PluginResult result = new PluginResult(PluginResult.Status.OK, payload.toJSON());
+                                result.setKeepCallback(true);
+                                callbackContext.sendPluginResult(result);
+                            } catch (JSONException e) {
+                                callbackContext.error(e.getMessage());
+                                e.printStackTrace();
+                            }
+                        }));
                     default:
                         return false;
                 }
@@ -1102,27 +1116,33 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
         return progressMsg;
     }
 
-    static private OfflineController getOfflineController(@Nullable Map map, @Nullable String styleUrl, Activity activity) throws Exception {
-        if (map == null) {
+    static private OfflineController getOfflineController(@Nullable MapLayout mapLayout, @Nullable String styleUrl, Activity activity) throws Exception {
+        if (mapLayout == null) {
             if (styleUrl == null || styleUrl.isEmpty()) {
                 throw new Exception("When the Map is not displayed, you need to provide a style url");
             }
             return OfflineControllerPool.get(styleUrl) != null ? OfflineControllerPool.get(styleUrl) : OfflineControllerPool.create(activity, styleUrl);
         } else {
-            return map.getMapCtrl().getOfflineController();
+            return mapLayout.getMapCtrl().getOfflineController();
         }
     }
 
     public void onPause(boolean multitasking) {
-        MapsManager.onPause();
+        if (mapLayout != null) {
+            mapLayout.getMapCtrl().getMapView().onStop();
+        }
     }
 
     public void onResume(boolean multitasking) {
-        MapsManager.onResume();
+        if (mapLayout != null) {
+            mapLayout.onResume();
+        }
     }
 
     public void onDestroy() {
-        MapsManager.onDestroy();
+        if (mapLayout != null) {
+            mapLayout.getMapCtrl().getMapView().onDestroy();
+        }
         OfflineControllerPool.onDestroy();
     }
 }
