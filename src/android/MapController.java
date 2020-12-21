@@ -719,40 +719,94 @@ class MapController implements MapboxMap.OnMapClickListener {
         }
     }
 
-    void addOnWillStartLoadingMapListener(Runnable callback) {
-        mMapView.addOnWillStartLoadingMapListener(callback::run);
+    void addOnWillStartLoadingMapListener(RunnableWithArg<JSONObject> callback) {
+        mMapView.addOnWillStartLoadingMapListener(() -> {
+            try {
+                callback.run(this.getJSONCameraGeoPosition());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    void addOnWillStartRenderingMapListener(Runnable callback) {
-        mMapView.addOnWillStartRenderingMapListener(callback::run);
+    void addOnWillStartRenderingMapListener(RunnableWithArg<JSONObject> callback) {
+        mMapView.addOnWillStartRenderingMapListener(() -> {
+            try {
+                callback.run(this.getJSONCameraGeoPosition());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    void addOnCameraWillChangeListener(Runnable callback) {
-        mMapView.addOnCameraWillChangeListener((boolean isAnimated) -> callback.run());
+    void addOnCameraWillChangeListener(RunnableWithArg<JSONObject> callback) {
+        mMapView.addOnCameraWillChangeListener((boolean isAnimated) -> {
+            try {
+                callback.run(this.getJSONCameraGeoPosition());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    void addOnCameraDidChangeListener(Runnable callback) {
-        mMapView.addOnCameraDidChangeListener((boolean isAnimated) -> callback.run());
+    void addOnCameraDidChangeListener(RunnableWithArg<JSONObject> callback) {
+        mMapView.addOnCameraDidChangeListener((boolean isAnimated) -> {
+            try {
+                callback.run(this.getJSONCameraGeoPosition());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    void addOnDidFinishLoadingStyleListener(Runnable callback) {
-        mMapView.addOnDidFinishLoadingStyleListener(callback::run);
+    void addOnDidFinishLoadingStyleListener(RunnableWithArg<JSONObject> callback) {
+        mMapView.addOnDidFinishLoadingStyleListener(() -> {
+            try {
+                callback.run(this.getJSONCameraGeoPosition());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    void addOnSourceChangedListener(Runnable callback) {
-        mMapView.addOnSourceChangedListener((String id) -> callback.run());
+    void addOnSourceChangedListener(RunnableWithArg<JSONObject> callback) {
+        mMapView.addOnSourceChangedListener((String id) -> {
+            try {
+                callback.run(this.getJSONCameraGeoPosition());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    void addOnWillStartRenderingFrameListener(Runnable callback) {
-        mMapView.addOnWillStartRenderingFrameListener(callback::run);
+    void addOnWillStartRenderingFrameListener(RunnableWithArg<JSONObject> callback) {
+        mMapView.addOnWillStartRenderingFrameListener(() -> {
+            try {
+                callback.run(this.getJSONCameraGeoPosition());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    void addOnDidFinishRenderingFrameListener(Runnable callback) {
-        mMapView.addOnDidFinishRenderingFrameListener((boolean fully) -> callback.run());
+    void addOnDidFinishRenderingFrameListener(RunnableWithArg<JSONObject> callback) {
+        mMapView.addOnDidFinishRenderingFrameListener((boolean fully) -> {
+            try {
+                callback.run(this.getJSONCameraGeoPosition());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    void addOnDidFinishLoadingMapListener(Runnable callback) {
-        mMapView.addOnDidFinishLoadingMapListener(callback::run);
+    void addOnDidFinishLoadingMapListener(RunnableWithArg<JSONObject> callback) {
+        mMapView.addOnDidFinishLoadingMapListener(() -> {
+            try {
+                callback.run(this.getJSONCameraGeoPosition());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     void addOnDidFinishRenderingMapListener(RunnableWithArg<Boolean> callback) {

@@ -895,102 +895,66 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                         });
                         break;
                     case ADD_ON_WILL_START_LOADING_MAP_LISTENER:
-                        activity.runOnUiThread(() -> mapCtrl.addOnWillStartLoadingMapListener(() -> {
-                            try {
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, mapCtrl.getJSONCameraScreenPosition());
-                                result.setKeepCallback(true);
-                                callbackContext.sendPluginResult(result);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                        activity.runOnUiThread(() -> mapCtrl.addOnWillStartLoadingMapListener(cameraPosition -> {
+                            PluginResult result = new PluginResult(PluginResult.Status.OK, cameraPosition);
+                            result.setKeepCallback(true);
+                            callbackContext.sendPluginResult(result);
                         }));
                         break;
                     case ADD_ON_WILL_START_RENDERING_MAP_LISTENER:
-                        activity.runOnUiThread(() -> mapCtrl.addOnWillStartRenderingMapListener(() -> {
-                            try {
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, mapCtrl.getJSONCameraScreenPosition());
-                                result.setKeepCallback(true);
-                                callbackContext.sendPluginResult(result);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                        activity.runOnUiThread(() -> mapCtrl.addOnWillStartRenderingMapListener(cameraPosition -> {
+                            PluginResult result = new PluginResult(PluginResult.Status.OK, cameraPosition);
+                            result.setKeepCallback(true);
+                            callbackContext.sendPluginResult(result);
                         }));
                         break;
                     case ADD_ON_CAMERA_WILL_CHANGE_LISTENER:
-                        activity.runOnUiThread(() -> mapCtrl.addOnCameraWillChangeListener(() -> {
-                            try {
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, mapCtrl.getJSONCameraScreenPosition());
-                                result.setKeepCallback(true);
-                                callbackContext.sendPluginResult(result);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                        activity.runOnUiThread(() -> mapCtrl.addOnCameraWillChangeListener(cameraPosition -> {
+                            PluginResult result = new PluginResult(PluginResult.Status.OK, cameraPosition);
+                            result.setKeepCallback(true);
+                            callbackContext.sendPluginResult(result);
                         }));
                         break;
                     case ADD_ON_CAMERA_DID_CHANGE_LISTENER:
-                        activity.runOnUiThread(() -> mapCtrl.addOnCameraDidChangeListener(() -> {
-                            try {
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, mapCtrl.getJSONCameraScreenPosition());
-                                result.setKeepCallback(true);
-                                callbackContext.sendPluginResult(result);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                        activity.runOnUiThread(() -> mapCtrl.addOnCameraDidChangeListener(cameraPosition -> {
+                            PluginResult result = new PluginResult(PluginResult.Status.OK, cameraPosition);
+                            result.setKeepCallback(true);
+                            callbackContext.sendPluginResult(result);
                         }));
                         break;
                     case ADD_ON_DID_FINISH_LOADING_STYLE_LISTENER:
-                        activity.runOnUiThread(() -> mapCtrl.addOnDidFinishLoadingStyleListener(() -> {
-                            try {
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, mapCtrl.getJSONCameraScreenPosition());
-                                result.setKeepCallback(true);
-                                callbackContext.sendPluginResult(result);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                        activity.runOnUiThread(() -> mapCtrl.addOnDidFinishLoadingStyleListener(cameraPosition -> {
+                            PluginResult result = new PluginResult(PluginResult.Status.OK, cameraPosition);
+                            result.setKeepCallback(true);
+                            callbackContext.sendPluginResult(result);
                         }));
                         break;
                     case ADD_ON_SOURCE_CHANGED_LISTENER:
-                        activity.runOnUiThread(() -> mapCtrl.addOnSourceChangedListener(() -> {
-                            try {
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, mapCtrl.getJSONCameraScreenPosition());
-                                result.setKeepCallback(true);
-                                callbackContext.sendPluginResult(result);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                        activity.runOnUiThread(() -> mapCtrl.addOnSourceChangedListener(cameraPosition -> {
+                            PluginResult result = new PluginResult(PluginResult.Status.OK, cameraPosition);
+                            result.setKeepCallback(true);
+                            callbackContext.sendPluginResult(result);
                         }));
                         break;
                     case ADD_ON_WILL_START_RENDERING_FRAME_LISTENER:
-                        activity.runOnUiThread(() -> mapCtrl.addOnWillStartRenderingFrameListener(() -> {
-                            try {
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, mapCtrl.getJSONCameraScreenPosition());
-                                result.setKeepCallback(true);
-                                callbackContext.sendPluginResult(result);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                        activity.runOnUiThread(() -> mapCtrl.addOnWillStartRenderingFrameListener(cameraPosition -> {
+                            PluginResult result = new PluginResult(PluginResult.Status.OK, cameraPosition);
+                            result.setKeepCallback(true);
+                            callbackContext.sendPluginResult(result);
                         }));
                         break;
                     case ADD_ON_DID_FINISH_RENDERING_FRAME_LISTENER:
-                        activity.runOnUiThread(() -> mapCtrl.addOnDidFinishRenderingFrameListener(() -> {
-                            try {
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, mapCtrl.getJSONCameraScreenPosition());
-                                result.setKeepCallback(true);
-                                callbackContext.sendPluginResult(result);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                        activity.runOnUiThread(() -> mapCtrl.addOnDidFinishRenderingFrameListener(cameraPosition -> {
+                            PluginResult result = new PluginResult(PluginResult.Status.OK, cameraPosition);
+                            result.setKeepCallback(true);
+                            callbackContext.sendPluginResult(result);
                         }));
                         break;
                     case ADD_ON_DID_FINISH_LOADING_MAP_LISTENER:
-                        activity.runOnUiThread(() -> mapCtrl.addOnDidFinishLoadingMapListener(() -> {
-                            try {
-                                PluginResult result = new PluginResult(PluginResult.Status.OK, mapCtrl.getJSONCameraScreenPosition());
-                                result.setKeepCallback(true);
-                                callbackContext.sendPluginResult(result);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                        activity.runOnUiThread(() -> mapCtrl.addOnDidFinishLoadingMapListener(cameraPosition -> {
+                            PluginResult result = new PluginResult(PluginResult.Status.OK, cameraPosition);
+                            result.setKeepCallback(true);
+                            callbackContext.sendPluginResult(result);
                         }));
                         break;
                     case ADD_ON_DID_FINISH_RENDERING_MAP_LISTENER:
