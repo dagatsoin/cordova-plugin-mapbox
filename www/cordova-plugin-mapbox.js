@@ -349,7 +349,7 @@ var setPitch = function (pitch, successCallback, errorCallback) {
 };
 exports.setPitch = setPitch;
 var getPitch = function (resultCallback, errorCallback) {
-    cordova.exec(resultCallback, errorCallback, MAPBOX, Command.GET_PITCH, []);
+    cordova.exec(function (value) { return resultCallback(Number(value)); }, errorCallback, MAPBOX, Command.GET_PITCH, []);
 };
 exports.getPitch = getPitch;
 var setZoom = function (zoom, options, successCallback, errorCallback) {

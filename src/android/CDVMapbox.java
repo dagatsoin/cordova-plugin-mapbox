@@ -446,13 +446,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                         break;
                     case GET_PITCH:
                         activity.runOnUiThread(() -> {
-                            try {
-                                JSONObject json = new JSONObject().put("pitch", mapCtrl.getTilt());
-                                callbackContext.success(json);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                callbackContext.error("action " + e.getMessage());
-                            }
+                            callbackContext.success(String.valueOf(mapCtrl.getTilt()));
                         });
                         break;
                     case FLY_TO:

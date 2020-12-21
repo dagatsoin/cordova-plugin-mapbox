@@ -1137,7 +1137,7 @@ export const getPitch: Mapbox['getPitch'] = function(
   resultCallback,
   errorCallback,
 ): void {
-  cordova.exec(resultCallback, errorCallback, MAPBOX, Command.GET_PITCH, [])
+  cordova.exec((value: string) => resultCallback(Number(value)), errorCallback, MAPBOX, Command.GET_PITCH, [])
 }
 
 export const setZoom: Mapbox['setZoom'] = function(
