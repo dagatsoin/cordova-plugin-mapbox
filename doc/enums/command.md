@@ -64,7 +64,7 @@
 
 •  **ADD\_IMAGE**:  = "ADD\_IMAGE"
 
-*Defined in [cordova-plugin-mapbox.ts:664](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L664)*
+*Defined in [cordova-plugin-mapbox.ts:664](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L664)*
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 •  **ADD\_LAYER**:  = "ADD\_LAYER"
 
-*Defined in [cordova-plugin-mapbox.ts:665](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L665)*
+*Defined in [cordova-plugin-mapbox.ts:665](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L665)*
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 •  **ADD\_MAP\_CLICK\_CALLBACK**:  = "ADD\_MAP\_CLICK\_CALLBACK"
 
-*Defined in [cordova-plugin-mapbox.ts:666](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L666)*
+*Defined in [cordova-plugin-mapbox.ts:666](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L666)*
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 •  **ADD\_ON\_CAMERA\_DID\_CHANGE\_LISTENER**:  = "ADD\_ON\_CAMERA\_DID\_CHANGE\_LISTENER"
 
-*Defined in [cordova-plugin-mapbox.ts:675](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L675)*
+*Defined in [cordova-plugin-mapbox.ts:675](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L675)*
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 •  **ADD\_ON\_CAMERA\_WILL\_CHANGE\_LISTENER**:  = "ADD\_ON\_CAMERA\_WILL\_CHANGE\_LISTENER"
 
-*Defined in [cordova-plugin-mapbox.ts:674](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L674)*
+*Defined in [cordova-plugin-mapbox.ts:674](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L674)*
 
 ___
 
@@ -104,7 +104,7 @@ ___
 
 •  **ADD\_ON\_DID\_FINISH\_LOADING\_MAP\_LISTENER**:  = "ADD\_ON\_DID\_FINISH\_LOADING\_MAP\_LISTENER"
 
-*Defined in [cordova-plugin-mapbox.ts:680](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L680)*
+*Defined in [cordova-plugin-mapbox.ts:680](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L680)*
 
 ___
 
@@ -112,7 +112,7 @@ ___
 
 •  **ADD\_ON\_DID\_FINISH\_LOADING\_STYLE\_LISTENER**:  = "ADD\_ON\_DID\_FINISH\_LOADING\_STYLE\_LISTENER"
 
-*Defined in [cordova-plugin-mapbox.ts:676](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L676)*
+*Defined in [cordova-plugin-mapbox.ts:676](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L676)*
 
 ___
 
@@ -120,7 +120,7 @@ ___
 
 •  **ADD\_ON\_DID\_FINISH\_RENDERING\_FRAME\_LISTENER**:  = "ADD\_ON\_DID\_FINISH\_RENDERING\_FRAME\_LISTENER"
 
-*Defined in [cordova-plugin-mapbox.ts:679](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L679)*
+*Defined in [cordova-plugin-mapbox.ts:679](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L679)*
 
 ___
 
@@ -128,7 +128,7 @@ ___
 
 •  **ADD\_ON\_DID\_FINISH\_RENDERING\_MAP\_LISTENER**:  = "ADD\_ON\_DID\_FINISH\_RENDERING\_MAP\_LISTENER"
 
-*Defined in [cordova-plugin-mapbox.ts:681](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L681)*
+*Defined in [cordova-plugin-mapbox.ts:681](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L681)*
 
 ___
 
@@ -136,7 +136,7 @@ ___
 
 •  **ADD\_ON\_FLING\_LISTENER**:  = "ADD\_ON\_FLING\_LISTENER"
 
-*Defined in [cordova-plugin-mapbox.ts:669](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L669)*
+*Defined in [cordova-plugin-mapbox.ts:669](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L669)*
 
 ___
 
@@ -144,7 +144,7 @@ ___
 
 •  **ADD\_ON\_MOVE\_LISTENER**:  = "ADD\_ON\_MOVE\_LISTENER"
 
-*Defined in [cordova-plugin-mapbox.ts:668](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L668)*
+*Defined in [cordova-plugin-mapbox.ts:668](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L668)*
 
 ___
 
@@ -152,7 +152,7 @@ ___
 
 •  **ADD\_ON\_ROTATE\_LISTENER**:  = "ADD\_ON\_ROTATE\_LISTENER"
 
-*Defined in [cordova-plugin-mapbox.ts:670](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L670)*
+*Defined in [cordova-plugin-mapbox.ts:670](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L670)*
 
 ___
 
@@ -160,7 +160,7 @@ ___
 
 •  **ADD\_ON\_SCALE\_LISTENER**:  = "ADD\_ON\_SCALE\_LISTENER"
 
-*Defined in [cordova-plugin-mapbox.ts:671](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L671)*
+*Defined in [cordova-plugin-mapbox.ts:671](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L671)*
 
 ___
 
@@ -168,7 +168,7 @@ ___
 
 •  **ADD\_ON\_SOURCE\_CHANGED\_LISTENER**:  = "ADD\_ON\_SOURCE\_CHANGED\_LISTENER"
 
-*Defined in [cordova-plugin-mapbox.ts:677](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L677)*
+*Defined in [cordova-plugin-mapbox.ts:677](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L677)*
 
 ___
 
@@ -176,7 +176,7 @@ ___
 
 •  **ADD\_ON\_WILL\_START\_LOADING\_MAP\_LISTENER**:  = "ADD\_ON\_WILL\_START\_LOADING\_MAP\_LISTENER"
 
-*Defined in [cordova-plugin-mapbox.ts:672](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L672)*
+*Defined in [cordova-plugin-mapbox.ts:672](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L672)*
 
 ___
 
@@ -184,7 +184,7 @@ ___
 
 •  **ADD\_ON\_WILL\_START\_RENDERING\_FRAME\_LISTENER**:  = "ADD\_ON\_WILL\_START\_RENDERING\_FRAME\_LISTENER"
 
-*Defined in [cordova-plugin-mapbox.ts:678](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L678)*
+*Defined in [cordova-plugin-mapbox.ts:678](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L678)*
 
 ___
 
@@ -192,7 +192,7 @@ ___
 
 •  **ADD\_ON\_WILL\_START\_RENDERING\_MAP\_LISTENER**:  = "ADD\_ON\_WILL\_START\_RENDERING\_MAP\_LISTENER"
 
-*Defined in [cordova-plugin-mapbox.ts:673](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L673)*
+*Defined in [cordova-plugin-mapbox.ts:673](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L673)*
 
 ___
 
@@ -200,7 +200,7 @@ ___
 
 •  **ADD\_SOURCE**:  = "ADD\_SOURCE"
 
-*Defined in [cordova-plugin-mapbox.ts:667](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L667)*
+*Defined in [cordova-plugin-mapbox.ts:667](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L667)*
 
 ___
 
@@ -208,7 +208,7 @@ ___
 
 •  **CONVERT\_COORDINATES**:  = "CONVERT\_COORDINATES"
 
-*Defined in [cordova-plugin-mapbox.ts:682](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L682)*
+*Defined in [cordova-plugin-mapbox.ts:682](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L682)*
 
 ___
 
@@ -216,7 +216,7 @@ ___
 
 •  **CONVERT\_POINT**:  = "CONVERT\_POINT"
 
-*Defined in [cordova-plugin-mapbox.ts:683](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L683)*
+*Defined in [cordova-plugin-mapbox.ts:683](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L683)*
 
 ___
 
@@ -224,7 +224,7 @@ ___
 
 •  **DELETE\_OFFLINE\_REGION**:  = "DELETE\_OFFLINE\_REGION"
 
-*Defined in [cordova-plugin-mapbox.ts:684](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L684)*
+*Defined in [cordova-plugin-mapbox.ts:684](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L684)*
 
 ___
 
@@ -232,7 +232,7 @@ ___
 
 •  **DESELECT**:  = "DESELECT"
 
-*Defined in [cordova-plugin-mapbox.ts:711](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L711)*
+*Defined in [cordova-plugin-mapbox.ts:711](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L711)*
 
 ___
 
@@ -240,7 +240,7 @@ ___
 
 •  **DESTROY**:  = "DESTROY"
 
-*Defined in [cordova-plugin-mapbox.ts:685](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L685)*
+*Defined in [cordova-plugin-mapbox.ts:685](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L685)*
 
 ___
 
@@ -248,7 +248,7 @@ ___
 
 •  **DOWNLOAD\_REGION**:  = "DOWNLOAD\_REGION"
 
-*Defined in [cordova-plugin-mapbox.ts:686](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L686)*
+*Defined in [cordova-plugin-mapbox.ts:686](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L686)*
 
 ___
 
@@ -256,7 +256,7 @@ ___
 
 •  **FLY\_TO**:  = "FLY\_TO"
 
-*Defined in [cordova-plugin-mapbox.ts:687](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L687)*
+*Defined in [cordova-plugin-mapbox.ts:687](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L687)*
 
 ___
 
@@ -264,7 +264,7 @@ ___
 
 •  **GET\_BOUNDS**:  = "GET\_BOUNDS"
 
-*Defined in [cordova-plugin-mapbox.ts:688](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L688)*
+*Defined in [cordova-plugin-mapbox.ts:688](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L688)*
 
 ___
 
@@ -272,7 +272,7 @@ ___
 
 •  **GET\_CAMERA\_POSITION**:  = "GET\_CAMERA\_POSITION"
 
-*Defined in [cordova-plugin-mapbox.ts:689](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L689)*
+*Defined in [cordova-plugin-mapbox.ts:689](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L689)*
 
 ___
 
@@ -280,7 +280,7 @@ ___
 
 •  **GET\_CENTER**:  = "GET\_CENTER"
 
-*Defined in [cordova-plugin-mapbox.ts:690](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L690)*
+*Defined in [cordova-plugin-mapbox.ts:690](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L690)*
 
 ___
 
@@ -288,7 +288,7 @@ ___
 
 •  **GET\_OFFLINE\_REGION\_LIST**:  = "GET\_OFFLINE\_REGION\_LIST"
 
-*Defined in [cordova-plugin-mapbox.ts:691](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L691)*
+*Defined in [cordova-plugin-mapbox.ts:691](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L691)*
 
 ___
 
@@ -296,7 +296,7 @@ ___
 
 •  **GET\_PITCH**:  = "GET\_PITCH"
 
-*Defined in [cordova-plugin-mapbox.ts:692](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L692)*
+*Defined in [cordova-plugin-mapbox.ts:692](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L692)*
 
 ___
 
@@ -304,7 +304,7 @@ ___
 
 •  **GET\_ZOOM**:  = "GET\_ZOOM"
 
-*Defined in [cordova-plugin-mapbox.ts:693](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L693)*
+*Defined in [cordova-plugin-mapbox.ts:693](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L693)*
 
 ___
 
@@ -312,7 +312,7 @@ ___
 
 •  **HIDE**:  = "HIDE"
 
-*Defined in [cordova-plugin-mapbox.ts:694](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L694)*
+*Defined in [cordova-plugin-mapbox.ts:694](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L694)*
 
 ___
 
@@ -320,7 +320,7 @@ ___
 
 •  **PAUSE\_DOWNLOAD**:  = "PAUSE\_DOWNLOAD"
 
-*Defined in [cordova-plugin-mapbox.ts:695](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L695)*
+*Defined in [cordova-plugin-mapbox.ts:695](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L695)*
 
 ___
 
@@ -328,7 +328,7 @@ ___
 
 •  **REMOVE\_IMAGE**:  = "REMOVE\_IMAGE"
 
-*Defined in [cordova-plugin-mapbox.ts:697](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L697)*
+*Defined in [cordova-plugin-mapbox.ts:697](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L697)*
 
 ___
 
@@ -336,7 +336,7 @@ ___
 
 •  **REMOVE\_LAYER**:  = "REMOVE\_LAYER"
 
-*Defined in [cordova-plugin-mapbox.ts:699](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L699)*
+*Defined in [cordova-plugin-mapbox.ts:699](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L699)*
 
 ___
 
@@ -344,7 +344,7 @@ ___
 
 •  **REMOVE\_SOURCE**:  = "REMOVE\_SOURCE"
 
-*Defined in [cordova-plugin-mapbox.ts:698](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L698)*
+*Defined in [cordova-plugin-mapbox.ts:698](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L698)*
 
 ___
 
@@ -352,7 +352,7 @@ ___
 
 •  **RESIZE**:  = "RESIZE"
 
-*Defined in [cordova-plugin-mapbox.ts:700](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L700)*
+*Defined in [cordova-plugin-mapbox.ts:700](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L700)*
 
 ___
 
@@ -360,7 +360,7 @@ ___
 
 •  **RESUME\_DOWNLOAD**:  = "RESUME\_DOWNLOAD"
 
-*Defined in [cordova-plugin-mapbox.ts:696](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L696)*
+*Defined in [cordova-plugin-mapbox.ts:696](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L696)*
 
 ___
 
@@ -368,7 +368,7 @@ ___
 
 •  **SCROLL\_MAP**:  = "SCROLL\_MAP"
 
-*Defined in [cordova-plugin-mapbox.ts:701](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L701)*
+*Defined in [cordova-plugin-mapbox.ts:701](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L701)*
 
 ___
 
@@ -376,7 +376,7 @@ ___
 
 •  **SET\_CENTER**:  = "SET\_CENTER"
 
-*Defined in [cordova-plugin-mapbox.ts:702](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L702)*
+*Defined in [cordova-plugin-mapbox.ts:702](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L702)*
 
 ___
 
@@ -384,7 +384,7 @@ ___
 
 •  **SET\_CLICKABLE**:  = "SET\_CLICKABLE"
 
-*Defined in [cordova-plugin-mapbox.ts:703](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L703)*
+*Defined in [cordova-plugin-mapbox.ts:703](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L703)*
 
 ___
 
@@ -392,7 +392,7 @@ ___
 
 •  **SET\_CONTAINER**:  = "SET\_CONTAINER"
 
-*Defined in [cordova-plugin-mapbox.ts:704](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L704)*
+*Defined in [cordova-plugin-mapbox.ts:704](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L704)*
 
 ___
 
@@ -400,7 +400,7 @@ ___
 
 •  **SET\_DEBUG**:  = "SET\_DEBUG"
 
-*Defined in [cordova-plugin-mapbox.ts:705](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L705)*
+*Defined in [cordova-plugin-mapbox.ts:705](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L705)*
 
 ___
 
@@ -408,7 +408,7 @@ ___
 
 •  **SET\_GEO\_JSON**:  = "SET\_GEO\_JSON"
 
-*Defined in [cordova-plugin-mapbox.ts:706](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L706)*
+*Defined in [cordova-plugin-mapbox.ts:706](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L706)*
 
 ___
 
@@ -416,7 +416,7 @@ ___
 
 •  **SET\_LAYOUT\_PROPERTY**:  = "SET\_LAYOUT\_PROPERTY"
 
-*Defined in [cordova-plugin-mapbox.ts:707](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L707)*
+*Defined in [cordova-plugin-mapbox.ts:707](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L707)*
 
 ___
 
@@ -424,7 +424,7 @@ ___
 
 •  **SET\_PITCH**:  = "SET\_PITCH"
 
-*Defined in [cordova-plugin-mapbox.ts:708](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L708)*
+*Defined in [cordova-plugin-mapbox.ts:708](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L708)*
 
 ___
 
@@ -432,7 +432,7 @@ ___
 
 •  **SET\_ZOOM**:  = "SET\_ZOOM"
 
-*Defined in [cordova-plugin-mapbox.ts:709](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L709)*
+*Defined in [cordova-plugin-mapbox.ts:709](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L709)*
 
 ___
 
@@ -440,7 +440,7 @@ ___
 
 •  **SHOW**:  = "SHOW"
 
-*Defined in [cordova-plugin-mapbox.ts:710](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L710)*
+*Defined in [cordova-plugin-mapbox.ts:710](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L710)*
 
 ___
 
@@ -448,4 +448,4 @@ ___
 
 •  **ZOOM\_TO**:  = "ZOOM\_TO"
 
-*Defined in [cordova-plugin-mapbox.ts:712](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/9961022/src/js/cordova-plugin-mapbox.ts#L712)*
+*Defined in [cordova-plugin-mapbox.ts:712](https://github.com/dagatsoin/cordova-plugin-mapbox/blob/0ea3085/src/js/cordova-plugin-mapbox.ts#L712)*

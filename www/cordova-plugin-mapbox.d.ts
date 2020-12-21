@@ -197,12 +197,10 @@ export interface Mapbox {
     /**
      * Delete an offline region
      * @param params
-     * @param successCallback a callback taking the result object of the deletion
+     * @param successCallback a callback taking the result boolean of the deletion
      * @param errorCallback called in case of error
      */
-    deleteOfflineRegion(params?: OfflineRegionParams, successCallback?: (result: {
-        isDelete: boolean;
-    }) => void, errorCallback?: (e: string) => void): void;
+    deleteOfflineRegion(params?: OfflineRegionParams, successCallback?: (isDeleted: boolean) => void, errorCallback?: (e: string) => void): void;
     /**
      * Pause the download of a region
      * @param options

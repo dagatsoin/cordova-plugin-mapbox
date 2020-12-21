@@ -296,22 +296,9 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                         final OfflineController offlineController = getOfflineController(mapLayout, styleUrl, activity);
                         offlineController.removeOfflineRegion(
                                 regionName,
-                                () -> {
-                                    try {
-                                        callbackContext.success(new JSONObject("{isDeleted: true}"));
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                },
-                                () -> {
-                                    try {
-                                        callbackContext.success(new JSONObject("{isDeleted: false}"));
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                });
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                                () -> callbackContext.success(1),
+                                () -> callbackContext.success(0)
+                        );
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
