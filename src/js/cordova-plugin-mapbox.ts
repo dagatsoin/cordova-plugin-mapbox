@@ -424,14 +424,12 @@ export interface Mapbox {
   ): void
   /**
    * Smoothly jump to a position on the map.
-   * @param options 
+   * @param cameraPosition 
    * @param successCallback called on success
    * @param errorCallback called in case of error
    */
   flyTo(
-    options: {
-      cameraPosition: Partial<CameraPosition> & { duration: number }
-    },
+    cameraPosition: Partial<CameraPosition> & { duration: number },
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
     id?: number

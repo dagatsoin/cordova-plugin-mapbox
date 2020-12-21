@@ -439,11 +439,11 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                     case FLY_TO:
                         activity.runOnUiThread(() -> {
                             try {
-                                JSONObject options = args.isNull(0) ? null : args.getJSONObject(0);
-                                if (options == null || options.isNull("cameraPosition"))
+                                JSONObject cameraPosition = args.isNull(0) ? null : args.getJSONObject(0);
+                                if (cameraPosition == null)
                                     callbackContext.error("Need a camera position");
                                 else {
-                                    mapCtrl.flyTo(options.getJSONObject("cameraPosition"));
+                                    mapCtrl.flyTo(cameraPosition);
                                     callbackContext.success("Animation started.");
                                 }
                             } catch (JSONException e) {

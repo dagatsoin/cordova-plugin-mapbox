@@ -292,14 +292,12 @@ export interface Mapbox {
     setGeoJson(sourceId: string, geoJson: SourceData<any, any>, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Smoothly jump to a position on the map.
-     * @param options
+     * @param cameraPosition
      * @param successCallback called on success
      * @param errorCallback called in case of error
      */
-    flyTo(options: {
-        cameraPosition: Partial<CameraPosition> & {
-            duration: number;
-        };
+    flyTo(cameraPosition: Partial<CameraPosition> & {
+        duration: number;
     }, successCallback?: () => void, errorCallback?: (e: string) => void, id?: number): void;
     /**
      * Center the map on another [[LngLat]] coordinates. (not animated)
