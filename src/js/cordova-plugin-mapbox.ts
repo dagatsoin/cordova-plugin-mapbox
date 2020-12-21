@@ -1156,7 +1156,7 @@ export const getZoom: Mapbox['getZoom'] = function(
   resultCallback,
   errorCallback,
 ): void {
-  cordova.exec(resultCallback, errorCallback, MAPBOX, Command.GET_ZOOM, [])
+  cordova.exec((value: string) => resultCallback(Number(value)), errorCallback, MAPBOX, Command.GET_ZOOM, [])
 }
 
 export const zoomTo: Mapbox['zoomTo'] = function(

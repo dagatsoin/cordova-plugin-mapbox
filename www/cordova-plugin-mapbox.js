@@ -360,7 +360,7 @@ var setZoom = function (zoom, options, successCallback, errorCallback) {
 };
 exports.setZoom = setZoom;
 var getZoom = function (resultCallback, errorCallback) {
-    cordova.exec(resultCallback, errorCallback, MAPBOX, Command.GET_ZOOM, []);
+    cordova.exec(function (value) { return resultCallback(Number(value)); }, errorCallback, MAPBOX, Command.GET_ZOOM, []);
 };
 exports.getZoom = getZoom;
 var zoomTo = function (zoom, options, successCallback, errorCallback) {

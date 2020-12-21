@@ -25,6 +25,7 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -351,11 +352,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                         break;
                     case GET_ZOOM:
                         activity.runOnUiThread(() -> {
-                            try {
-                                callbackContext.success(new JSONObject("{\"zoom\":" + mapCtrl.getZoom() + '}'));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                            callbackContext.success(String.valueOf(mapCtrl.getZoom()));
                         });
                         break;
                     case SET_ZOOM:
