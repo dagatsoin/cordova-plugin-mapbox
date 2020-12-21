@@ -22,14 +22,26 @@ export type MapEventPayload = {
   latLngBounds: Bounds
 }
 
-export type LayoutPropertyName =
-| "icon-image"
-| "icon-offset"
-| "icon-size"
-| "icon-allow-overlap"
-| "text-field"
-| "text-size"
-| "text-font"
+type PickOne<T> = { [P in keyof T]: Record<P, T[P]> & Partial<Record<Exclude<keyof T, P>, undefined>> }[keyof T]
+
+export type LayoutProperties = {
+  'icon-image': string
+  'icon-offset': [number, number]
+  'icon-size': number | Expression
+  'icon-allow-overlap': boolean
+  'text-size': number | Expression
+  'text-field': string
+  'text-font': string[]
+}
+
+export type LayoutProperty = PickOne<LayoutProperties>
+
+export type PaintProperties = {
+  'text-color': string | Expression
+  'text-halo-blur': number | Expression
+  'text-halo-color': string | Expression
+  'text-halo-width': number | Expression
+}
 
 export type MapEventListener = (payload: MapEventPayload) => void
 
@@ -70,21 +82,8 @@ export type Layer = {
   minzoom?: number
   filter?: Expression
   maxzoom?: number
-  layout?: Partial<{
-    'icon-image': string
-    'icon-offset': [number, number]
-    'icon-size': number | Expression
-    'icon-allow-overlap': boolean
-    'text-size': number | Expression
-    'text-field': string
-    'text-font': string[]
-  }>
-  paint?: Partial<{
-    'text-color': string | Expression
-    'text-halo-blur': number | Expression
-    'text-halo-color': string | Expression
-    'text-halo-width': number | Expression
-  }>
+  layout?: Partial<LayoutProperties>
+  paint?: Partial<PaintProperties>
 }
 
 export type CameraOptions = {
@@ -369,8 +368,7 @@ export interface Mapbox {
    */ 
   setLayoutProperty(
     layerId: string,
-    name: LayoutPropertyName,
-    value: any,
+    property: LayoutProperty,
     successCallback?: () => void,
     errorCallback?: (_e: string) => void,
   ): void 
@@ -1023,8 +1021,7 @@ export const addLayer: Mapbox['addLayer'] = function(
 
 export const setLayoutProperty: Mapbox['setLayoutProperty'] = function(
   layerId,
-  name,
-  value,
+  property,
   successCallback,
   errorCallback?,
 ): void {
@@ -1033,7 +1030,7 @@ export const setLayoutProperty: Mapbox['setLayoutProperty'] = function(
     errorCallback,
     MAPBOX,
     Command.SET_LAYOUT_PROPERTY,
-    [layerId, name, value],
+    [layerId, property]
   )
 }
 

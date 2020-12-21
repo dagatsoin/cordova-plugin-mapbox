@@ -290,8 +290,8 @@ var addLayer = function (layerObject, beforeId, successCallback, errorCallback) 
     ]);
 };
 exports.addLayer = addLayer;
-var setLayoutProperty = function (layerId, name, value, successCallback, errorCallback) {
-    cordova.exec(successCallback, errorCallback, MAPBOX, Command.SET_LAYOUT_PROPERTY, [layerId, name, value]);
+var setLayoutProperty = function (layerId, property, successCallback, errorCallback) {
+    cordova.exec(successCallback, errorCallback, MAPBOX, Command.SET_LAYOUT_PROPERTY, [layerId, property]);
 };
 exports.setLayoutProperty = setLayoutProperty;
 var removeLayer = function (layerId, successCallback, errorCallback) {

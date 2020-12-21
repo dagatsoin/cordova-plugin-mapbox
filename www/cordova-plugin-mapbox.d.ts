@@ -19,7 +19,25 @@ export declare type MapEventPayload = {
     type: MapEventType;
     latLngBounds: Bounds;
 };
-export declare type LayoutPropertyName = "icon-image" | "icon-offset" | "icon-size" | "icon-allow-overlap" | "text-field" | "text-size" | "text-font";
+declare type PickOne<T> = {
+    [P in keyof T]: Record<P, T[P]> & Partial<Record<Exclude<keyof T, P>, undefined>>;
+}[keyof T];
+export declare type LayoutProperties = {
+    'icon-image': string;
+    'icon-offset': [number, number];
+    'icon-size': number | Expression;
+    'icon-allow-overlap': boolean;
+    'text-size': number | Expression;
+    'text-field': string;
+    'text-font': string[];
+};
+export declare type LayoutProperty = PickOne<LayoutProperties>;
+export declare type PaintProperties = {
+    'text-color': string | Expression;
+    'text-halo-blur': number | Expression;
+    'text-halo-color': string | Expression;
+    'text-halo-width': number | Expression;
+};
 export declare type MapEventListener = (payload: MapEventPayload) => void;
 export declare type Bounds = {
     sw: [number, number];
@@ -45,21 +63,8 @@ export declare type Layer = {
     minzoom?: number;
     filter?: Expression;
     maxzoom?: number;
-    layout?: Partial<{
-        'icon-image': string;
-        'icon-offset': [number, number];
-        'icon-size': number | Expression;
-        'icon-allow-overlap': boolean;
-        'text-size': number | Expression;
-        'text-field': string;
-        'text-font': string[];
-    }>;
-    paint?: Partial<{
-        'text-color': string | Expression;
-        'text-halo-blur': number | Expression;
-        'text-halo-color': string | Expression;
-        'text-halo-width': number | Expression;
-    }>;
+    layout?: Partial<LayoutProperties>;
+    paint?: Partial<PaintProperties>;
 };
 export declare type CameraOptions = {
     center: LngLat;
@@ -259,7 +264,7 @@ export interface Mapbox {
      * @param successCallback called on success
      * @param errorCallback called in case of error
      */
-    setLayoutProperty(layerId: string, name: LayoutPropertyName, value: any, successCallback?: () => void, errorCallback?: (_e: string) => void): void;
+    setLayoutProperty(layerId: string, property: LayoutProperty, successCallback?: () => void, errorCallback?: (_e: string) => void): void;
     /**
      * Remove a layer from the map style
      * @param layerId
@@ -551,3 +556,4 @@ export declare const addOnDidFinishLoadingMapListener: Mapbox['addOnDidFinishLoa
  * This event is triggered when the map is fully rendered.
  */
 export declare function addOnDidFinishRenderingMapListener(listener: (fully: boolean) => void, id?: number): void;
+export {};

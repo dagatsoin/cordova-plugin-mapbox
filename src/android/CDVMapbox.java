@@ -747,45 +747,43 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                 if (layerId.isEmpty())
                                     throw new JSONException(action + " no layerId provided");
 
-                                final String name = args.optString(1);
-                                if (name.isEmpty())
-                                    throw new JSONException(action + " no property name provided");
+                                final JSONObject property = args.optJSONObject(1);
 
-                                if (args.isNull(2))
-                                    throw new JSONException(action + " no value provided");
-
-                                switch (name) {
-                                    case "icon-image":
-                                        final String imageId = args.getString(2);
-                                        mapCtrl.setLayoutPropertyIconImage(layerId, imageId);
-                                        break;
-                                    case "icon-offset":
-                                        final JSONArray jsonOffsetArray = args.getJSONArray(2);
-                                        final Float[] offset = {(float) jsonOffsetArray.getDouble(0), (float) jsonOffsetArray.getDouble(1)};
-                                        mapCtrl.setLayoutPropertyOffset(layerId, offset);
-                                        break;
-                                    case "icon-size":
-                                        final String size = args.getString(2);
-                                        mapCtrl.setLayoutPropertySize(layerId, size);
-                                        break;
-                                    case "icon-allow-overlap":
-                                        final boolean isOverlap = args.getBoolean(2);
-                                        mapCtrl.setLayoutPropertyIconOverlap(layerId, isOverlap);
-                                    case "text-field":
-                                        final String fieldId = args.getString(2);
-                                        mapCtrl.setLayoutPropertyTextField(layerId, fieldId);
-                                        break;
-                                    case "text-size":
-                                        final String textSize = args.getString(2);
-                                        mapCtrl.setLayoutPropertyTextSize(layerId, textSize);
-                                        break;
-                                    case "text-font":
-                                        final String textFont = args.getString(2);
-                                        mapCtrl.setLayoutPropertyTextFont(layerId, textFont);
+                                if (property == null) {
+                                    throw new JSONException(action + " no property provided");
+                                }
+                                if (property.optString("icon-image") != null) {
+                                    final String imageId = property.getString("icon-image");
+                                    mapCtrl.setLayoutPropertyIconImage(layerId, imageId);
+                                }
+                                if (property.optString("icon-offset") != null) {
+                                    final JSONArray jsonOffsetArray = property.getJSONArray("icon-offset");
+                                    final Float[] offset = {(float) jsonOffsetArray.getDouble(0), (float) jsonOffsetArray.getDouble(1)};
+                                    mapCtrl.setLayoutPropertyOffset(layerId, offset);
+                                }
+                                if (property.optString("icon-size") != null) {
+                                    final String size = property.getString("icon-size");
+                                    mapCtrl.setLayoutPropertySize(layerId, size);
+                                }
+                                if (property.optString("icon-allow-overlap") != null) {
+                                    final boolean isOverlap = property.getBoolean("icon-allow-overlap");
+                                    mapCtrl.setLayoutPropertyIconOverlap(layerId, isOverlap);
+                                }
+                                if (property.optString("text-field") != null) {
+                                    final String fieldId = property.getString("text-field");
+                                    mapCtrl.setLayoutPropertyTextField(layerId, fieldId);
+                                }
+                                if (property.optString("text-size") != null) {
+                                    final String textSize = property.getString("text-size");
+                                    mapCtrl.setLayoutPropertyTextSize(layerId, textSize);
+                                }
+                                if (property.optString("text-font") != null) {
+                                    final String textFont = property.getString("text-font");
+                                    mapCtrl.setLayoutPropertyTextFont(layerId, textFont);
                                 }
 
                                 callbackContext.success();
-                            } catch (JSONException e) {
+                            } catch(JSONException e){
                                 e.printStackTrace();
                                 callbackContext.error("action " + e.getMessage());
                             }
