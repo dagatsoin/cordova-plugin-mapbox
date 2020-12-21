@@ -845,6 +845,7 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                         activity.runOnUiThread(() -> {
                             try {
                                 pluginLayout.setDebug(args.getInt(0) != 0);
+                                callbackContext.success();
                             } catch (JSONException e) {
                                 e.printStackTrace();
                                 callbackContext.error("action " + e.getMessage());

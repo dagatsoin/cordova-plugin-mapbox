@@ -144,9 +144,7 @@ public class PluginLayout extends FrameLayout  {
 
     public void setDebug(boolean debug) {
         _isDebug = debug;
-        if (_isDebug) {
-            inValidate();
-        }
+        inValidate();
     }
 
     /**
