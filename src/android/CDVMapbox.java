@@ -771,6 +771,17 @@ public class CDVMapbox extends CordovaPlugin implements ViewTreeObserver.OnScrol
                                     case "icon-allow-overlap":
                                         final boolean isOverlap = args.getBoolean(2);
                                         mapCtrl.setLayoutPropertyIconOverlap(layerId, isOverlap);
+                                    case "text-field":
+                                        final String fieldId = args.getString(2);
+                                        mapCtrl.setLayoutPropertyTextField(layerId, fieldId);
+                                        break;
+                                    case "text-size":
+                                        final String textSize = args.getString(2);
+                                        mapCtrl.setLayoutPropertyTextSize(layerId, textSize);
+                                        break;
+                                    case "text-font":
+                                        final String textFont = args.getString(2);
+                                        mapCtrl.setLayoutPropertyTextFont(layerId, textFont);
                                 }
 
                                 callbackContext.success();
