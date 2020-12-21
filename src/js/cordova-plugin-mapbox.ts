@@ -495,7 +495,6 @@ export interface Mapbox {
    */
   setZoom(
     zoom: number,
-    options?: any,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
   ): void
@@ -512,13 +511,11 @@ export interface Mapbox {
   /**
    * 
    * @param zoom 
-   * @param options 
    * @param successCallback called when animation start
    * @param errorCallback called in case of error
    */
   zoomTo(
     zoom: number,
-    options?: any,
     successCallback?: () => void,
     errorCallback?: (e: string) => void,
   ): void
@@ -1140,14 +1137,10 @@ export const getPitch: Mapbox['getPitch'] = function(
 
 export const setZoom: Mapbox['setZoom'] = function(
   zoom,
-  options,
   successCallback,
   errorCallback,
 ): void {
-  cordova.exec(successCallback, errorCallback, MAPBOX, Command.SET_ZOOM, [
-    zoom,
-    options,
-  ])
+  cordova.exec(successCallback, errorCallback, MAPBOX, Command.SET_ZOOM, [zoom])
 }
 
 export const getZoom: Mapbox['getZoom'] = function(
@@ -1159,14 +1152,10 @@ export const getZoom: Mapbox['getZoom'] = function(
 
 export const zoomTo: Mapbox['zoomTo'] = function(
   zoom,
-  options,
   successCallback,
   errorCallback,
 ): void {
-  cordova.exec(successCallback, errorCallback, MAPBOX, Command.ZOOM_TO, [
-    zoom,
-    options,
-  ])
+  cordova.exec(successCallback, errorCallback, MAPBOX, Command.ZOOM_TO, [zoom])
 }
 
 export const getBounds: Mapbox['getBounds'] = function(

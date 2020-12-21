@@ -352,22 +352,16 @@ var getPitch = function (resultCallback, errorCallback) {
     cordova.exec(function (value) { return resultCallback(Number(value)); }, errorCallback, MAPBOX, Command.GET_PITCH, []);
 };
 exports.getPitch = getPitch;
-var setZoom = function (zoom, options, successCallback, errorCallback) {
-    cordova.exec(successCallback, errorCallback, MAPBOX, Command.SET_ZOOM, [
-        zoom,
-        options,
-    ]);
+var setZoom = function (zoom, successCallback, errorCallback) {
+    cordova.exec(successCallback, errorCallback, MAPBOX, Command.SET_ZOOM, [zoom]);
 };
 exports.setZoom = setZoom;
 var getZoom = function (resultCallback, errorCallback) {
     cordova.exec(function (value) { return resultCallback(Number(value)); }, errorCallback, MAPBOX, Command.GET_ZOOM, []);
 };
 exports.getZoom = getZoom;
-var zoomTo = function (zoom, options, successCallback, errorCallback) {
-    cordova.exec(successCallback, errorCallback, MAPBOX, Command.ZOOM_TO, [
-        zoom,
-        options,
-    ]);
+var zoomTo = function (zoom, successCallback, errorCallback) {
+    cordova.exec(successCallback, errorCallback, MAPBOX, Command.ZOOM_TO, [zoom]);
 };
 exports.zoomTo = zoomTo;
 var getBounds = function (resultCallback, errorCallback) {

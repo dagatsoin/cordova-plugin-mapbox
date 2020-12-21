@@ -340,7 +340,7 @@ export interface Mapbox {
      * @param errorCallback
      * @param id
      */
-    setZoom(zoom: number, options?: any, successCallback?: () => void, errorCallback?: (e: string) => void): void;
+    setZoom(zoom: number, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Return the current map zoom
      * @param resultCallback takes a the current zoom as argument.
@@ -350,11 +350,10 @@ export interface Mapbox {
     /**
      *
      * @param zoom
-     * @param options
      * @param successCallback called when animation start
      * @param errorCallback called in case of error
      */
-    zoomTo(zoom: number, options?: any, successCallback?: () => void, errorCallback?: (e: string) => void): void;
+    zoomTo(zoom: number, successCallback?: () => void, errorCallback?: (e: string) => void): void;
     /**
      * Get the current map bounds
      * @param resultCallback takes the map [[Bounds]] as argument
